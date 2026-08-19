@@ -34,8 +34,20 @@ task after a task-level deviation.
 5. Note dependencies on other tasks explicitly if they exist
    (`P01-T03 depends on P01-T02`) — this determines what can run in
    parallel.
-6. Stop for task review — see [../../policy.md](../../policy.md).
+6. Create or update `tasks/index.md` in the same `tasks/` folder — add a
+   row for this task. Format:
+
+   ```
+   | ID | Title | Purpose | Depends on | Status |
+   |---|---|---|---|---|
+   | P01-T03 | Refresh token rotation | ... | P01-T02 | planned |
+   ```
+
+   Status starts at `planned`; the Implementation Agent updates it from
+   there (see [workflow-implementation §4](../workflow-implementation/SKILL.md#4-finishing)).
+7. Stop for task review — see [../../policy.md](../../policy.md).
 
 ## Output
 
 `phases/p{NN}-.../tasks/p{NN}-t{NN}-{name}/{context,implementation}.md`
+`phases/p{NN}-.../tasks/index.md` (created or updated)

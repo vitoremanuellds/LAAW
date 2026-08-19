@@ -126,6 +126,17 @@ Write an ADR when a decision is deliberate and future work needs to know
 it — not every deviation produces one, and not every ADR comes from a
 deviation. Format: [ADR Template](decisions/_template.md).
 
+**Ownership:** whichever agent's scope produced the decision writes it —
+Constitution Agent (project-level), Phase Planning Agent (phase-level),
+Implementation Agent (decisions made or discovered during
+implementation). No other agent writes an ADR; a Review Agent that spots
+a missing one flags it back to the owning scope. See
+[agents.md](agents.md).
+
+Before writing a new ADR, check [decisions/index.md](decisions/index.md)
+— a related decision may already exist. Whoever writes the ADR also adds
+its entry to the index in the same step.
+
 ---
 
 ## 8. Validation vs Review

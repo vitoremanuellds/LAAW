@@ -33,13 +33,18 @@ Create it next to the task: `tasks/p01-t03-.../deviation.md`.
 
 ## Phase-Level Deviation
 
-If the discovery invalidates the phase plan, replan the phase. Completed
-tasks are inputs to the new plan, not discarded.
+If the discovery invalidates the phase plan, the Phase Planning Agent
+replans the phase. Completed tasks are inputs to the new plan, not
+discarded. If the change is architecturally significant, the Phase
+Planning Agent also writes an ADR (see
+[agents.md §Phase Planning Agent](agents.md#phase-planning-agent)).
 
 ## Project-Level Deviation
 
-If the discovery changes project direction, replan the project and write
-an ADR (see [decisions/_template.md](decisions/_template.md)) — a
+If the discovery changes project direction, the Constitution Agent
+replans the project and writes an ADR (see
+[decisions/_template.md](decisions/_template.md) and
+[agents.md §Constitution Agent](agents.md#constitution-agent)) — a
 project-level deviation is, by definition, a decision future work needs
 to know about.
 

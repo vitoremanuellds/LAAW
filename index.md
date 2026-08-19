@@ -45,12 +45,16 @@ only the links your current task actually needs.
 
 ## Decisions
 
-- [decisions/](decisions/) — one ADR per persistent decision
+- [decisions/index.md](decisions/index.md) — topic lookup before
+  writing a new ADR
+- [decisions/](decisions/) — the ADRs themselves
 
 ## Current Work
 
 - Active phase and task: see [state.md](state.md)
 - All phases: [phases/](phases/)
+- Each phase's `tasks/index.md` lists its tasks, status, and
+  dependencies — check it before opening individual task files.
 
 ## Skill Lookup
 

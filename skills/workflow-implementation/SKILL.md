@@ -43,10 +43,12 @@ you've hit (e.g. you're unsure whether something counts as a deviation).
    [../../deviations.md](../../deviations.md). Do not silently expand
    scope or improvise past what was approved.
 5. If you make an architectural decision along the way (a new
-   dependency, a new pattern) that future work needs to know about,
-   document it — as a deviation if it wasn't planned, or flag it for an
-   ADR (see [../../decisions/_template.md](../../decisions/_template.md))
-   if it's a deliberate persistent choice.
+   dependency, a new pattern) that future work needs to know about, this
+   is yours to document — you don't escalate it. Check
+   [../../decisions/index.md](../../decisions/index.md) first; a related
+   decision may already exist. If not, write the ADR from
+   [../../decisions/_template.md](../../decisions/_template.md) and add
+   its row to the index in the same step.
 
 ## 3. Keep the project structure map accurate
 
@@ -69,7 +71,10 @@ fact and should never be out of date even for one task-cycle.
 
 ## 4. Finishing
 
-1. Update the task's status per your project's convention.
+1. Update the task's status per your project's convention, and update
+   its row in the phase's `tasks/index.md` to match (see
+   [workflow-task](../workflow-task/SKILL.md)) — the two must never
+   disagree.
 2. Stop for `task-validation` — see [../../policy.md](../../policy.md)
    for whether that's yours to run (→
    [workflow-validation](../workflow-validation/SKILL.md)) or a human's.
@@ -79,5 +84,7 @@ fact and should never be out of date even for one task-cycle.
 
 ## Output
 
-Modified project files, an updated `project-context/structure.md` if the
-file tree changed, and the task ready for validation.
+Modified project files; an updated `project-context/structure.md` if the
+file tree changed; an updated `tasks/index.md` row; a new ADR and
+`decisions/index.md` row if an architectural decision was made; the task
+ready for validation.
