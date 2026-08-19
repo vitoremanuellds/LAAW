@@ -26,27 +26,32 @@ Two ideas do most of the work:
 
 Everything else — skills, agent contracts, deviation/decision rules,
 context propagation — supports those two ideas. See
-[`.ai/workflow.md`](.ai/workflow.md) for the full protocol and
-[`.ai/index.md`](.ai/index.md) to navigate the rest.
+[`workflow.md`](workflow.md) for the full protocol and
+[`index.md`](index.md) to navigate the rest. This repo's root is
+designed to *become* your project's `.ai/` folder directly — see
+Bootstrapping below.
 
 ## Bootstrapping into a project
 
 ### Option A — copy the template
 
 ```bash
-git clone <this-repo-url> agent-workflow-template
-cp -r agent-workflow-template/.ai your-project/.ai
+git clone <this-repo-url> .ai
+rm -rf .ai/.git    # detach it from this repo's history
 ```
 
 ### Option B — git submodule (keeps the protocol updatable)
 
 ```bash
 cd your-project
-git submodule add <this-repo-url> .ai-workflow
-cp -r .ai-workflow/.ai .
+git submodule add <this-repo-url> .ai
 ```
 
-Either way, after copying:
+One command — the submodule's name *is* `.ai`, so there's no extra copy
+step. `git submodule update --remote .ai` later pulls protocol updates
+into every project using it.
+
+Either way, after this:
 
 1. **Wire up `AGENTS.md`.** This repo does not ship its own — most
    projects already have one, or use it for other tools too. Instead,
@@ -70,7 +75,7 @@ Either way, after copying:
 
 From there the normal loop is: plan a phase → get it reviewed → break
 it into tasks → implement → validate → review → let context propagate
-→ repeat. Full lifecycle diagrams: [`.ai/lifecycle.md`](.ai/lifecycle.md).
+→ repeat. Full lifecycle diagrams: [`.ai/lifecycle.md`](lifecycle.md).
 
 ## What you fill in vs. what's fixed
 
@@ -90,19 +95,81 @@ every project using it benefits.
 
 ## Repository structure
 
+This repo's root is flat by design — no `.ai/` wrapper inside it.
+Whatever you name the folder when you clone or submodule it (`.ai` is
+the convention this workflow expects) becomes the prefix for every path
+below:
+
 ```
-agents-snippet.md   ← paste into your project's own AGENTS.md
-.ai/
-├── index.md · workflow.md · policy.md · state.md
-├── structure.md · lifecycle.md · deviations.md · agents.md
-├── skills/
-│   ├── workflow-constitution/
-│   ├── workflow-phase/
-│   ├── workflow-task/
-│   ├── workflow-validation/
-│   ├── workflow-review/
-│   └── workflow-context/
-└── decisions/_template.md
+README.md            ← this file — also readable as .ai/README.md once installed
+agents-snippet.md     ← paste into your project's own AGENTS.md
+index.md · workflow.md · policy.md · state.md
+structure.md · lifecycle.md · deviations.md · agents.md
+skills/
+├── workflow-constitution/
+├── workflow-phase/
+├── workflow-task/
+├── workflow-implementation/
+├── workflow-validation/
+├── workflow-review/
+└── workflow-context/
+decisions/
+├── _template.md
+└── index.md
+project-context/
+└── structure.md   ← starter; filled in per-project, kept live by agents
 ```
 
-Full layout and link conventions: [`.ai/structure.md`](.ai/structure.md).
+Every link between these files is relative (`workflow.md`,
+`../../agents.md`, etc.) — none of them hardcode `.ai/`, so this whole
+tree is portable to any folder name or nesting depth without touching a
+single link. Full layout and link conventions: [`structure.md`](structure.md).
+
+## Best Practices
+
+Learned from actually running this against a local model — update this
+section as more surfaces.
+
+**Reasoning effort should match the gate, not stay uniform.** If your
+harness lets you set a thinking/reasoning level per call (e.g. Ollama's
+OpenAI-compatible endpoint), don't leave it at the same setting for
+every skill:
+
+- **High/medium** — `workflow-constitution`, `workflow-phase`, and any
+  deviation or ADR decision. These are exactly the places ambiguity is
+  real and a wrong call cascades into everything built on top. Spending
+  reasoning budget here is the point of the workflow.
+- **Low** — `workflow-implementation` and `workflow-validation`. The
+  hard thinking already happened at planning time; execution should be
+  close to mechanical (follow the steps, adjust minor mismatches,
+  escalate real deviations rather than reasoning your way around them).
+  This is also your most frequently invoked skill, so unnecessary
+  reasoning tokens here compound fast across a phase.
+
+Compare actual token usage and output quality before committing to a
+split — it varies by model.
+
+**Be explicit about which operation you want.** Constitution creation
+in particular tends to prompt for confirmation before starting if asked
+generically ("plan the app") rather than directly ("create the
+constitution"). Neither is wrong, but if you want it to proceed without
+asking, say so — this is a prompting choice, not a workflow gate (there
+is deliberately no "may I start" gate in `policy.md`, only review gates
+after a draft exists).
+
+**One thread per phase/task-batch of work, not one long thread.** The
+workflow assumes stateless agents (§2) — bootstrapping/constitution work
+is naturally the most expensive single operation (one-time, front-loads
+project understanding) and is worth spending a large chunk of context
+on, since everything downstream reads the result rather than repeating
+the work. Starting fresh threads for subsequent phases keeps each one's
+context budget close to just what that phase/task needs, rather than
+accumulating the full project history in one window.
+
+**Watch for skills reading one step ahead of where they should.** A
+model may read an adjacent skill (e.g. `workflow-phase` while still
+doing constitution work) even when its own description says it requires
+the prior step to exist first. Usually harmless — it doesn't act
+prematurely, just previews — but if you see an agent *acting* on a
+skill before its prerequisites are met, that's worth tightening the
+skill descriptions to be more mutually exclusive.
