@@ -23,6 +23,9 @@ Defining a new phase, or replanning one after a phase-level deviation
 
 ## Procedure
 
+Steps 1–6 require no prior approval — draft the full set of phase
+artifacts before stopping for anything. Only step 7 is gated.
+
 1. Read the roadmap entry for this phase. Read only the project-context
    modules it names — do not read the whole project-context tree.
 2. Write `context.md` — architecture, modules, domain concepts,

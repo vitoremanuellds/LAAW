@@ -21,6 +21,9 @@ task after a task-level deviation.
 
 ## Procedure
 
+Steps 1–6 require no prior approval — draft the task fully before
+stopping for anything. Only step 7 is gated.
+
 1. Read the phase plan step this task corresponds to.
 2. Write `context.md` — task-specific only. Do not copy phase context;
    link to it. Include: relevant files, relevant constraints, links to

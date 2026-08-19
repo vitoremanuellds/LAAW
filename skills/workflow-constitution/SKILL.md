@@ -20,6 +20,9 @@ Creating or updating `mission.md`, `techstack.md`, or `roadmap/`.
 
 ## Procedure
 
+Steps 1–5 require no prior approval — draft the full constitution
+before stopping for anything. Only step 6 is gated.
+
 1. Read existing constitution files if present — do not overwrite blind.
 2. Ask the user for anything missing that's required to write mission,
    tech stack, or roadmap. Do not invent goals or constraints the user

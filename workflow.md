@@ -154,7 +154,15 @@ grants implementation authority.
 
 ## 9. Gates
 
-A gate blocks progress until its condition is met. Standard gates:
+A gate blocks *advancing past* a completed artifact until its condition
+is met — it never blocks *producing* the artifact in the first place.
+Drafting a phase plan, a task, or an implementation never requires prior
+approval; only moving past that draft's review checkpoint does. If
+you're unsure whether you're "allowed" to start drafting, the answer is
+yes — check the relevant skill's procedure before making any judgment
+about what a gate permits.
+
+Standard gates:
 
 ```
 constitution-review · phase-review · task-review
