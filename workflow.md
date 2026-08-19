@@ -49,11 +49,17 @@ Links are pointers, not preloads.
 
 ```
 Constitution → Phase → Requirements → Plan → Validations → Tasks
-  → Task Context → Task Implementation → Implement → Validate
-  → Review → Context Evaluation → Task Complete
+  → Task Context → Task Implementation → Task Review → Implement
+  → Validate → Review → Context Evaluation → Task Complete
   → (repeat) → Phase Validation → Phase Review
   → Reconcile Phase Context → Reconcile Project Context → Phase Complete
 ```
+
+Each gate unlocks only the operation immediately following it — never
+anything further down the chain. Passing `phase-review` unlocks task
+*planning*, not implementation; passing `task-review` unlocks
+*implementation* for that task. Do not treat an earlier approval as
+covering a later step.
 
 Full diagram: [Lifecycle Diagram](lifecycle.md)
 
