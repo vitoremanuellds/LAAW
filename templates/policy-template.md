@@ -1,8 +1,8 @@
 # Execution Policy
 
-Referenced from [workflow/workflow.md §5](workflow/workflow.md#5-lifecycle--gates).
-Defines **who** satisfies each gate. Changing this file never requires
-changing [workflow/workflow.md](workflow/workflow.md).
+Copy this to `../policy.md` (i.e. `.ai/policy.md`) in your project and
+edit freely — this file is yours, never touched by a submodule update.
+Defines **who** satisfies each gate.
 
 ## Mode
 
@@ -49,5 +49,5 @@ assume delegation — if a gate is absent here, treat it as human-owned.
 
 To delegate a gate, add or edit its entry above. This is the only file
 that should ever change when adjusting how much autonomy agents have.
-[workflow/workflow.md](workflow/workflow.md) (including agent contracts,
-§10) stays fixed regardless of mode.
+The protocol itself (including agent contracts) stays fixed regardless
+of mode — see `workflow.md` (i.e. `.ai/workflow/workflow.md`) §10.

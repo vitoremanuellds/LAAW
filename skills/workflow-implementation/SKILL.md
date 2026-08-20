@@ -53,7 +53,7 @@ deviation).
    this is yours to document — you don't escalate it. Check
    [../../../decisions/index.md](../../../decisions/index.md) first; a
    related decision may already exist. If not, write the ADR from
-   [../../decision-template.md](../../decision-template.md) and add its
+   [../../templates/decision-template.md](../../templates/decision-template.md) and add its
    row to the index in the same step.
 
 ## 3. Finishing

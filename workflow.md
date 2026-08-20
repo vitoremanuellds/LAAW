@@ -28,7 +28,12 @@ Do not duplicate this file's rules elsewhere. Reference it.
    phase) that phase's `tasks/index.md`. No separate state file — the
    folders and indexes *are* the state.
 2. Read [`../policy.md`](../policy.md) — who is authorized for the
-   gate you're about to hit.
+   gate you're about to hit. **If it doesn't exist yet, this is a
+   brand-new project that hasn't been bootstrapped.** Treat every gate
+   as human-owned (the same as the default for any unlisted gate) and
+   go run `workflow-constitution` first if you aren't already — its
+   first-run procedure is what creates `policy.md` from
+   `templates/policy-template.md`. Don't invent gate authority in its absence.
 3. Use the matching skill below for the operation you're performing.
    Read the rest of this file in full unless the skill says otherwise
    (currently only `workflow-implementation` skips the reread — it's
@@ -54,11 +59,13 @@ directory names or loop restating intent.
 
 ```
 .ai/
-├── README.md                 Bootstrap instructions + AGENTS.md snippet
-├── policy.md                  Execution policy — gate authority (config, not protocol)
-├── workflow/
+├── workflow/                 ◄── git submodule boundary — never written to
+│   ├── README.md               Install instructions, this repo's own docs
 │   ├── workflow.md              This file
-│   ├── decision-template.md      ADR template (fixed — instantiated into decisions/)
+│   ├── templates/
+│   │   ├── decision-template.md      ADR template (copied into ../../decisions/)
+│   │   ├── policy-template.md         Copied to ../../policy.md on first run
+│   │   └── decisions-index-template.md Copied to ../../decisions/index.md on first run
 │   └── skills/
 │       ├── workflow-constitution/SKILL.md
 │       ├── workflow-phase/SKILL.md
@@ -67,6 +74,8 @@ directory names or loop restating intent.
 │       ├── workflow-validation/SKILL.md
 │       ├── workflow-review/SKILL.md
 │       └── workflow-context/SKILL.md
+│
+├── policy.md                  Execution policy — gate authority (your project's own file)
 │
 ├── constitution/
 │   ├── mission.md
@@ -91,6 +100,10 @@ directory names or loop restating intent.
             └── p01-t01-task-name/
                 └── task.md              Context + Implementation, merged
 ```
+
+Everything under `workflow/` ships from a separate repo (submodule) and
+is never written to by any agent — see that repo's own README for why.
+Everything else is a regular file in your project's own git history.
 
 **Link rule:** every link is relative to the file containing it, never
 to `.ai/` root or repo root. This is what makes the whole tree portable
@@ -200,7 +213,7 @@ agent writes one — Review Agent flags a missing ADR back to the owning
 scope instead.
 
 Check `../decisions/index.md` before writing a new one. Whoever writes
-the ADR copies [`decision-template.md`](decision-template.md) into
+the ADR copies [`templates/decision-template.md`](templates/decision-template.md) into
 `../decisions/d{NN}-{name}.md` and fills it in, adding its index row in
 the same step. Template fields: **Decision**, **Context** (link the
 deviation if any), **Alternatives Considered**, **Consequences**.
@@ -241,8 +254,10 @@ its contract below. Gate authority comes from `../policy.md`.
 
 **Constitution Agent** — Can: read project info, create/modify
 constitution artifacts, ask for clarification. Must: write an ADR for
-project-level decisions. Cannot: touch project code; invent
-unsupported requirements.
+project-level decisions; on first run, bootstrap `../policy.md` and
+`../decisions/index.md` from their templates, unedited, never
+overwriting either if it already exists. Cannot: touch project code;
+invent unsupported requirements.
 
 **Phase Planning Agent** — Can: read constitution + relevant project
 context, create phase `context.md` + `phase.md`. Must: write an ADR for
@@ -330,7 +345,9 @@ transition.
 ## 14. Entry point
 
 Projects using this workflow point agents here via a short snippet
-pasted into their own `AGENTS.md` — see [`../README.md`](../README.md)
-for exact bootstrap steps. This file and `skills/` never change per
+pasted into their own `AGENTS.md` — see [`README.md`](README.md) for
+exact bootstrap steps, including why this repo mounts at `.ai/workflow/`
+rather than `.ai/` directly. This file and `skills/` never change per
 project; `../policy.md`, `../constitution/`, `../project-context/`,
-`../decisions/`, `../phases/` are all per-project content.
+`../decisions/`, `../phases/` are all per-project content, tracked by
+the project's own repo, not this one.

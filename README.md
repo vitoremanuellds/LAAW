@@ -18,43 +18,57 @@ Two ideas do most of the work:
    never reads the whole project to do bounded work.
 
 2. **Separate *what* must happen from *who* is allowed to decide it.**
-   `workflow/workflow.md` defines the process (constitution → phases →
-   tasks → validation → review) and never changes. `policy.md` defines
-   which gates a human must approve and which an agent may — and
-   *that* can change freely as you trust the agents more, without
-   touching the process itself.
+   `workflow.md` (this repo) defines the process (constitution →
+   phases → tasks → validation → review) and never changes.
+   `policy.md` (your project, not this repo — see below) defines which
+   gates a human must approve and which an agent may, and *that* can
+   change freely as you trust the agents more, without touching the
+   process itself.
 
 Everything else — skills, agent contracts, deviation/decision rules,
-context propagation — lives inside that one self-contained protocol
-file. See [`workflow/workflow.md`](workflow/workflow.md) for all of it.
-This repo's root is designed to *become* your project's `.ai/` folder
-directly — see Bootstrapping below.
+context propagation — lives inside `workflow.md`, self-contained. See
+[`workflow.md`](workflow.md) for all of it.
+
+## This repo is only the fixed half
+
+This repo contains **only** protocol content that never changes
+per-project: `workflow.md`, `templates/decision-template.md`, `skills/`. It gets
+installed as a git submodule mounted at `.ai/workflow/` inside your
+project — one level *inside* your project's `.ai/` folder, not the
+whole thing.
+
+That's deliberate, not incidental. `constitution/`, `project-context/`,
+`phases/`, `decisions/`, and `policy.md` all get written to constantly
+by agents — if the whole `.ai/` folder were the submodule, every one of
+those writes would leave the submodule dirty. You'd either be unable to
+commit that work at all, or committing your project's actual
+constitution/phases/decisions into the shared template's own history —
+neither is right. And `git submodule update --remote` against a dirty
+submodule ranges from "refuses to run" to "silently discards your
+uncommitted work," depending on your git config. Scoping the submodule
+to just `.ai/workflow/` means nothing ever writes inside it — updates
+stay clean, and everything agents actually produce lives in your
+project's own git history like any other file.
 
 ## Bootstrapping into a project
 
-### Option A — copy the template
-
-```bash
-git clone <this-repo-url> .ai
-rm -rf .ai/.git    # detach it from this repo's history
-```
-
-### Option B — git submodule (keeps the protocol updatable)
-
 ```bash
 cd your-project
-git submodule add <this-repo-url> .ai
+git submodule add <this-repo-url> .ai/workflow
 ```
 
-One command — the submodule's name *is* `.ai`, so there's no extra copy
-step. `git submodule update --remote .ai` later pulls protocol updates
-into every project using it.
+`git submodule update --remote .ai/workflow` later pulls protocol
+updates cleanly, since nothing ever modifies that directory.
 
-Either way, after this:
+(Prefer not to use submodules? `git clone <this-repo-url> .ai/workflow
+&& rm -rf .ai/workflow/.git` works too — you just lose easy updates
+and take on manually re-syncing later.)
 
-1. **Wire up `AGENTS.md`.** This repo does not ship its own — most
-   projects already have one, or use it for other tools too. Paste this
-   block into your project's `AGENTS.md` (create the file if it
+Then, as regular files tracked by *your project's own repo* (not this
+one):
+
+1. **Wire up `AGENTS.md`.** Most projects already have one, or use it
+   for other tools too. Paste this block in (create the file if it
    doesn't exist; add as a section if other instructions already live
    there):
 
@@ -68,71 +82,76 @@ Either way, after this:
    That single pointer is enough — everything else is discovered from
    there, including the skill lookup table.
 
-2. **Fill the constitution.** Point an agent (or yourself) at
-   `.ai/workflow/skills/workflow-constitution/SKILL.md` and write
-   `mission.md`, `techstack.md`, and `roadmap.md` for your actual
-   project. This is the only step that can't be skipped — everything
-   downstream assumes it exists.
-
-3. **Set your execution policy.** Open `.ai/policy.md`. If you don't
-   trust agents yet, leave `mode: manual` and every gate on `human`.
-   You can delegate gates later without touching anything else.
+2. **Run the constitution skill.** Point an agent (or yourself) at
+   `.ai/workflow/skills/workflow-constitution/SKILL.md`. Until this
+   runs, `.ai/policy.md` genuinely doesn't exist yet — that's expected,
+   not a sign anything's broken. On a brand-new project this single
+   step writes `.ai/constitution/mission.md`, `techstack.md`,
+   `roadmap.md` — *and* bootstraps `.ai/policy.md` and
+   `.ai/decisions/index.md` from their templates automatically (safe
+   conservative defaults; edit `policy.md` afterward once you're ready
+   to delegate any gates). This is the only step that can't be
+   skipped — everything downstream assumes it exists.
 
 There's no state file to check or initialize — status lives in
-`constitution/roadmap.md` (phase-level) and each phase's
+`.ai/constitution/roadmap.md` (phase-level) and each phase's
 `tasks/index.md` (task-level), both created as you go.
 
 From there the normal loop is: plan a phase → get it reviewed → break
 it into tasks → implement → validate → review → let context propagate
-→ repeat. Full lifecycle: [`workflow/workflow.md §5`](workflow/workflow.md#5-lifecycle--gates).
+→ repeat. Full lifecycle: [`workflow.md §5`](workflow.md#5-lifecycle--gates).
 
-## What you fill in vs. what's fixed
+## What's in this repo vs. what's in your project
 
-| Fixed (don't edit per-project) | Filled in per-project |
+| This repo (`.ai/workflow/`, submodule, never edited per-project) | Your project (`.ai/`, regular files, edit freely) |
 |---|---|
-| `workflow/workflow.md`, `workflow/skills/*` | Your project's `AGENTS.md` |
-| `workflow/decision-template.md` | `constitution/*` |
-| | `project-context/*` |
-| | `phases/*` |
-| | `decisions/*` |
-| | `policy.md` (adjusted as trust grows) |
+| `workflow.md` | `AGENTS.md` (has the snippet pasted in) |
+| `templates/decision-template.md`, `templates/policy-template.md`, `templates/decisions-index-template.md` | `policy.md` — bootstrapped from template, then yours |
+| `skills/*` | `constitution/*`, `project-context/*`, `phases/*` |
+| | `decisions/*` — `index.md` bootstrapped from template, `dNN-*.md` follow `templates/decision-template.md` |
 
-If you find yourself editing `workflow/workflow.md` per-project, that's
-a signal the protocol itself needs a change — make it here, in this
-repo, so every project using it benefits.
+If you find yourself editing anything under `.ai/workflow/` per-project,
+that's a signal the protocol itself needs a change — make it in this
+repo instead, so every project using it benefits, and so
+`git submodule update` doesn't just overwrite your edit next time.
 
-## Repository structure
-
-This repo's root is flat by design except for one level of nesting
-around the protocol itself — everything that's genuinely per-project
-config or content sits at the top level; everything that's fixed
-protocol sits under `workflow/`:
+## This repo's own structure
 
 ```
-README.md              ← this file — also readable as .ai/README.md once installed
-policy.md                ← per-project config: who's authorized for each gate
-workflow/
-├── workflow.md            ← the whole protocol, self-contained
-├── decision-template.md    ← ADR template, instantiated into decisions/
-└── skills/
-    ├── workflow-constitution/
-    ├── workflow-phase/
-    ├── workflow-task/
-    ├── workflow-implementation/
-    ├── workflow-validation/
-    ├── workflow-review/
-    └── workflow-context/
-decisions/
-└── index.md
+README.md
+workflow.md                    ← the whole protocol, self-contained
+templates/
+├── decision-template.md          ← ADR template, copied into your project's decisions/
+├── policy-template.md             ← copied to .ai/policy.md on first run
+└── decisions-index-template.md     ← copied to .ai/decisions/index.md on first run
+skills/
+├── workflow-constitution/
+├── workflow-phase/
+├── workflow-task/
+├── workflow-implementation/
+├── workflow-validation/
+├── workflow-review/
+└── workflow-context/
 ```
 
-Not shipped by the template — created as you use it:
-`constitution/`, `project-context/`, `phases/`.
+Once mounted at `.ai/workflow/` in a project, alongside it (in the
+*project's* own repo, not this one) you'll have:
 
-Every link between these files is relative and none hardcode `.ai/`,
-so this whole tree is portable to any folder name or nesting depth
-without touching a single link. Full layout and link conventions:
-[`workflow/workflow.md §3`](workflow/workflow.md#3-directory-structure).
+```
+.ai/
+├── workflow/              ← this repo, as a submodule
+├── policy.md
+├── constitution/
+├── project-context/
+├── phases/
+└── decisions/
+```
+
+Every link inside this repo is relative and none hardcode `.ai/`, so it
+stays correct regardless of what your project names the mount point —
+though `.ai/workflow/` is the convention every skill and the `AGENTS.md`
+snippet assumes. Full layout and link conventions:
+[`workflow.md §3`](workflow.md#3-directory-structure).
 
 ## Best Practices
 
@@ -190,3 +209,10 @@ those before assuming what's active — this replaced a real bug (a
 never-updated `state.md`) but shifts the burden onto every skill
 consistently writing to the right index at the right moment. Worth
 extra scrutiny in the first few runs after this change.
+
+**Keep the submodule boundary clean.** Never let an agent write inside
+`.ai/workflow/` — if a skill ever seems to want to (e.g. "fixing" a typo
+in `workflow.md` mid-task), that's a signal to raise it as feedback for
+this repo, not to patch it locally; a local patch will just be
+overwritten by the next `git submodule update` and silently diverge
+from what the rest of your team is running.
