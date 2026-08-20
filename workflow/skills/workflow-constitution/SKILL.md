@@ -6,11 +6,11 @@ description: Use this skill when creating or updating a project's constitution �
 # Skill: workflow.constitution
 
 Operation for the **Constitution Agent**. Contract:
-[../../agents.md#constitution-agent](../../agents.md#constitution-agent).
+[../../workflow.md §10](../../workflow.md#10-agent-contracts).
 
 ## When to use
 
-Creating or updating `mission.md`, `techstack.md`, or `roadmap/`.
+Creating or updating `mission.md`, `techstack.md`, or `roadmap.md`.
 
 ## Inputs
 
@@ -32,14 +32,19 @@ before stopping for anything. Only step 6 is gated.
 4. Write `techstack.md`: languages, frameworks, runtime, infra,
    constraints. Describe the foundation, not per-task implementation
    choices.
-5. Write `roadmap.md` as an index only — ordered phases with one-line
-   descriptions and links to `p{NN}-{name}.md` detail files. Split large
-   roadmaps into individual phase files rather than growing the index.
-6. Stop. Constitution review is a gate — see
-   [../../policy.md](../../policy.md) for who approves it. Do not
-   proceed to phase planning yourself unless authorized.
+5. Write `roadmap.md` — ordered phases, one-line description each, and
+   a **Status** column (`planned` for all of them initially — this
+   file doubles as the phase index; see
+   [../../workflow.md §11](../../workflow.md#11-status-vocabulary-indexes-not-a-state-file)).
+   No separate per-phase roadmap files — phase detail lives in each
+   phase's own `context.md`/`phase.md` once planned, not here.
+6. Commit the draft (see
+   [../../workflow.md §13](../../workflow.md#13-commit-discipline)). Stop.
+   Constitution review is a gate — see [../../../policy.md](../../../policy.md)
+   for who approves it. Do not proceed to phase planning yourself
+   unless authorized.
 
 ## Output
 
 `constitution/mission.md`, `constitution/techstack.md`,
-`constitution/roadmap/*.md`.
+`constitution/roadmap.md`.

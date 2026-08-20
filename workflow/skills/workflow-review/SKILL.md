@@ -6,7 +6,7 @@ description: Use this skill to review a task or phase's plan, implementation, an
 # Skill: workflow.review
 
 Operation for the **Review Agent**. Contract:
-[../../agents.md#review-agent](../../agents.md#review-agent).
+[../../workflow.md §10](../../workflow.md#10-agent-contracts).
 
 ## When to use
 
@@ -16,25 +16,32 @@ before the task/phase is marked complete. Distinct from validation: see
 
 ## Inputs
 
-- Requirements, plan, implementation, and the actual changes made.
-- Tests and validation results.
+- `task.md` or `phase.md`, and the actual changes made.
+- Tests and validation results (`tasks/index.md` Status, `phase.md`
+  Validations section).
 - Relevant context files and ADRs.
 
 ## Procedure
 
-1. Confirm the change matches its stated scope — flag anything done
+1. Set the task's Status to `reviewing` in the phase's `tasks/index.md` if
+   applicable (task-level review only; phase-level review has no
+   per-task status to set).
+2. Confirm the change matches its stated scope — flag anything done
    that wasn't in the plan (scope violation) or required but missing
    (requirement mismatch).
-2. Check for unnecessary complexity relative to the task's stated
-   objective.
-3. Check consistency with existing architecture and any relevant ADRs
-   in [../../decisions/](../../decisions/).
-4. Check that validation coverage actually matches what the requirements
-   call for — flag missing validation.
-5. Check that context files (task/phase) still accurately describe the
+3. Check for unnecessary complexity relative to the stated objective.
+4. Check consistency with existing architecture and any relevant ADRs
+   in [../../../decisions/](../../../decisions/).
+5. Check that validation coverage actually matches what the
+   requirements call for — flag missing validation.
+6. Check that context files (task/phase) still accurately describe the
    result — flag context inconsistencies for the context skill to fix.
-6. Report findings. Do not silently fix issues yourself unless your
-   entry in [../../policy.md](../../policy.md) explicitly grants
+7. Check for undocumented decisions — an architectural choice with no
+   corresponding ADR. Flag it back to the agent whose scope produced
+   it (see [../../workflow.md §10](../../workflow.md#10-agent-contracts)) —
+   do not write the ADR yourself.
+8. Report findings. Do not silently fix issues yourself unless your
+   entry in [../../../policy.md](../../../policy.md) explicitly grants
    implementation authority.
 
 ## Output

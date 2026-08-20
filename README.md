@@ -14,22 +14,21 @@ Two ideas do most of the work:
 1. **Don't make agents reconstruct what can be written down once.**
    Project knowledge lives in small Markdown files, linked together
    like a graph. An agent starts at the smallest file that defines its
-   current task and follows links only as far as it needs to —  it
+   current task and follows links only as far as it needs to — it
    never reads the whole project to do bounded work.
 
 2. **Separate *what* must happen from *who* is allowed to decide it.**
-   `workflow.md` defines the process (constitution → phases → tasks →
-   validation → review) and never changes. `policy.md` defines which
-   gates a human must approve and which an agent may — and *that* can
-   change freely as you trust the agents more, without touching the
-   process itself.
+   `workflow/workflow.md` defines the process (constitution → phases →
+   tasks → validation → review) and never changes. `policy.md` defines
+   which gates a human must approve and which an agent may — and
+   *that* can change freely as you trust the agents more, without
+   touching the process itself.
 
 Everything else — skills, agent contracts, deviation/decision rules,
-context propagation — supports those two ideas. See
-[`workflow.md`](workflow.md) for the full protocol and
-[`index.md`](index.md) to navigate the rest. This repo's root is
-designed to *become* your project's `.ai/` folder directly — see
-Bootstrapping below.
+context propagation — lives inside that one self-contained protocol
+file. See [`workflow/workflow.md`](workflow/workflow.md) for all of it.
+This repo's root is designed to *become* your project's `.ai/` folder
+directly — see Bootstrapping below.
 
 ## Bootstrapping into a project
 
@@ -54,14 +53,23 @@ into every project using it.
 Either way, after this:
 
 1. **Wire up `AGENTS.md`.** This repo does not ship its own — most
-   projects already have one, or use it for other tools too. Instead,
-   paste [`agents-snippet.md`](agents-snippet.md) into your project's
-   `AGENTS.md` (create the file if it doesn't exist). The snippet is a
-   single pointer to `.ai/index.md` — everything else is discovered
-   from there.
+   projects already have one, or use it for other tools too. Paste this
+   block into your project's `AGENTS.md` (create the file if it
+   doesn't exist; add as a section if other instructions already live
+   there):
+
+   ```markdown
+   ## Agent Workflow
+   This project uses a structured agent workflow. Before planning,
+   implementing, validating, reviewing, or maintaining context, read
+   [.ai/workflow/workflow.md](.ai/workflow/workflow.md) and follow it.
+   ```
+
+   That single pointer is enough — everything else is discovered from
+   there, including the skill lookup table.
 
 2. **Fill the constitution.** Point an agent (or yourself) at
-   `.ai/skills/workflow-constitution/SKILL.md` and write
+   `.ai/workflow/skills/workflow-constitution/SKILL.md` and write
    `mission.md`, `techstack.md`, and `roadmap.md` for your actual
    project. This is the only step that can't be skipped — everything
    downstream assumes it exists.
@@ -70,60 +78,61 @@ Either way, after this:
    trust agents yet, leave `mode: manual` and every gate on `human`.
    You can delegate gates later without touching anything else.
 
-4. **Check `.ai/state.md`** — it should read "not started." An agent
-   or human updates it as the first phase begins.
+There's no state file to check or initialize — status lives in
+`constitution/roadmap.md` (phase-level) and each phase's
+`tasks/index.md` (task-level), both created as you go.
 
 From there the normal loop is: plan a phase → get it reviewed → break
 it into tasks → implement → validate → review → let context propagate
-→ repeat. Full lifecycle diagrams: [`.ai/lifecycle.md`](lifecycle.md).
+→ repeat. Full lifecycle: [`workflow/workflow.md §5`](workflow/workflow.md#5-lifecycle--gates).
 
 ## What you fill in vs. what's fixed
 
 | Fixed (don't edit per-project) | Filled in per-project |
 |---|---|
-| `agents-snippet.md` (pasted once, then fixed) | Your project's `AGENTS.md` |
-| `.ai/index.md`, `workflow.md` | `.ai/constitution/*` |
-| `.ai/structure.md`, `lifecycle.md` | `.ai/project-context/*` |
-| `.ai/deviations.md`, `agents.md` | `.ai/phases/*` |
-| `.ai/skills/*` | `.ai/decisions/*` |
-| | `.ai/state.md` (updated, not rewritten) |
-| | `.ai/policy.md` (adjusted as trust grows) |
+| `workflow/workflow.md`, `workflow/skills/*` | Your project's `AGENTS.md` |
+| `workflow/decision-template.md` | `constitution/*` |
+| | `project-context/*` |
+| | `phases/*` |
+| | `decisions/*` |
+| | `policy.md` (adjusted as trust grows) |
 
-If you find yourself editing `workflow.md` per-project, that's a signal
-the protocol itself needs a change — make it here, in this repo, so
-every project using it benefits.
+If you find yourself editing `workflow/workflow.md` per-project, that's
+a signal the protocol itself needs a change — make it here, in this
+repo, so every project using it benefits.
 
 ## Repository structure
 
-This repo's root is flat by design — no `.ai/` wrapper inside it.
-Whatever you name the folder when you clone or submodule it (`.ai` is
-the convention this workflow expects) becomes the prefix for every path
-below:
+This repo's root is flat by design except for one level of nesting
+around the protocol itself — everything that's genuinely per-project
+config or content sits at the top level; everything that's fixed
+protocol sits under `workflow/`:
 
 ```
-README.md            ← this file — also readable as .ai/README.md once installed
-agents-snippet.md     ← paste into your project's own AGENTS.md
-index.md · workflow.md · policy.md · state.md
-structure.md · lifecycle.md · deviations.md · agents.md
-skills/
-├── workflow-constitution/
-├── workflow-phase/
-├── workflow-task/
-├── workflow-implementation/
-├── workflow-validation/
-├── workflow-review/
-└── workflow-context/
+README.md              ← this file — also readable as .ai/README.md once installed
+policy.md                ← per-project config: who's authorized for each gate
+workflow/
+├── workflow.md            ← the whole protocol, self-contained
+├── decision-template.md    ← ADR template, instantiated into decisions/
+└── skills/
+    ├── workflow-constitution/
+    ├── workflow-phase/
+    ├── workflow-task/
+    ├── workflow-implementation/
+    ├── workflow-validation/
+    ├── workflow-review/
+    └── workflow-context/
 decisions/
-├── _template.md
 └── index.md
-project-context/
-└── structure.md   ← starter; filled in per-project, kept live by agents
 ```
 
-Every link between these files is relative (`workflow.md`,
-`../../agents.md`, etc.) — none of them hardcode `.ai/`, so this whole
-tree is portable to any folder name or nesting depth without touching a
-single link. Full layout and link conventions: [`structure.md`](structure.md).
+Not shipped by the template — created as you use it:
+`constitution/`, `project-context/`, `phases/`.
+
+Every link between these files is relative and none hardcode `.ai/`,
+so this whole tree is portable to any folder name or nesting depth
+without touching a single link. Full layout and link conventions:
+[`workflow/workflow.md §3`](workflow/workflow.md#3-directory-structure).
 
 ## Best Practices
 
@@ -158,8 +167,8 @@ is deliberately no "may I start" gate in `policy.md`, only review gates
 after a draft exists).
 
 **One thread per phase/task-batch of work, not one long thread.** The
-workflow assumes stateless agents (§2) — bootstrapping/constitution work
-is naturally the most expensive single operation (one-time, front-loads
+workflow assumes stateless agents — bootstrapping/constitution work is
+naturally the most expensive single operation (one-time, front-loads
 project understanding) and is worth spending a large chunk of context
 on, since everything downstream reads the result rather than repeating
 the work. Starting fresh threads for subsequent phases keeps each one's
@@ -173,3 +182,11 @@ the prior step to exist first. Usually harmless — it doesn't act
 prematurely, just previews — but if you see an agent *acting* on a
 skill before its prerequisites are met, that's worth tightening the
 skill descriptions to be more mutually exclusive.
+
+**No state file means status must come from the indexes, every time.**
+Since `state.md` was removed in favor of `roadmap.md` + `tasks/index.md`
+carrying status directly, watch early on whether agents reliably check
+those before assuming what's active — this replaced a real bug (a
+never-updated `state.md`) but shifts the burden onto every skill
+consistently writing to the right index at the right moment. Worth
+extra scrutiny in the first few runs after this change.

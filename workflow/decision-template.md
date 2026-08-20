@@ -1,7 +1,5 @@
 # D{NN} — {Decision Title}
 
-Referenced from [../workflow/workflow.md §7](../workflow/workflow.md#7-decisions-adrs).
-
 ## Decision
 
 What was deliberately decided.

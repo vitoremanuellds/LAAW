@@ -1,12 +1,12 @@
 # Decisions Index
 
 One row per ADR. Check here before writing a new ADR — a related
-decision may already exist (see [../workflow.md §7](../workflow.md#7-decisions-adrs)).
+decision may already exist (see [../workflow/workflow.md §7](../workflow/workflow.md#7-decisions-adrs)).
 
 **Kept current by whoever writes the ADR** — Constitution Agent,
 Phase Planning Agent, or Implementation Agent (see
-[../agents.md](../agents.md)). Add the row in the same step as creating
-the ADR file.
+[../workflow/workflow.md §10](../workflow/workflow.md#10-agent-contracts)).
+Add the row in the same step as creating the ADR file.
 
 | ID | Title | Topic | Scope |
 |---|---|---|---|
