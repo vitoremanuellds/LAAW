@@ -1,6 +1,6 @@
 ---
 name: workflow-context
-description: Use this skill to evaluate and propagate reusable knowledge into context files after a task or phase completes — updating phase context.md at task completion, or project-context files at phase completion. Also finalizes status: marks a task complete in tasks/index.md, or a phase complete in roadmap.md. Trigger this whenever the user wants to determine whether something learned during a task or phase should be persisted for future tasks, or wants to reconcile project-context/*.md after a phase finishes. Do not use this to record task history, temporary implementation details, or internal reasoning — only persistent, reusable facts propagate.
+description: Use this skill to evaluate and propagate reusable knowledge into context files after a task or phase completes — updating phase context.md at task completion, or project-context files at phase completion. Also finalizes status - marks a task complete in tasks/index.md, or a phase complete in roadmap.md. Trigger this whenever the user wants to determine whether something learned during a task or phase should be persisted for future tasks, or wants to reconcile project-context/*.md after a phase finishes. Do not use this to record task history, temporary implementation details, or internal reasoning — only persistent, reusable facts propagate.
 ---
 
 # Skill: workflow.context
