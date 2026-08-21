@@ -150,11 +150,23 @@ A link is a pointer, not a preload.
 ## 5. Lifecycle & gates
 
 ```
-Constitution → Phase (context + phase.md) → Tasks (task.md)
-  → Task Review → Implement → Validate → Review → Context Evaluation
-  → Task Complete → (repeat) → Phase Validation → Phase Review
+Constitution → Constitution Review → Phase (context + phase.md)
+  → Phase Plan Review → Tasks (task.md) → Task Plan Review → Implement
+  → Validate → Review → Context Evaluation → Task Complete
+  → (repeat) → Phase Validation → Phase Completion Review
   → Reconcile Phase Context → Reconcile Project Context → Phase Complete
 ```
+
+Diagram labels favor readability over matching `policy.md`'s YAML keys
+exactly — don't assume identical spelling. Mapping:
+
+| Diagram label | `policy.md` gate key | Notes |
+|---|---|---|
+| Constitution Review | `constitution-review` | |
+| Phase Plan Review | `phase-review` | Approves `phase.md` — not the same as Phase Completion Review below |
+| Task Plan Review | `task-review` | Approves `task.md` — not the same as the unqualified Review step below |
+| (unqualified) Review | `task-completion-review` | Post-implementation coherence check, one per task — distinct from `task-review` above despite both being "reviews" |
+| Phase Completion Review | `phase-completion-review` | Post-implementation coherence check, one per phase — distinct from `phase-review` above |
 
 **A gate blocks *advancing past* a completed draft — never blocks
 *producing* the draft.** Drafting a phase, a task, or an implementation
@@ -166,19 +178,45 @@ what a gate permits.
 **Each gate unlocks only the operation immediately following it —
 never anything further down the chain.** Passing `phase-review`
 unlocks task *planning*, not implementation. Passing `task-review`
-unlocks *implementation* for that task, and only that task.
+unlocks *implementation* for that task, and only that task. Passing
+`task-completion-review`/`phase-completion-review` unlocks marking the
+task/phase complete — it does not retroactively bless anything about
+the plan or the implementation beyond what was actually checked.
+
+**Unlocking the next operation is not the same as starting it.** In
+`manual` and `assisted` mode (see `../policy.md`'s Mode section — the
+authority table alone doesn't tell you which; mode does), report that
+the gate passed, update the relevant Status field, and explicitly ask
+before beginning the next operation — wait for a distinct confirmation,
+even though the gate technically authorizes it. Don't fold "your plan
+is approved" and "I'll now implement it" into the same uninterrupted
+turn. This applies at completion-review too: finding no problems is
+not itself approval — report clean findings and still wait for an
+explicit yes before marking anything complete. In
+`delegated`/`autonomous` mode this separation is unnecessary — chaining
+straight into the next operation once a gate passes is the point of
+those modes.
 
 Standard gates: `constitution-review` · `phase-review` · `task-review`
-· `task-validation` · `phase-validation` · `context-update`.
+· `task-validation` · `phase-validation` · `task-completion-review` ·
+`phase-completion-review` · `context-update`.
 
 **Task completion requires:** implementation done; validation passed
-(or documented exception); review passed; context evaluated; the
-task's row in `tasks/index.md` marked complete.
+(or documented exception); `task-completion-review` passed; context
+evaluated; the task's row in `tasks/index.md` marked complete.
 
 **Phase completion requires:** all tasks complete; phase requirements
-and validations satisfied; phase review passed; phase and project
-context reconciled; required ADRs exist; the phase's row in
+and validations satisfied; `phase-completion-review` passed; phase and
+project context reconciled; required ADRs exist; the phase's row in
 `roadmap.md` marked complete.
+
+Neither completion-review gate is the same check as `task-review`/
+`phase-review` — those approve a *plan*, before implementation exists;
+these approve the *result*, after it's done. Both default to `human`
+authority in `templates/policy-template.md`, matching the other
+`-review` gates rather than the agent-default `-validation` gates —
+coherence/judgment calls default to human, mechanical correctness
+checks default to agent.
 
 ---
 
@@ -300,13 +338,19 @@ force a pass — return to the implementation loop instead.
 changes/tests/context/ADRs; flag scope violations, requirement
 mismatches, unnecessary complexity, architectural inconsistencies,
 missing validation, context inconsistencies, undocumented decisions;
-set Status to `reviewing` while running. Should not: silently fix
-problems or write a missing ADR itself — flag back to the owning scope.
+set Status to `reviewing` while running. Must: stop for
+`task-completion-review`/`phase-completion-review` after reporting
+findings, even clean ones — never treat "no problems found" as
+approval in its own right. Should not: silently fix problems or write
+a missing ADR itself — flag back to the owning scope.
 
 **Context Agent** — Can: inspect completed work, identify reusable
 knowledge, update phase/project context; mark the task's row complete
 in `tasks/index.md` and the phase's row complete in `roadmap.md` at
-their respective completions. Should not: copy task history into
+their respective completions. Must: verify the relevant
+completion-review gate has actually been approved before marking
+anything complete — this agent finalizes an approved review, it
+doesn't substitute for one. Should not: copy task history into
 context; duplicate information already represented elsewhere; record
 internal reasoning.
 
@@ -318,13 +362,41 @@ There is no `state.md`. "What's happening right now" is always
 answered by reading `roadmap.md` (phase-level) and the relevant
 `tasks/index.md` (task-level) — never a separate tracked file.
 
-**`roadmap.md` Status column**, set by Phase Planning Agent /
-Context Agent: `planned` · `awaiting-review` · `in-progress` ·
-`phase-complete`.
+**One shared Status enum, used by both `roadmap.md` and every
+`tasks/index.md`:**
 
-**`tasks/index.md` Status column**, set by whichever agent is
-currently acting on the task: `planned` · `awaiting-review` ·
-`in-progress` · `validating` · `reviewing` · `complete` · `blocked`.
+```
+not-planned → awaiting-plan-review → plan-approved → in-progress
+  → validating → reviewing → complete
+(blocked can apply from any of the active states)
+```
+
+| Value | Meaning | Set by |
+|---|---|---|
+| `not-planned` | Entry exists (roadmap row / — tasks don't practically start here, see below), no draft yet | `workflow-constitution`, for every phase, initially |
+| `awaiting-plan-review` | A draft (`phase.md` / `task.md`) exists, committed, waiting on its plan-review gate | `workflow-phase` / `workflow-task`, at the end of drafting |
+| `plan-approved` | The plan-review gate passed; work hasn't necessarily started yet | Whichever skill's ending receives the approval — see §5's two-step rule. This is the value that makes that rule concrete: don't leave Status stuck at `awaiting-plan-review` once approved, and don't jump straight to `in-progress` either. |
+| `in-progress` | Real work is actively happening | `workflow-task` (phase-level, when task planning begins) / `workflow-implementation` (task-level, when implementation begins) |
+| `validating` | Correctness check running | `workflow-validation`, task- or phase-level |
+| `reviewing` | Coherence/quality check running — **this is a different check from plan-review above; see the note below** | `workflow-review`, task- or phase-level |
+| `complete` | Done — only after `task-completion-review`/`phase-completion-review` is approved | `workflow-context`, task-level (task) or project-level (phase) |
+| `blocked` | Stuck, needs attention | Any agent, from any active state |
+
+Tasks are created with their draft already written (task planning
+drafts `task.md` and adds the `tasks/index.md` row in the same
+operation — see `workflow-task`), so a task row's *first* recorded
+value is normally `awaiting-plan-review` directly, not `not-planned`.
+`not-planned` is reachable in principle for tasks too (e.g. if you
+choose to pre-list planned-but-undrafted work), just not something the
+current skills produce.
+
+**Naming note — plan-review vs. review are not the same check.**
+`awaiting-plan-review`/`plan-approved` are about a *plan document*
+(`phase.md`/`task.md`) before work begins. `reviewing` is about the
+*implementation* after it's done — code coherence, scope, architecture
+consistency (§8). Don't conflate the two just because both involve a
+human or agent "reviewing" something; they check entirely different
+things at entirely different points in the lifecycle.
 
 If you're unsure what's currently active and no index answers it,
 check which `phases/`/`tasks/` directories exist — folder presence
@@ -337,12 +409,14 @@ logically belongs earlier — e.g. a foundational setup step added after
 `P01-T01`–`P01-T04` already exist still gets `P01-T05`. If a person
 says "implement the first task" or "the next task," resolve it against
 `tasks/index.md`'s **Depends on** and **Status** columns — the task
-with no unmet dependencies and Status `planned`/`awaiting-review` that
-nothing else depends on ahead of it — not the lowest ID number. If it's
-still ambiguous which task is meant, ask rather than guess; picking the
-wrong task silently is worse than one clarifying question.
+with no unmet dependencies and Status `awaiting-plan-review` or
+`plan-approved` that nothing else depends on ahead of it — not the
+lowest ID number. If it's still ambiguous which task is meant, ask
+rather than guess; picking the wrong task silently is worse than one
+clarifying question.
 
 ---
+
 
 ## 12. Multi-agent / multi-human
 

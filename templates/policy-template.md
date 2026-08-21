@@ -38,6 +38,12 @@ task-validation:
 phase-validation:
   authority: agent
 
+task-completion-review:
+  authority: human
+
+phase-completion-review:
+  authority: human
+
 context-update:
   authority: agent
 ```

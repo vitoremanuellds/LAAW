@@ -1,6 +1,6 @@
 ---
 name: workflow-context
-description: Use this skill to evaluate and propagate reusable knowledge into context files after a task or phase completes — updating phase context.md at task completion, or project-context files at phase completion. Also finalizes status - marks a task complete in tasks/index.md, or a phase complete in roadmap.md. Trigger this whenever the user wants to determine whether something learned during a task or phase should be persisted for future tasks, or wants to reconcile project-context/*.md after a phase finishes. Do not use this to record task history, temporary implementation details, or internal reasoning — only persistent, reusable facts propagate.
+description: Use this skill to evaluate and propagate reusable knowledge into context files after a task or phase completes — updating phase context.md at task completion, or project-context files at phase completion. Also finalizes status, marking a task complete in tasks/index.md or a phase complete in roadmap.md — but only once its completion-review gate (task-completion-review or phase-completion-review) has already been approved via workflow-review; this skill finalizes an approved review, it doesn't perform one. Trigger this whenever the user wants to determine whether something learned during a task or phase should be persisted for future tasks, or wants to reconcile project-context/*.md after a phase finishes. Do not use this to record task history, temporary implementation details, or internal reasoning — only persistent, reusable facts propagate.
 ---
 
 # Skill: workflow.context
@@ -10,6 +10,13 @@ Operation for the **Context Agent**. Contract:
 sub-operations — use whichever matches the trigger.
 
 ## workflow.context.task — on task completion
+
+**Precondition:** the task's Status must already be `reviewing` with
+an approved `task-completion-review` (see
+[workflow-review](../workflow-review/SKILL.md)) — this operation
+finalizes an already-approved review, it doesn't substitute for one.
+If Status isn't `reviewing` with approval confirmed, that gate hasn't
+passed yet; don't mark complete regardless of how the task looks.
 
 1. Inspect what the task actually produced.
 2. Ask: does anything discovered here matter to *other tasks in this
@@ -28,12 +35,17 @@ the phase progresses.
 
 ## workflow.context.project — on phase completion
 
+**Precondition:** the phase's Status must already be `reviewing` with
+an approved `phase-completion-review`, and all tasks in the phase
+already `complete` — same principle as the task-level precondition
+above.
+
 1. Read the finished phase's `context.md`.
 2. Ask: does this remain relevant *beyond this phase*? Only
    sufficiently general, persistent knowledge qualifies.
 3. If yes, update `project-context/context.md` or the relevant
    `project-context/modules/*.md`.
-4. Set the phase's Status to `phase-complete` in
+4. Set the phase's Status to `complete` in
    `../../../constitution/roadmap.md` — this is the actual "phase complete"
    marker.
 5. Commit (see

@@ -35,10 +35,14 @@ gate) or phase level (`phase-validation` gate). See
 
 ## Procedure — phase validation
 
-1. Read `phase.md`'s Validations section and every task's result in
+1. Set the phase's Status to `validating` in
+   `../../../constitution/roadmap.md` if not already set.
+2. Read `phase.md`'s Validations section and every task's result in
    the phase (`tasks/index.md`).
-2. Check cross-task/integration behavior and phase acceptance criteria.
-3. Report pass/fail per validation item, not just an overall verdict.
+3. Check cross-task/integration behavior and phase acceptance criteria.
+4. Report pass/fail per validation item, not just an overall verdict.
+   On failure, set Status back to `in-progress` rather than leaving it
+   at `validating`.
 
 ## Output
 

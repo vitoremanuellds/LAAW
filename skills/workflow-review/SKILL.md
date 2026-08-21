@@ -1,6 +1,6 @@
 ---
 name: workflow-review
-description: Use this skill to review a task or phase's plan, implementation, and validation results for scope violations, requirement mismatches, unnecessary complexity, architectural inconsistencies, missing validation, or context inconsistencies. Trigger this at a task-review or phase-review gate, after validation has passed. This is distinct from workflow-validation — validation checks correctness against requirements, review checks whether the work is appropriate, coherent, and consistent with project direction. Do not use this to silently fix issues found; report them instead unless the execution policy explicitly grants implementation authority.
+description: Use this skill to review a task or phase's implementation and validation results for scope violations, requirement mismatches, unnecessary complexity, architectural inconsistencies, missing validation, or context inconsistencies. Trigger this at the task-completion-review or phase-completion-review gate, after validation has passed — not the same as task-review/phase-review, which approve the plan before implementation. Distinct from workflow-validation — validation checks correctness against requirements, review checks whether the work is appropriate, coherent, and consistent with project direction. Do not use this to silently fix issues found; report them and stop for the completion-review gate, same as any other gate.
 ---
 
 # Skill: workflow.review
@@ -10,8 +10,14 @@ Operation for the **Review Agent**. Contract:
 
 ## When to use
 
-At the `task-review` or `phase-review` gate — after validation passes,
-before the task/phase is marked complete. Distinct from validation: see
+After validation passes, before a task or phase is marked complete —
+this is the "Review" step in the lifecycle
+(`Implement → Validate → Review → Context Evaluation → Complete`), a
+different moment from the `task-review`/`phase-review` gates (which
+approve the *plan*, before any implementation happens — see
+[../../workflow.md §11](../../workflow.md#11-status-vocabulary-indexes-not-a-state-file)'s
+naming note). Don't confuse the two just because both are called
+"review." Distinct from validation too: see
 [../../workflow.md §8](../../workflow.md#8-validation-vs-review).
 
 ## Inputs
@@ -23,9 +29,9 @@ before the task/phase is marked complete. Distinct from validation: see
 
 ## Procedure
 
-1. Set the task's Status to `reviewing` in the phase's `tasks/index.md` if
-   applicable (task-level review only; phase-level review has no
-   per-task status to set).
+1. Set Status to `reviewing` — in the task's `tasks/index.md` row for
+   a task-level review, or the phase's row in
+   `../../../constitution/roadmap.md` for a phase-level review.
 2. Confirm the change matches its stated scope — flag anything done
    that wasn't in the plan (scope violation) or required but missing
    (requirement mismatch).
@@ -40,11 +46,31 @@ before the task/phase is marked complete. Distinct from validation: see
    corresponding ADR. Flag it back to the agent whose scope produced
    it (see [../../workflow.md §10](../../workflow.md#10-agent-contracts)) —
    do not write the ADR yourself.
-8. Report findings. Do not silently fix issues yourself unless your
-   entry in [../../../policy.md](../../../policy.md) explicitly grants
+8. Report findings — approve, or changes requested. Do not silently
+   fix issues yourself unless your entry in
+   [../../../policy.md](../../../policy.md) explicitly grants
    implementation authority.
+9. Commit if you made any changes to context/ADR files as part of
+   flagging (see
+   [../../workflow.md §13](../../workflow.md#13-commit-discipline)).
+   Stop for `task-completion-review` (task-level) or
+   `phase-completion-review` (phase-level) — see
+   [../../../policy.md](../../../policy.md). **Clean findings are not
+   themselves approval** — even if you found nothing wrong, stop and
+   wait for an explicit yes before anything gets marked complete; don't
+   treat "I approve of what I found" as the same thing as the human's
+   sign-off (see
+   [../../workflow.md §5](../../workflow.md#5-lifecycle--gates)). If
+   changes were requested instead, return to the implementation loop —
+   there's nothing to stop for until it comes back for review again.
+10. **When approval comes back, that's a separate turn:** in
+    `manual`/`assisted` mode, report the approval and explicitly ask
+    whether to run `workflow-context` now to finalize completion,
+    rather than starting it in the same response.
 
 ## Output
 
 A review verdict (approve / changes requested) with findings listed
-against the checks above.
+against the checks above. If approved: the task/phase left at Status
+`reviewing`, ready for `workflow-context` to mark it `complete` —
+review itself never sets Status to `complete`.

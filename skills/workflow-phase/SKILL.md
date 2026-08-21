@@ -27,7 +27,7 @@ Steps 1–5 require no prior approval — draft the full set of phase
 artifacts before stopping for anything. Only step 6 is gated.
 
 1. Read the roadmap entry for this phase. Don't touch its Status yet —
-   whether this is a first draft (already `planned`, set by
+   whether this is a first draft (already `not-planned`, set by
    `workflow-constitution`) or a replan (already `in-progress`), leave
    it as-is until step 5. Read only the project-context modules it
    names — do not read the whole project-context tree.
@@ -44,7 +44,7 @@ artifacts before stopping for anything. Only step 6 is gated.
 4. If replanning: fold in what's already complete rather than
    discarding it; note the change in `phase.md` itself (Git carries
    the prior version).
-5. **Set the phase's Status to `awaiting-review` in
+5. **Set the phase's Status to `awaiting-plan-review` in
    `../../../constitution/roadmap.md` — unconditionally, including when
    replanning mid-phase with tasks actively `in-progress`.** This is
    not a contradiction: Status tracks whether *this plan document* has
@@ -56,13 +56,20 @@ artifacts before stopping for anything. Only step 6 is gated.
    review requirement wins.
 6. Commit the draft (see
    [../../workflow.md §13](../../workflow.md#13-commit-discipline)). Stop for
-   phase review — see [../../../policy.md](../../../policy.md). Stop your
+   phase plan review (`phase-review` gate) — see
+   [../../../policy.md](../../../policy.md). Stop your
    turn here. Do not continue into task breakdown, task IDs, or
    `tasks/index.md` — that's a separate operation
-   ([workflow-task](../workflow-task/SKILL.md)), invoked separately
-   once this phase's plan is approved. Approval unlocks task
+   ([workflow-task](../workflow-task/SKILL.md)). Approval unlocks task
    *planning*, not implementation — `task-review` is a separate gate
-   still to come after tasks exist.
+   still to come after tasks exist. **When approval comes back, that's
+   a separate turn:** set Status to `plan-approved` in
+   `../../../constitution/roadmap.md` — `workflow-task`'s own first
+   step is what later moves it to `in-progress`, once task planning
+   genuinely starts. In `manual`/`assisted` mode, report the approval
+   and explicitly ask whether to proceed to task planning now, rather
+   than starting it in the same response (see
+   [../../workflow.md §5](../../workflow.md#5-lifecycle--gates)).
 
 ## Output
 

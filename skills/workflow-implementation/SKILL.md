@@ -39,7 +39,11 @@ deviation).
    expected to change, dependencies, expected result, validation
    instructions.
 2. Read the Context section and only the referenced files it names.
-3. Set the task's Status to `in-progress` in the phase's `tasks/index.md`.
+3. Check the task's current Status in `tasks/index.md`. It should be
+   `plan-approved` — if it's still `awaiting-plan-review`, task-review
+   hasn't actually passed yet; stop and check before proceeding rather
+   than assuming being asked to implement implies approval happened.
+   Once confirmed, set Status to `in-progress`.
 4. Implement the steps in order. Minor mismatches (a function living
    in a different file than expected) — adjust and continue, no
    deviation needed.

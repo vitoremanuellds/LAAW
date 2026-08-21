@@ -47,7 +47,7 @@ for anything. Only step 7 is gated.
    constraints. Describe the foundation, not per-task implementation
    choices.
 6. Write `roadmap.md` — ordered phases, one-line description each, and
-   a **Status** column (`planned` for all of them initially — this
+   a **Status** column (`not-planned` for all of them initially — this
    file doubles as the phase index; see
    [../../workflow.md §11](../../workflow.md#11-status-vocabulary-indexes-not-a-state-file)).
    No separate per-phase roadmap files — phase detail lives in each
@@ -58,7 +58,11 @@ for anything. Only step 7 is gated.
    just created them. Stop. Constitution review is a gate — see
    [../../../policy.md](../../../policy.md) for who approves it (it
    exists by now regardless of whether this was a first run). Do not
-   proceed to phase planning yourself unless authorized.
+   proceed to phase planning yourself unless authorized. **When
+   approval comes back, that's a separate turn:** in `manual`/`assisted`
+   mode, report the approval and explicitly ask whether to start phase
+   planning now, rather than starting it in the same response (see
+   [../../workflow.md §5](../../workflow.md#5-lifecycle--gates)).
 
 ## Output
 
