@@ -373,7 +373,7 @@ not-planned → awaiting-plan-review → plan-approved → in-progress
 
 | Value | Meaning | Set by |
 |---|---|---|
-| `not-planned` | Entry exists (roadmap row / — tasks don't practically start here, see below), no draft yet | `workflow-constitution`, for every phase, initially |
+| `not-planned` | Entry exists, no draft yet | `workflow-constitution`, for every phase, initially — and `workflow-task`, for every remaining plan step it hasn't been asked to draft yet, on its first invocation for a phase |
 | `awaiting-plan-review` | A draft (`phase.md` / `task.md`) exists, committed, waiting on its plan-review gate | `workflow-phase` / `workflow-task`, at the end of drafting |
 | `plan-approved` | The plan-review gate passed; work hasn't necessarily started yet | Whichever skill's ending receives the approval — see §5's two-step rule. This is the value that makes that rule concrete: don't leave Status stuck at `awaiting-plan-review` once approved, and don't jump straight to `in-progress` either. |
 | `in-progress` | Real work is actively happening | `workflow-task` (phase-level, when task planning begins) / `workflow-implementation` (task-level, when implementation begins) |
@@ -382,13 +382,14 @@ not-planned → awaiting-plan-review → plan-approved → in-progress
 | `complete` | Done — only after `task-completion-review`/`phase-completion-review` is approved | `workflow-context`, task-level (task) or project-level (phase) |
 | `blocked` | Stuck, needs attention | Any agent, from any active state |
 
-Tasks are created with their draft already written (task planning
-drafts `task.md` and adds the `tasks/index.md` row in the same
-operation — see `workflow-task`), so a task row's *first* recorded
-value is normally `awaiting-plan-review` directly, not `not-planned`.
-`not-planned` is reachable in principle for tasks too (e.g. if you
-choose to pre-list planned-but-undrafted work), just not something the
-current skills produce.
+On its first invocation for a given phase, `workflow-task` stubs a row
+at `not-planned` for *every* remaining plan step at once — cheap, since
+it's just a title, not a full draft — then fully drafts only whatever
+was actually asked for that invocation, moving those rows to
+`awaiting-plan-review`. So a task row's *first* recorded value is
+`not-planned` unless it happens to be one of the tasks drafted
+immediately; either way, both values are genuinely produced, not just
+theoretically possible.
 
 **Naming note — plan-review vs. review are not the same check.**
 `awaiting-plan-review`/`plan-approved` are about a *plan document*
