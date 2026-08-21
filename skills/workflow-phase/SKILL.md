@@ -26,10 +26,11 @@ Defining a new phase, or replanning one after a phase-level deviation
 Steps 1–5 require no prior approval — draft the full set of phase
 artifacts before stopping for anything. Only step 6 is gated.
 
-1. Read the roadmap entry for this phase, and set its Status to
-   `in-progress` in `../../../constitution/roadmap.md`. Read only the
-   project-context modules it names — do not read the whole
-   project-context tree.
+1. Read the roadmap entry for this phase. Don't touch its Status yet —
+   whether this is a first draft (already `planned`, set by
+   `workflow-constitution`) or a replan (already `in-progress`), leave
+   it as-is until step 5. Read only the project-context modules it
+   names — do not read the whole project-context tree.
 2. Write `context.md` — architecture, modules, domain concepts,
    constraints shared by this phase's tasks. Do not duplicate project
    context; link to it.
@@ -43,8 +44,16 @@ artifacts before stopping for anything. Only step 6 is gated.
 4. If replanning: fold in what's already complete rather than
    discarding it; note the change in `phase.md` itself (Git carries
    the prior version).
-5. Set the phase's Status to `awaiting-review` in
-   `../../../constitution/roadmap.md`.
+5. **Set the phase's Status to `awaiting-review` in
+   `../../../constitution/roadmap.md` — unconditionally, including when
+   replanning mid-phase with tasks actively `in-progress`.** This is
+   not a contradiction: Status tracks whether *this plan document* has
+   been reviewed, not whether execution is happening. A replanned
+   `phase.md` is a fresh draft and needs its own review regardless of
+   what unaffected tasks are doing. Do not reason "it's already
+   in-progress, so nothing needs to change" — that conflates two
+   different things this one field can't both represent, and the
+   review requirement wins.
 6. Commit the draft (see
    [../../workflow.md §13](../../workflow.md#13-commit-discipline)). Stop for
    phase review — see [../../../policy.md](../../../policy.md). Stop your

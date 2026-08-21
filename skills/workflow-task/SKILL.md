@@ -36,7 +36,15 @@ stopping for anything. Only step 6 is gated.
      expected result, validation instructions.
 4. Note dependencies on other tasks explicitly if they exist
    (`P01-T03 depends on P01-T02`) — this determines what can run in
-   parallel.
+   parallel. **If this task logically precedes tasks that already
+   exist** (e.g. a replan inserts a foundational setup step after
+   `P01-T01`–`P01-T04` were already created), this new task's own
+   Depends-on may be empty, but go back and add it to the Depends-on
+   column of every existing task that now needs it done first. Skipping
+   this leaves the dependency graph wrong in exactly the way that makes
+   "implement the first task" ambiguous later (see
+   [../../workflow.md §11](../../workflow.md#11-status-vocabulary-indexes-not-a-state-file)) —
+   ID order alone won't reflect the real sequence once this happens.
 5. Create or update `tasks/index.md` in the same `tasks/` folder — add
    a row for this task:
 

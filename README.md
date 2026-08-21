@@ -47,8 +47,15 @@ neither is right. And `git submodule update --remote` against a dirty
 submodule ranges from "refuses to run" to "silently discards your
 uncommitted work," depending on your git config. Scoping the submodule
 to just `.ai/workflow/` means nothing ever writes inside it — updates
-stay clean, and everything agents actually produce lives in your
-project's own git history like any other file.
+stay clean *with respect to agent-generated content*.
+
+That doesn't make updates risk-free in general, though: this repo's
+own internal structure can still change between versions (it has,
+more than once, early on) — files moving, renaming, or being merged.
+Floating on the default branch means every one of those changes lands
+on you immediately, and a structural change can leave an
+already-checked-out submodule referencing paths that no longer exist.
+See **Updating the protocol** below before you pull.
 
 ## Bootstrapping into a project
 
@@ -56,13 +63,6 @@ project's own git history like any other file.
 cd your-project
 git submodule add <this-repo-url> .ai/workflow
 ```
-
-`git submodule update --remote .ai/workflow` later pulls protocol
-updates cleanly, since nothing ever modifies that directory.
-
-(Prefer not to use submodules? `git clone <this-repo-url> .ai/workflow
-&& rm -rf .ai/workflow/.git` works too — you just lose easy updates
-and take on manually re-syncing later.)
 
 Then, as regular files tracked by *your project's own repo* (not this
 one):
@@ -93,6 +93,23 @@ one):
    to delegate any gates). This is the only step that can't be
    skipped — everything downstream assumes it exists.
 
+3. **Optional: sync skills to `.agents/skills/`.** If your harness
+   auto-discovers skills from `.agents/skills/` rather than following
+   `workflow.md`'s explicit lookup table, run:
+
+   ```bash
+   .ai/workflow/sync-skills.sh
+   ```
+
+   from your project root (if you get "permission denied," run
+   `chmod +x .ai/workflow/sync-skills.sh` once — file permissions
+   sometimes don't survive a download or the first checkout). This
+   copies (not links) the skills there — re-run it after every
+   `git submodule update`, or the mirrored copy silently drifts out of
+   sync with the real one in `.ai/workflow/`. If you don't know
+   whether your harness needs this, you probably don't —
+   `workflow.md §2`'s lookup table works without it.
+
 There's no state file to check or initialize — status lives in
 `.ai/constitution/roadmap.md` (phase-level) and each phase's
 `tasks/index.md` (task-level), both created as you go.
@@ -101,6 +118,40 @@ From there the normal loop is: plan a phase → get it reviewed → break
 it into tasks → implement → validate → review → let context propagate
 → repeat. Full lifecycle: [`workflow.md §5`](workflow.md#5-lifecycle--gates).
 
+## Updating the protocol
+
+**Pin to a commit or tag, don't float on the branch head:**
+
+```bash
+cd .ai/workflow
+git log --oneline -5        # find a commit you've actually reviewed
+cd ../..
+git -C .ai/workflow checkout <sha-or-tag>
+git add .ai/workflow
+git commit -m "Pin workflow protocol to <sha-or-tag>"
+```
+
+Review what changed before moving the pin — `git -C .ai/workflow log
+<old-sha>..<new-sha>` — the same way you'd review any dependency
+upgrade. This repo doesn't yet publish tagged releases; until it does,
+treat every commit as a potential breaking change and pin explicitly
+rather than trusting `--remote` to only ever pull safe updates.
+
+**If a submodule update leaves things broken** (paths that used to
+resolve don't anymore, `git status` shows the submodule in a strange
+state): don't try to patch it in place.
+
+```bash
+git submodule deinit -f .ai/workflow
+rm -rf .git/modules/.ai/workflow
+git submodule add <this-repo-url> .ai/workflow
+```
+
+This re-adds it clean at whatever commit you point it to. Your
+project's own content (`policy.md`, `constitution/`, `phases/`,
+`decisions/`, `project-context/`) is untouched either way — it was
+never inside the submodule to begin with.
+
 ## What's in this repo vs. what's in your project
 
 | This repo (`.ai/workflow/`, submodule, never edited per-project) | Your project (`.ai/`, regular files, edit freely) |
@@ -108,7 +159,12 @@ it into tasks → implement → validate → review → let context propagate
 | `workflow.md` | `AGENTS.md` (has the snippet pasted in) |
 | `templates/decision-template.md`, `templates/policy-template.md`, `templates/decisions-index-template.md` | `policy.md` — bootstrapped from template, then yours |
 | `skills/*` | `constitution/*`, `project-context/*`, `phases/*` |
-| | `decisions/*` — `index.md` bootstrapped from template, `dNN-*.md` follow `templates/decision-template.md` |
+| `sync-skills.sh` | `decisions/*` — `index.md` bootstrapped from template, `dNN-*.md` follow `templates/decision-template.md` |
+
+A third category, technically outside both sides: `.agents/skills/`, if
+you use `sync-skills.sh` — it's a generated copy of `skills/`, not
+source of truth for either repo. Don't edit it directly and don't treat
+it as authoritative; re-run the script instead.
 
 If you find yourself editing anything under `.ai/workflow/` per-project,
 that's a signal the protocol itself needs a change — make it in this
@@ -120,6 +176,7 @@ repo instead, so every project using it benefits, and so
 ```
 README.md
 workflow.md                    ← the whole protocol, self-contained
+sync-skills.sh                   ← optional: mirrors skills/ to .agents/skills/
 templates/
 ├── decision-template.md          ← ADR template, copied into your project's decisions/
 ├── policy-template.md             ← copied to .ai/policy.md on first run
@@ -216,3 +273,24 @@ in `workflow.md` mid-task), that's a signal to raise it as feedback for
 this repo, not to patch it locally; a local patch will just be
 overwritten by the next `git submodule update` and silently diverge
 from what the rest of your team is running.
+
+**Smaller/weaker local models may need to be pointed at skill files
+explicitly, every time, especially early in a session.** In testing
+with a 9B-class quantized model, the single most common failure was the
+model never actually opening the relevant `SKILL.md` at all — skipping
+straight past a review gate, creating files a skill explicitly
+forbids it from creating — while a larger model in the same setup
+self-navigated the lookup table reliably. `workflow.md §2` now says
+this as forcefully as prose can, but if you see a gate skipped or an
+agent inventing its own procedure, the fastest fix is still just
+telling it to open the specific skill file by path. Don't assume a
+strengthened instruction alone has fully solved this for small models —
+watch for it, especially on the first operation of a new session.
+
+**Say which task you mean, especially after a replan.** Task IDs are
+sequential and never reflect a reordering — if a phase gets replanned
+mid-execution and a new task is inserted that logically comes first,
+its ID will still be the highest number, not the lowest. "Implement the
+first task" is genuinely ambiguous in that situation even though it
+reads as precise; naming the task by ID or title avoids an agent
+guessing wrong and building on top of the wrong plan.

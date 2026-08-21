@@ -34,11 +34,22 @@ Do not duplicate this file's rules elsewhere. Reference it.
    go run `workflow-constitution` first if you aren't already — its
    first-run procedure is what creates `policy.md` from
    `templates/policy-template.md`. Don't invent gate authority in its absence.
-3. Use the matching skill below for the operation you're performing.
-   Read the rest of this file in full unless the skill says otherwise
+3. **Open and actually read the matching skill file below before doing
+   anything else for that operation.** Not "recall that it exists" —
+   use your file-read tool on it now, every time you start a new
+   operation type in a session, even if you believe you already know
+   what it says. The rules that stop you from skipping a gate, from
+   overstepping into another agent's scope, and from mismarking status
+   live in the skill file's procedure, not in your general
+   understanding of this table. Skipping this step is the single most
+   common failure mode observed in practice — constitution review
+   getting skipped, phases getting created without a plan, status
+   fields left wrong — and every instance traced back to the skill
+   never actually being opened.
+4. Read the rest of this file in full unless the skill says otherwise
    (currently only `workflow-implementation` skips the reread — it's
    invoked too often per phase to justify it every time).
-4. Never bypass a gate unless policy explicitly authorizes you to.
+5. Never bypass a gate unless policy explicitly authorizes you to.
 
 | Operation | Skill |
 |---|---|
@@ -319,6 +330,17 @@ If you're unsure what's currently active and no index answers it,
 check which `phases/`/`tasks/` directories exist — folder presence
 itself is signal (a phase with no `phase.md` yet hasn't been planned;
 a task directory with no `task.md` doesn't really exist yet).
+
+**Task ID order is not execution order.** IDs are assigned sequentially
+as tasks are created (§10), but a replan can insert a task that
+logically belongs earlier — e.g. a foundational setup step added after
+`P01-T01`–`P01-T04` already exist still gets `P01-T05`. If a person
+says "implement the first task" or "the next task," resolve it against
+`tasks/index.md`'s **Depends on** and **Status** columns — the task
+with no unmet dependencies and Status `planned`/`awaiting-review` that
+nothing else depends on ahead of it — not the lowest ID number. If it's
+still ambiguous which task is meant, ask rather than guess; picking the
+wrong task silently is worse than one clarifying question.
 
 ---
 
