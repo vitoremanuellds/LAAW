@@ -19,43 +19,44 @@ Two ideas do most of the work:
 
 2. **Separate *what* must happen from *who* is allowed to decide it.**
    `workflow.md` (this repo) defines the process (constitution →
-   phases → tasks → validation → review) and never changes.
-   `policy.md` (your project, not this repo — see below) defines which
-   gates a human must approve and which an agent may, and *that* can
-   change freely as you trust the agents more, without touching the
-   process itself.
+   phases → tasks → validation → review) and never changes. `info.md`
+   (your project, not this repo — see below) holds who's authorized
+   for each gate and what's currently active, and *that* can change
+   freely as you trust the agents more, without touching the process
+   itself.
 
 Everything else — skills, agent contracts, deviation/decision rules,
-context propagation — lives inside `workflow.md`, self-contained. See
+context propagation, the full gate list and what each execution mode
+defaults to — lives inside `workflow.md`, self-contained. See
 [`workflow.md`](workflow.md) for all of it.
 
 ## This repo is only the fixed half
 
 This repo contains **only** protocol content that never changes
-per-project: `workflow.md`, `templates/decision-template.md`, `skills/`. It gets
-installed as a git submodule mounted at `.ai/workflow/` inside your
-project — one level *inside* your project's `.ai/` folder, not the
-whole thing.
+per-project: `workflow.md`, `templates/`, `skills/`. It gets installed
+as a git submodule mounted at `.ai/workflow/` inside your project — one
+level *inside* your project's `.ai/` folder, not the whole thing.
 
-That's deliberate, not incidental. `constitution/`, `project-context/`,
-`phases/`, `decisions/`, and `policy.md` all get written to constantly
-by agents — if the whole `.ai/` folder were the submodule, every one of
-those writes would leave the submodule dirty. You'd either be unable to
-commit that work at all, or committing your project's actual
-constitution/phases/decisions into the shared template's own history —
-neither is right. And `git submodule update --remote` against a dirty
-submodule ranges from "refuses to run" to "silently discards your
-uncommitted work," depending on your git config. Scoping the submodule
-to just `.ai/workflow/` means nothing ever writes inside it — updates
-stay clean *with respect to agent-generated content*.
+That's deliberate, not incidental. `constitution/`, `context/`,
+`phases/`, `tasks/`, `decisions/`, and `info.md` all get written to
+constantly by agents — if the whole `.ai/` folder were the submodule,
+every one of those writes would leave the submodule dirty. You'd
+either be unable to commit that work at all, or committing your
+project's actual constitution/phases/decisions into the shared
+template's own history — neither is right. And `git submodule update
+--remote` against a dirty submodule ranges from "refuses to run" to
+"silently discards your uncommitted work," depending on your git
+config. Scoping the submodule to just `.ai/workflow/` means nothing
+ever writes inside it — updates stay clean *with respect to
+agent-generated content*.
 
 That doesn't make updates risk-free in general, though: this repo's
-own internal structure can still change between versions (it has,
-more than once, early on) — files moving, renaming, or being merged.
-Floating on the default branch means every one of those changes lands
-on you immediately, and a structural change can leave an
-already-checked-out submodule referencing paths that no longer exist.
-See **Updating the protocol** below before you pull.
+own internal structure can still change between versions (it has, more
+than once) — files moving, renaming, or being merged. Floating on the
+default branch means every one of those changes lands on you
+immediately, and a structural change can leave an already-checked-out
+submodule referencing paths that no longer exist. See **Updating the
+protocol** below before you pull.
 
 ## Bootstrapping into a project
 
@@ -80,18 +81,23 @@ one):
    ```
 
    That single pointer is enough — everything else is discovered from
-   there, including the skill lookup table.
+   there, including the skill lookup table. Because this gets read at
+   the start of every session automatically, no skill needs to
+   separately instruct a `workflow.md` reread mid-session — only
+   `.ai/info.md` (below) genuinely needs rereading, since it's the one
+   file that changes while a session is running.
 
 2. **Run the constitution skill.** Point an agent (or yourself) at
    `.ai/workflow/skills/workflow-constitution/SKILL.md`. Until this
-   runs, `.ai/policy.md` genuinely doesn't exist yet — that's expected,
+   runs, `.ai/info.md` genuinely doesn't exist yet — that's expected,
    not a sign anything's broken. On a brand-new project this single
    step writes `.ai/constitution/mission.md`, `techstack.md`,
-   `roadmap.md` — *and* bootstraps `.ai/policy.md` and
-   `.ai/decisions/index.md` from their templates automatically (safe
-   conservative defaults; edit `policy.md` afterward once you're ready
-   to delegate any gates). This is the only step that can't be
-   skipped — everything downstream assumes it exists.
+   `roadmap.md` — *and* bootstraps `.ai/info.md`,
+   `.ai/context/context.md`, and `.ai/decisions/decisions.md` from
+   their templates automatically (safe conservative defaults; edit
+   `info.md` afterward once you're ready to delegate any gates). This
+   is the only step that can't be skipped — everything downstream
+   assumes it exists.
 
 3. **Optional: sync skills to `.agents/skills/`.** If your harness
    auto-discovers skills from `.agents/skills/` rather than following
@@ -110,9 +116,14 @@ one):
    whether your harness needs this, you probably don't —
    `workflow.md §2`'s lookup table works without it.
 
-There's no state file to check or initialize — status lives in
-`.ai/constitution/roadmap.md` (phase-level) and each phase's
-`tasks/index.md` (task-level), both created as you go.
+`.ai/info.md`'s Status section is the fast answer to "what's happening
+right now" — IDs only, no status values, updated by every skill as its
+first and last action. `.ai/constitution/roadmap.md` (phase-level) and
+each phase file's embedded task table (task-level) are the slower
+permanent record of every actual status value, not just what's active
+— see
+[`workflow.md §11`](workflow.md#11-status-the-fast-pointer-and-the-permanent-record)
+for how the two stay in sync.
 
 From there the normal loop is: plan a phase → get it reviewed → break
 it into tasks → implement → validate → review → let context propagate
@@ -148,8 +159,8 @@ git submodule add <this-repo-url> .ai/workflow
 ```
 
 This re-adds it clean at whatever commit you point it to. Your
-project's own content (`policy.md`, `constitution/`, `phases/`,
-`decisions/`, `project-context/`) is untouched either way — it was
+project's own content (`info.md`, `constitution/`, `context/`,
+`phases/`, `tasks/`, `decisions/`) is untouched either way — it was
 never inside the submodule to begin with.
 
 ## What's in this repo vs. what's in your project
@@ -157,9 +168,11 @@ never inside the submodule to begin with.
 | This repo (`.ai/workflow/`, submodule, never edited per-project) | Your project (`.ai/`, regular files, edit freely) |
 |---|---|
 | `workflow.md` | `AGENTS.md` (has the snippet pasted in) |
-| `templates/decision-template.md`, `templates/policy-template.md`, `templates/decisions-index-template.md` | `policy.md` — bootstrapped from template, then yours |
-| `skills/*` | `constitution/*`, `project-context/*`, `phases/*` |
-| `sync-skills.sh` | `decisions/*` — `index.md` bootstrapped from template, `dNN-*.md` follow `templates/decision-template.md` |
+| `templates/info-template.md`, `templates/context-template.md`, `templates/decisions-template.md`, `templates/adr-template.md` | `info.md` — bootstrapped from template, then yours |
+| `skills/*` | `constitution/*`, `context/*` |
+| `sync-skills.sh` | `phases/*` — one flat file per phase, own Context section embedded |
+| | `tasks/*` — one flat file per task, own Context section embedded |
+| | `decisions/*` — `decisions.md` bootstrapped from template, `adrNN-*.md` follow `templates/adr-template.md` |
 
 A third category, technically outside both sides: `.agents/skills/`, if
 you use `sync-skills.sh` — it's a generated copy of `skills/`, not
@@ -178,9 +191,10 @@ README.md
 workflow.md                    ← the whole protocol, self-contained
 sync-skills.sh                   ← optional: mirrors skills/ to .agents/skills/
 templates/
-├── decision-template.md          ← ADR template, copied into your project's decisions/
-├── policy-template.md             ← copied to .ai/policy.md on first run
-└── decisions-index-template.md     ← copied to .ai/decisions/index.md on first run
+├── info-template.md              ← copied to .ai/info.md on first run
+├── context-template.md            ← copied to .ai/context/context.md on first run
+├── decisions-template.md           ← copied to .ai/decisions/decisions.md on first run
+└── adr-template.md                  ← ADR format, copied into your project's decisions/ per decision
 skills/
 ├── workflow-constitution/
 ├── workflow-phase/
@@ -197,11 +211,18 @@ Once mounted at `.ai/workflow/` in a project, alongside it (in the
 ```
 .ai/
 ├── workflow/              ← this repo, as a submodule
-├── policy.md
+├── info.md                  ← policy + status, merged: who's authorized, what's active
 ├── constitution/
-├── project-context/
+├── context/
+│   ├── context.md              ← entry point, table of everything else here
+│   └── (however many files fit this project's actual architecture)
 ├── phases/
+│   └── p01-name.md              ← one flat file per phase: own Context + Requirements + Plan + Validations + task table
+├── tasks/
+│   └── p01-t01-name.md            ← one flat file per task: own Context + Implementation, no per-phase subfolder
 └── decisions/
+    ├── decisions.md                ← index: ID, Name, Description, Status, Relations
+    └── adr01-name.md
 ```
 
 Every link inside this repo is relative and none hardcode `.ai/`, so it
@@ -220,10 +241,12 @@ harness lets you set a thinking/reasoning level per call (e.g. Ollama's
 OpenAI-compatible endpoint), don't leave it at the same setting for
 every skill:
 
-- **High/medium** — `workflow-constitution`, `workflow-phase`, and any
-  deviation or ADR decision. These are exactly the places ambiguity is
-  real and a wrong call cascades into everything built on top. Spending
-  reasoning budget here is the point of the workflow.
+- **High/medium** — `workflow-constitution`, `workflow-phase`,
+  `workflow-task` (it now writes fairly detailed task files — files to
+  touch, ordered steps, sometimes pseudocode — and that detail is only
+  useful if it's actually correct), and any deviation or ADR decision.
+  These are exactly the places ambiguity is real and a wrong call
+  cascades into everything built on top.
 - **Low** — `workflow-implementation` and `workflow-validation`. The
   hard thinking already happened at planning time; execution should be
   close to mechanical (follow the steps, adjust minor mismatches,
@@ -234,13 +257,28 @@ every skill:
 Compare actual token usage and output quality before committing to a
 split — it varies by model.
 
-**Be explicit about which operation you want.** Constitution creation
-in particular tends to prompt for confirmation before starting if asked
-generically ("plan the app") rather than directly ("create the
-constitution"). Neither is wrong, but if you want it to proceed without
-asking, say so — this is a prompting choice, not a workflow gate (there
-is deliberately no "may I start" gate in `policy.md`, only review gates
-after a draft exists).
+**Call the skill explicitly, don't rely on it self-navigating.** Even
+though `workflow.md §2` names the skill-lookup table and instructs
+opening the file, it's cheaper and more reliable to just say "use
+workflow-task to plan this" than to phrase a request generically and
+hope it finds the right skill on its own. This has been the single
+most common failure point in testing (see below) — a five-word prompt
+addition avoids it entirely.
+
+**Name the task or phase you mean, don't rely on "the first one" or
+"the next one."** Same logic as above, extended to *which* artifact:
+"implement P02-T03" beats "implement the next task," especially after
+any replanning has happened (task IDs don't reorder — see the note
+further down). Being explicit costs nothing and removes an entire
+category of ambiguity.
+
+**Be explicit about which operation you want, more generally.**
+Constitution creation in particular tends to prompt for confirmation
+before starting if asked generically ("plan the app") rather than
+directly ("create the constitution"). Neither is wrong, but if you
+want it to proceed without asking, say so — this is a prompting
+choice, not a workflow gate (there is deliberately no "may I start"
+gate, only review gates after a draft exists).
 
 **One thread per phase/task-batch of work, not one long thread.** The
 workflow assumes stateless agents — bootstrapping/constitution work is
@@ -259,13 +297,15 @@ prematurely, just previews — but if you see an agent *acting* on a
 skill before its prerequisites are met, that's worth tightening the
 skill descriptions to be more mutually exclusive.
 
-**No state file means status must come from the indexes, every time.**
-Since `state.md` was removed in favor of `roadmap.md` + `tasks/index.md`
-carrying status directly, watch early on whether agents reliably check
-those before assuming what's active — this replaced a real bug (a
-never-updated `state.md`) but shifts the burden onto every skill
-consistently writing to the right index at the right moment. Worth
-extra scrutiny in the first few runs after this change.
+**`info.md`'s Status section is a fast pointer, not the full
+picture — and it can only track one active item.** It answers "what's
+happening right now" in one read, which is the point, but by design it
+holds no status values (those live in `roadmap.md`/the phase file) and
+doesn't (yet) support more than one active phase/task at a time. If
+you're running genuinely parallel work across multiple agents, watch
+for it getting overwritten by whichever agent finishes its update last
+— that's a real limitation of the current single-pointer format, not a
+bug to route around by ignoring the file.
 
 **Keep the submodule boundary clean.** Never let an agent write inside
 `.ai/workflow/` — if a skill ever seems to want to (e.g. "fixing" a typo
@@ -285,7 +325,10 @@ this as forcefully as prose can, but if you see a gate skipped or an
 agent inventing its own procedure, the fastest fix is still just
 telling it to open the specific skill file by path. Don't assume a
 strengthened instruction alone has fully solved this for small models —
-watch for it, especially on the first operation of a new session.
+watch for it, especially on the first operation of a new session. This
+is the same reason the "call the skill explicitly" best practice above
+exists — it's the same failure, addressed as a habit rather than a
+one-off fix.
 
 **Say which task you mean, especially after a replan.** Task IDs are
 sequential and never reflect a reordering — if a phase gets replanned
@@ -294,3 +337,12 @@ its ID will still be the highest number, not the lowest. "Implement the
 first task" is genuinely ambiguous in that situation even though it
 reads as precise; naming the task by ID or title avoids an agent
 guessing wrong and building on top of the wrong plan.
+
+**A gate's authority can be changed mid-session — read `info.md`
+fresh at the moment of every gate check, not from memory.** This
+caused a real bug: a gate's authority was changed in `info.md`
+partway through a session, and a skill that had already read the old
+value earlier kept acting on stale information. Every skill's
+gate-check step now says to reread `info.md` fresh rather than trust
+an earlier read — if you see a gate's behavior not match what you just
+changed in `info.md`, this is the first thing to check.
