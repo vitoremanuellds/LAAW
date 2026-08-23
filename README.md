@@ -81,11 +81,13 @@ one):
    ```
 
    That single pointer is enough — everything else is discovered from
-   there, including the skill lookup table. Because this gets read at
-   the start of every session automatically, no skill needs to
-   separately instruct a `workflow.md` reread mid-session — only
-   `.ai/info.md` (below) genuinely needs rereading, since it's the one
-   file that changes while a session is running.
+   there, including the skill lookup table. This gets read at the
+   start of every session automatically, but every skill *also*
+   instructs reading `.ai/workflow/workflow.md` in full as part of its
+   own procedure — a single session-start read turned out not to be
+   reliable enough in practice across a long session (see Best
+   Practices below). `.ai/info.md` needs rereading even more
+   aggressively, since unlike `workflow.md` it can change mid-session.
 
 2. **Run the constitution skill.** Point an agent (or yourself) at
    `.ai/workflow/skills/workflow-constitution/SKILL.md`. Until this
@@ -252,7 +254,12 @@ every skill:
   close to mechanical (follow the steps, adjust minor mismatches,
   escalate real deviations rather than reasoning your way around them).
   This is also your most frequently invoked skill, so unnecessary
-  reasoning tokens here compound fast across a phase.
+  reasoning tokens here compound fast across a phase. Reading more
+  content (see below — this skill now rereads `workflow.md` in full,
+  same as every other skill) isn't the same as needing more reasoning
+  effort to use it correctly; low effort is still appropriate as long
+  as the correct information is actually present at decision time,
+  which was the thing that was missing, not reasoning depth.
 
 Compare actual token usage and output quality before committing to a
 split — it varies by model.
@@ -346,3 +353,28 @@ value earlier kept acting on stale information. Every skill's
 gate-check step now says to reread `info.md` fresh rather than trust
 an earlier read — if you see a gate's behavior not match what you just
 changed in `info.md`, this is the first thing to check.
+
+**"Compiled into this skill" is a claim that needs to actually be
+true, not just asserted.** `workflow-implementation` used to skip
+rereading `workflow.md`, on the assumption that its rules were fully
+summarized locally. They weren't — the skill only mentioned the status
+values *it* transitions through, never stated the enum was closed, and
+an agent invented a status value outside it as a result. The carve-out
+is gone; every skill now rereads `workflow.md` in full, every time.
+If you reintroduce a similar shortcut anywhere, verify the "compiled"
+version is actually complete for edge cases, not just the common path
+— a partial summary is more dangerous than no summary, since it looks
+authoritative while quietly omitting the constraint that mattered.
+
+**A relative link's correctness depends on every file that references
+it staying at the depth it was designed for — including copies.**
+`sync-skills.sh` mirrors skill files to `.agents/skills/`, a different
+relative depth than their canonical location. Every dot-relative
+cross-reference inside those skills was only correct at the canonical
+depth; once mirrored, they silently resolved to the wrong files, which
+is very likely what produced confused reasoning in an agent reading
+the mirrored copy. Every skill's cross-references now use
+`.ai/workflow/`-anchored paths instead, making them correct regardless
+of which copy gets read. If you ever add another way for these files
+to get copied or cached elsewhere, re-verify this — it's the kind of
+bug that produces no error, just quietly wrong behavior.

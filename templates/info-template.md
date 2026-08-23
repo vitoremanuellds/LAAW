@@ -1,24 +1,26 @@
 # Info
 
-Copy this to `../info.md` in your project and edit — this file is
+Copy this to `.ai/info.md` in your project and edit — this file is
 yours, never touched by a submodule update. It's read at the start of
-every operation (see `workflow.md §2`) — always read it fresh, never
-rely on what you saw earlier in a session; it can change mid-session
-and stale memory of it is exactly what causes a gate to get ignored.
+every operation (see `.ai/workflow/workflow.md §2`) — always read it
+fresh, never rely on what you saw earlier in a session; it can change
+mid-session and stale memory of it is exactly what causes a gate to
+get ignored.
 
 ## Policy — who's authorized for each gate
 
-Full gate list and explanations live in `workflow.md §5` — this section
-holds only the values, not the reasoning, so keep it short.
+Full gate list and explanations live in `.ai/workflow/workflow.md §5`
+— this section holds only the values, not the reasoning, so keep it
+short.
 
 ```yaml
 mode: assisted   # manual | assisted | delegated | autonomous
 
 overrides:
-  # Only needed for exceptions to your mode's default (see workflow.md
-  # §5 for what each mode defaults to). In delegated mode this list
-  # *is* your actual policy — every gate you don't list here falls
-  # back to human.
+  # Only needed for exceptions to your mode's default (see
+  # .ai/workflow/workflow.md §5 for what each mode defaults to). In
+  # delegated mode this list *is* your actual policy — every gate you
+  # don't list here falls back to human.
 ```
 
 ## Status — the fast pointer
@@ -31,5 +33,6 @@ Blocked: none
 
 IDs only, no status values — this just tells you which two files to
 open next. The actual status of the active phase/task lives in the
-permanent record: `constitution/roadmap.md` (phase) and that phase's
-own file's task table (task). See `workflow.md §11`.
+permanent record: `.ai/constitution/roadmap.md` (phase) and that
+phase's own file's task table (task). See
+`.ai/workflow/workflow.md §11`.
