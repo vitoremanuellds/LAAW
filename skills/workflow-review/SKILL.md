@@ -29,19 +29,24 @@ naming note). Don't confuse the two just because both are called
 
 ## Inputs
 
-- The task file or phase file, and the actual changes made.
-- Tests and validation results (the task's Status in its owning phase
-  file's Tasks table; the phase file's Validations section).
-- Relevant `.ai/context/` files and ADRs.
+- The task's detail (its own file at `full`; the inline block under
+  its table row at `medium`/`lite`) or the phase file (`full`/`medium`
+  only — no phase layer at `lite`, §14), and the actual changes made.
+- Tests and validation results (the task's Status in its owning Tasks
+  table; the phase file's Validations section at `full`/`medium`).
+- Relevant context (`.ai/context/` at `full`; `techstack.md`'s or
+  `project.md`'s `## Context` subsection at `medium`/`lite`) and ADRs.
 
 ## Procedure
 
-1. Read `.ai/info.md` fresh — confirms `task-completion-review`/
-   `phase-completion-review` authority; don't rely on a read from
-   earlier in the session. Set Status to `reviewing` — in the task's
-   row in its owning phase file's Tasks table for a task-level review,
+1. Read `.ai/info.md` fresh — confirms gate authority (§14 for which
+   gate applies at your profile); don't rely on a read from earlier in
+   the session. Set Status to `reviewing` — in the task's row in its
+   owning Tasks table (the phase file's at `full`/`medium`,
+   `.ai/project.md`'s Roadmap table at `lite`) for a task-level review,
    or the phase's row in `.ai/constitution/roadmap.md` for a
-   phase-level review. Update `.ai/info.md`'s Status section to match.
+   phase-level review (`full`/`medium` only — no phase layer at
+   `lite`). Update `.ai/info.md`'s Status section to match.
 2. Confirm the change matches its stated scope — flag anything done
    that wasn't in the plan (scope violation) or required but missing
    (requirement mismatch).
@@ -50,10 +55,13 @@ naming note). Don't confuse the two just because both are called
    in `.ai/decisions/`.
 5. Check that validation coverage actually matches what the
    requirements call for — flag missing validation.
-6. Check that context files (`.ai/context/context.md` and its listed
-   files, the phase file's own Context section) still accurately
-   describe the result — flag context inconsistencies for the context
-   skill to fix.
+6. Check that context still accurately describes the result — flag
+   inconsistencies for the context skill to fix. At `full`:
+   `.ai/context/context.md` and its listed files, plus the phase
+   file's own Context section. At `medium`: `techstack.md`'s
+   `## Context` subsection, plus the phase file's own Context section.
+   At `lite`: `project.md`'s Techstack `## Context` subsection (no
+   phase-level Context section exists).
 7. Check for undocumented decisions — an architectural choice with no
    corresponding ADR. Flag it back to the agent whose scope produced
    it (see [.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts)) —
@@ -64,8 +72,8 @@ naming note). Don't confuse the two just because both are called
 9. Commit if you made any changes to context/ADR files as part of
    flagging (see
    [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
-   Stop for `task-completion-review` (task-level) or
-   `phase-completion-review` (phase-level) — see `.ai/info.md`.
+   At `full`/`medium`: stop for `task-completion-review` (task-level)
+   or `phase-completion-review` (phase-level) — see `.ai/info.md`.
    **Clean findings are not themselves approval** — even if you found
    nothing wrong, stop and wait for an explicit yes before anything
    gets marked complete; don't treat "I approve of what I found" as
@@ -73,15 +81,26 @@ naming note). Don't confuse the two just because both are called
    [.ai/workflow/workflow.md §5](.ai/workflow/workflow.md#5-lifecycle--gates)). If
    changes were requested instead, return to the implementation loop —
    there's nothing to stop for until it comes back for review again.
-10. **When approval comes back, that's a separate turn:** in
-    `manual`/`assisted` mode, report the approval and explicitly ask
-    whether to run `workflow-context` now to finalize completion,
-    rather than starting it in the same response.
+   **At `lite`, don't stop here at all** — these findings aren't
+   themselves the gate; carry them straight into `workflow-context`'s
+   task-completion sub-operation, which presents validation + review +
+   context findings together and is where the single `task-completion`
+   gate actually stops (§14).
+10. **At `full`/`medium`, when approval comes back, that's a separate
+    turn:** in `manual`/`assisted` mode, report the approval and
+    explicitly ask whether to run `workflow-context` now to finalize
+    completion, rather than starting it in the same response. **At
+    `lite`**, there's no separate approval to wait for here (step 9) —
+    proceed directly into `workflow-context`'s task-completion
+    sub-operation in the same turn; that operation is itself where the
+    turn stops for the single `task-completion` gate.
 
 ## Output
 
 A review verdict (approve / changes requested) with findings listed
-against the checks above. If approved: the task/phase left at Status
-`reviewing` in the relevant table and `.ai/info.md`, ready for
-`workflow-context` to mark it `complete` — review itself never sets
-Status to `complete`.
+against the checks above. At `full`/`medium`, if approved: the
+task/phase left at Status `reviewing` in the relevant table and
+`.ai/info.md`, ready for `workflow-context` to mark it `complete` —
+review itself never sets Status to `complete`. At `lite`: findings
+handed directly to `workflow-context`, which presents them at the
+combined `task-completion` gate.

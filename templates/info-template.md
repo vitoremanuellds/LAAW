@@ -7,20 +7,28 @@ fresh, never rely on what you saw earlier in a session; it can change
 mid-session and stale memory of it is exactly what causes a gate to
 get ignored.
 
-## Policy — who's authorized for each gate
+## Policy — who's authorized for each gate, and how much structure applies
 
-Full gate list and explanations live in `.ai/workflow/workflow.md §5`
-— this section holds only the values, not the reasoning, so keep it
-short.
+Full gate list and explanations live in `.ai/workflow/workflow.md §5`;
+profile tiers live in `.ai/workflow/workflow.md §14` — this section
+holds only the values, not the reasoning, so keep it short.
 
 ```yaml
 mode: assisted   # manual | assisted | delegated | autonomous
+profile: full    # lite | medium | full — structural/ceremony/detail tier,
+                 # independent of mode (any combination is valid).
+                 # Missing key = full, for compatibility with info.md files
+                 # written before this field existed.
+                 # See .ai/workflow/workflow.md §14 for what each tier cuts.
 
 overrides:
   # Only needed for exceptions to your mode's default (see
   # .ai/workflow/workflow.md §5 for what each mode defaults to). In
   # delegated mode this list *is* your actual policy — every gate you
   # don't list here falls back to human.
+  # A gate that doesn't exist at your current profile (§14) is ignored
+  # here even if listed — profile controls which gates exist at all;
+  # mode/overrides only control who approves the ones that do.
 ```
 
 ## Status — the fast pointer
