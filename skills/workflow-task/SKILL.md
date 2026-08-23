@@ -100,7 +100,26 @@ invocation:**
        is guidance for the Implementation Agent, not a literal script
        — see [.ai/workflow/workflow.md §6](.ai/workflow/workflow.md#6-deviations)
        for why deviating from its specifics isn't automatically a
-       deviation.
+       deviation. **Write it in informal, language-agnostic
+       notation — never the target language's real syntax.** No real
+       class/decorator/import syntax, no exact method signatures, no
+       code that would compile once imports were added. If what
+       you've written looks like it could be pasted straight into the
+       file, it's too literal — that's implementation, which this
+       agent Cannot do (§10). For example, for a non-trivial
+       transform, write:
+       ```
+       for each raw item:
+         if item.status is "archived", skip it
+         group remaining items by item.category
+         within each group, sort by item.updatedAt descending
+       return groups as a list of {category, items} entries
+       ```
+       not:
+       ```typescript
+       items.filter(i => i.status !== 'archived')
+         .reduce((acc, i) => { acc[i.category] ??= []; acc[i.category].push(i); return acc; }, {} as Record<string, Item[]>)
+       ```
      - **Dependencies**, **expected result**, **validation
        instructions**.
 
