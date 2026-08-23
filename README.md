@@ -90,19 +90,14 @@ one):
    aggressively, since unlike `workflow.md` it can change mid-session.
 
 2. **Run the constitution skill.** Point an agent (or yourself) at
-   `.ai/workflow/skills/workflow-constitution/SKILL.md`. Also state a
-   profile — `lite`, `medium`, or `full` — when you invoke it; defaults
-   to `full` if unstated. See **Choosing a profile** below. Until this
+   `.ai/workflow/skills/workflow-constitution/SKILL.md`. Until this
    runs, `.ai/info.md` genuinely doesn't exist yet — that's expected,
    not a sign anything's broken. On a brand-new project this single
-   step writes the constitution (three files at `full`/`medium`, one
-   merged `project.md` at `lite`) — *and* bootstraps `.ai/info.md`,
-   `.ai/decisions/decisions.md`, and (at `full` only) `.ai/context/context.md`
-   from their templates automatically (safe conservative defaults; edit
-   `info.md` afterward once you're ready to delegate any gates). If the
-   project already has code in it, this step also inspects the
-   existing codebase before interviewing you — see
-   [`workflow.md §14`](workflow.md#14-profiles). This
+   step writes `.ai/constitution/mission.md`, `techstack.md`,
+   `roadmap.md` — *and* bootstraps `.ai/info.md`,
+   `.ai/context/context.md`, and `.ai/decisions/decisions.md` from
+   their templates automatically (safe conservative defaults; edit
+   `info.md` afterward once you're ready to delegate any gates). This
    is the only step that can't be skipped — everything downstream
    assumes it exists.
 
@@ -122,21 +117,6 @@ one):
    sync with the real one in `.ai/workflow/`. If you don't know
    whether your harness needs this, you probably don't —
    `workflow.md §2`'s lookup table works without it.
-
-### Choosing a profile
-
-`info.md`'s `profile:` field picks how much structure and ceremony the
-protocol carries for this project — pick one at bootstrap (switching
-later isn't supported yet, treat it as a manual operation if you do).
-
-| Tier | Structure | Gates | Best for |
-|---|---|---|---|
-| `lite` | one `project.md`, flat task list, no phase layer | 3 | small or solo/local-model-heavy projects |
-| `medium` | phases + inline tasks, merged context | 8 | mid-size projects wanting full gate rigor without file sprawl |
-| `full` (default) | today's layout, unchanged | 8 | larger, multi-agent/multi-human, or long-lived projects |
-
-Full breakdown of what each tier cuts:
-[`workflow.md §14`](workflow.md#14-profiles).
 
 `.ai/info.md`'s Status section is the fast answer to "what's happening
 right now" — IDs only, no status values, updated by every skill as its
@@ -252,12 +232,6 @@ stays correct regardless of what your project names the mount point —
 though `.ai/workflow/` is the convention every skill and the `AGENTS.md`
 snippet assumes. Full layout and link conventions:
 [`workflow.md §3`](workflow.md#3-directory-structure).
-
-The layout shown above is `profile: full`. `medium` merges task files
-into their phase file's Tasks table and `context/` into `techstack.md`;
-`lite` further merges the constitution and phase layer into a single
-flat `project.md`. See [`workflow.md §14`](workflow.md#14-profiles) for
-both variants' directory diagrams.
 
 ## Best Practices
 

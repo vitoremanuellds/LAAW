@@ -70,9 +70,6 @@ index, no shared per-phase/per-task context file, one merged
 config/status file. A task's status lives in exactly one place — its
 phase file's table — never duplicated into the task's own file.
 
-This is the `profile: full` layout — `medium` and `lite` cut layers
-from it; see §14.
-
 **Every bare mention below** of `info.md`, `roadmap.md`, `phases/`,
 `tasks/`, `context/`, `decisions/`, or `constitution/` refers to that
 file/folder under `.ai/` as shown above — this document is a reference
@@ -147,8 +144,7 @@ Diagram labels favor readability over `info.md`'s exact YAML keys:
 
 Full gate list: `constitution-review` · `phase-review` · `task-review`
 · `task-validation` · `phase-validation` · `task-completion-review` ·
-`phase-completion-review` · `context-update`. This is `profile: full`'s
-gate set — `medium` keeps all 8, `lite` collapses to 3; see §14.
+`phase-completion-review` · `context-update`.
 
 **Gates block *advancing past* a draft, never *producing* one.**
 Drafting never needs prior approval; only passing review does. Unsure
@@ -275,9 +271,7 @@ the same step.
 ## 10. Agent contracts
 
 No agent determines its own authority — gate authority comes from
-`../info.md`. Contracts below assume `profile: full`; see §14 for what
-changes at `medium`/`lite` (e.g. `workflow-phase` isn't invoked at
-`lite`).
+`../info.md`.
 
 **Constitution Agent** — Can: constitution artifacts, ask
 clarification. Must: ADR for project-level decisions; first run,
@@ -354,10 +348,6 @@ not-planned → awaiting-plan-review → plan-approved → in-progress
 (blocked applies from any active state)
 ```
 
-This enum is identical at every profile tier — never add or drop a
-value for `medium`/`lite`; only how many levels track it and how many
-transitions pause for a gate changes. See §14.
-
 | Value | Set by |
 |---|---|
 | `not-planned` | `workflow-constitution` (every phase, initially); `workflow-task` (every undrafted plan step, on first invocation per phase) |
@@ -405,112 +395,3 @@ review happens via `git diff`. Messages tied to IDs: `P01: phase
 drafted`, `P01-T01: task planned`, `P01-T01: implementation complete`,
 `P01: phase complete`. Commit again whenever `info.md`, `roadmap.md`,
 or a phase file's task table changes.
-
----
-
-## 14. Profiles
-
-Selected by `info.md`'s `profile:` field — `lite` | `medium` | `full`,
-default `full` if unset. Orthogonal to `mode`: `mode` decides *who*
-approves a gate; `profile` decides *how much* structure and how many
-gates exist at all. Any combination of the two is valid — e.g.
-`profile: lite, mode: manual` is a small project where a human still
-approves everything, just far fewer things need approving.
-
-Every rule in §1–§13 above assumes `profile: full` unless the section
-says otherwise. `medium` and `lite` are graduated cuts —
-`medium`'s cuts are a strict subset of `lite`'s.
-
-### Cut table
-
-| Axis | `full` | `medium` | `lite` |
-|---|---|---|---|
-| Pseudocode | allowed when non-obvious | never written | never written |
-| Task granularity | own file `tasks/p{NN}-t{NN}-{name}.md` | inline block in the phase file's Tasks-table row | inline block in `project.md`'s flat Tasks-table row |
-| Cross-phase context | `context/` dir + `context.md` index | merged into `techstack.md`'s own `## Context` subsection | merged into `project.md`'s Techstack section's `## Context` subsection |
-| Gates | 8, all separate | 8, all separate (unchanged) | 3: `constitution-review`, `task-review`, `task-completion` |
-| Phase layer | `phases/*.md` + `phase-review`/`phase-validation`/`phase-completion-review` | unchanged, full phase layer intact | removed — flat `T{NN}` task table directly in `project.md`'s Roadmap section |
-| Constitution | `mission.md` + `techstack.md` + `roadmap.md` | unchanged, 3 files | merged into one `project.md` |
-| Decisions/ADRs | unchanged | unchanged | unchanged — out of scope at every tier |
-
-### Status enum
-
-Identical at every tier — never invent or drop a value for a lower
-profile (§11's closed 8-value enum stands as-is). What actually
-changes:
-
-- **Levels tracked**: 2 (phase in `roadmap.md`, task in phase file) at
-  `full`/`medium`; 1 (task rows in `project.md`'s flat table) at `lite`.
-- **Transitions that pause for a gate**: all of them at `full`/
-  `medium`; only `awaiting-plan-review`→`plan-approved` (via
-  `task-review`) and the move to `complete` (via the combined
-  `task-completion` gate) at `lite` — `validating`/`reviewing` still
-  get set as the combined check runs, just without their own stop.
-
-### Gate list per tier
-
-| Tier | Gates |
-|---|---|
-| `full` | all 8 (§5) |
-| `medium` | all 8 (§5), unchanged — medium changes structure/detail, never the gate graph |
-| `lite` | `constitution-review`, `task-review`, `task-completion` (a new combined gate, distinct from `task-completion-review` — folds validation + review + context-finalize into one stop) |
-
-A gate not in the current tier's list is inert if listed in `info.md`'s
-`overrides` — not an error, not a backdoor. Profile controls which
-gates exist; mode/overrides only control who approves the ones that do.
-
-### Per-skill behavior by tier
-
-Every change below is a short inline callout at an existing step in
-that skill, never a parallel duplicated procedure.
-
-| Skill | `medium` | `lite` |
-|---|---|---|
-| `workflow-constitution` | skip `context/context.md` bootstrap; techstack.md gains a `## Context` subsection | write one `project.md` (Mission + Techstack[+Context] + Roadmap) instead of three files; Roadmap stubs flat `T{NN}` task rows, not phase rows |
-| `workflow-phase` | note: Tasks-table rows will be inline blocks, not file links | **not invoked** — go straight from constitution to `workflow-task` against `project.md`'s flat table |
-| `workflow-task` | write an inline block under the phase file's Tasks-table row instead of a separate task file; skip Pseudocode always | write into `project.md`'s flat table directly; no phase-level `in-progress` step (no phase status to flip) |
-| `workflow-implementation` | read/write the inline block instead of a separate task file | read/write `project.md`'s flat table row directly |
-| `workflow-validation` | task-level reads the inline block; phase-level unchanged | phase-level N/A; task-level: don't stop for a separate gate, continue straight into `workflow-review`'s checks |
-| `workflow-review` | reads the inline block instead of a task file | after reporting findings, don't stop — continue into `workflow-context`, carrying findings forward; phase-level N/A |
-| `workflow-context` | context updates redirect to `techstack.md`'s `## Context` subsection, no index row to maintain | the task-completion sub-operation **is** the single `task-completion` gate stop — present validation + review + context findings together, one approval, then set `complete` and clear `info.md`; phase/project sub-operations N/A |
-
-Brownfield bootstrap (workflow-constitution's existing-codebase
-detection step) applies at every tier the same way — only where the
-resulting snapshot gets written differs, per the table above.
-
-### Directory structure — `medium`
-
-```
-.ai/
-├── workflow/
-├── info.md
-├── constitution/
-│   ├── mission.md
-│   ├── techstack.md          ◄── includes ## Context subsection
-│   └── roadmap.md
-├── phases/
-│   └── p01-name.md              Tasks-table rows are inline blocks, no separate task files
-└── decisions/
-    ├── decisions.md
-    └── adr01-name.md
-```
-
-### Directory structure — `lite`
-
-```
-.ai/
-├── workflow/
-├── info.md
-├── project.md                 ◄── Mission + Techstack (w/ Context) + Roadmap (flat task table, inline blocks)
-└── decisions/
-    ├── decisions.md
-    └── adr01-name.md
-```
-
-### Out of scope for now
-
-Changing `profile:` mid-project has no supported migration — pick a
-profile at bootstrap; changing it later is a manual, unsupported
-operation. `lite` has no project-completion gate by design (3 gates
-total, no 4th); a project that needs completion ceremony has outgrown
-`lite`.

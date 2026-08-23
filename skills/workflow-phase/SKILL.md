@@ -13,18 +13,11 @@ Operation for the **Phase Planning Agent**. Contract:
 Defining a new phase, or replanning one after a phase-level deviation
 (see [.ai/workflow/workflow.md §6](.ai/workflow/workflow.md#6-deviations)).
 
-**Not invoked at `profile: lite`** — check `.ai/info.md` first; at
-`lite` there's no phase layer, go straight from `workflow-constitution`
-to [workflow-task](.ai/workflow/skills/workflow-task/SKILL.md) against
-`.ai/project.md`'s flat Roadmap table instead (see
-[.ai/workflow/workflow.md §14](.ai/workflow/workflow.md#14-profiles)).
-
 ## Inputs
 
 - `.ai/constitution/roadmap.md`
-- Relevant context — at `full`, `.ai/context/context.md` and whatever
-  files it points to; at `medium`, `techstack.md`'s own `## Context`
-  subsection (§14) — only what this phase actually touches.
+- Relevant `.ai/context/context.md` and whatever files it points to —
+  only what this phase actually touches.
 - If replanning: the deviation that triggered it, and completed tasks
   from the prior plan.
 
@@ -47,15 +40,12 @@ stopping for anything. Only step 7 is gated.
 1. Read the roadmap entry for this phase. Don't touch its Status yet —
    whether this is a first draft (already `not-planned`, set by
    `workflow-constitution`) or a replan (already `in-progress`), leave
-   it as-is until step 5. Read only the relevant context — at `full`,
-   the `.ai/context/` files relevant to this phase, not the whole
-   `context/` tree; at `medium`, `techstack.md`'s `## Context`
-   subsection.
+   it as-is until step 5. Read only the `.ai/context/` files relevant
+   to this phase — do not read the whole `context/` tree.
 2. Write `.ai/phases/p{NN}-{name}.md` in one file, with these sections:
    - **Context** — architecture, modules, domain concepts, constraints
-     specific to *this* phase. Don't repeat the project-wide context —
-     link to it instead (`.ai/context/context.md`'s specific files at
-     `full`, `techstack.md`'s `## Context` subsection at `medium`).
+     specific to *this* phase. Don't repeat `.ai/context/context.md` —
+     link to the specific files there instead.
    - **Requirements** — outcomes that must be true for the phase to be
      complete. Outcomes, not steps.
    - **Plan** — the ordered sequence of work. Defines *what* must
@@ -65,10 +55,7 @@ stopping for anything. Only step 7 is gated.
    - **Tasks** — a table, initially with **no rows** (or, if
      replanning, only the rows that already existed): `| ID | Title |
      Purpose | Depends on | Status |`. Leave it empty/unchanged here —
-     `workflow-task` populates it, not you. At `profile: medium`, each
-     row's detail will be an inline block under the row rather than a
-     link to a separate `.ai/tasks/...md` file (§14) — doesn't change
-     anything you do here, only what `workflow-task` writes later.
+     `workflow-task` populates it, not you.
 3. If replanning: fold in what's already complete rather than
    discarding it; note the change in the file itself (Git carries the
    prior version). The existing Tasks table rows carry over unchanged —

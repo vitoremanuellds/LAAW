@@ -18,12 +18,7 @@ for the full list; never invent one not on it.
 ## When to use
 
 After implementation, before review — at task level (`task-validation`
-gate) or phase level (`phase-validation` gate). **At `profile: lite`**,
-these aren't separate gates (§14) — phase-level validation doesn't
-apply (no phase layer), and task-level validation still runs the same
-checks but doesn't stop on its own; continue straight into
-`workflow-review`, which itself continues into the single combined
-`task-completion` gate.
+gate) or phase level (`phase-validation` gate).
 
 ## Before anything else: check authority, freshly
 
@@ -37,21 +32,15 @@ still current.
 
 ## Inputs
 
-- Task: the task's Implementation detail (validation instructions) —
-  its own file at `full`, the inline block under its table row at
-  `medium`/`lite`.
-- Phase (`full`/`medium` only, no phase layer at `lite`): the phase
-  file's Validations section and its Tasks table.
+- Task: the task file's Implementation section (validation instructions).
+- Phase: the phase file's Validations section and its Tasks table.
 
 ## Procedure — task validation
 
-1. Set the task's Status to `validating` in its owning Tasks table
-   (the phase file's at `full`/`medium`, `.ai/project.md`'s Roadmap
-   table at `lite`) if not already set, and update `.ai/info.md`'s
-   Status section to match.
-2. Read the task's Implementation detail (requirements + plan) — its
-   own file at `full`, the inline block under its table row at
-   `medium`/`lite`.
+1. Set the task's Status to `validating` in its owning
+   `.ai/phases/p{NN}-{name}.md` Tasks table if not already set, and
+   update `.ai/info.md`'s Status section to match.
+2. Read the task file's Implementation section (requirements + plan).
 3. Execute the validation instructions (automated tests, integration
    checks).
 4. Report pass/fail. On failure, do **not** edit implementation to
@@ -59,15 +48,9 @@ still current.
    return the task to the implementation loop (see
    [.ai/workflow/workflow.md §5](.ai/workflow/workflow.md#5-lifecycle--gates)).
 5. Record any accepted exceptions explicitly rather than silently
-   ignoring a failure. **At `lite`**, don't stop for a separate gate
-   here on pass — carry the result straight into `workflow-review`'s
-   checks (§14); a failure still returns to implementation exactly as
-   above, at every profile.
+   ignoring a failure.
 
 ## Procedure — phase validation
-
-**Not applicable at `profile: lite`** — no phase layer exists (§14);
-task validation above is the only validation operation at that tier.
 
 1. Set the phase's Status to `validating` in
    `.ai/constitution/roadmap.md` if not already set, and update
@@ -81,8 +64,7 @@ task validation above is the only validation operation at that tier.
 
 ## Output
 
-Pass/fail result recorded against the task (in its owning Tasks table
-— the phase file's at `full`/`medium`, `.ai/project.md`'s Roadmap
-table at `lite`) or phase (`full`/`medium` only: in
-`.ai/constitution/roadmap.md` and the phase file itself) — not a
-separate permanent log file. `.ai/info.md` updated to match.
+Pass/fail result recorded against the task (in its owning phase file's
+Tasks table) or phase (in `.ai/constitution/roadmap.md` and the phase
+file itself) — not a separate permanent log file. `.ai/info.md`
+updated to match.
