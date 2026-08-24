@@ -1,12 +1,15 @@
 ---
-name: workflow-constitution
-description: Use this skill to create or update a project's constitution (mission.md, techstack.md, roadmap.md) under .ai/constitution/ — the first operation on a new project; also bootstraps info.md, context/context.md, and decisions/decisions.md on first run. Not for phase or task planning — see workflow-phase/workflow-task.
+name: create-constitution-full
+description: Full-profile skill to create or update a project's constitution (mission.md, techstack.md, roadmap.md) under .ai/constitution/ — the first operation on a new project; also bootstraps info.md, context/context.md, and decisions/decisions.md on first run. Not for phase or task planning — see define-phase/define-task-full.
 ---
 
-# Skill: workflow.constitution
+# Skill: create-constitution-full
 
 Operation for the **Constitution Agent**. Contract:
 [.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts).
+
+Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
+as every other skill — do not skip it for constitution work.
 
 ## When to use
 
@@ -50,13 +53,20 @@ draft everything before stopping for anything. Only step 7 is gated.
 5. Write `.ai/constitution/techstack.md`: languages, frameworks,
    runtime, infra, constraints. Describe the foundation, not per-task
    implementation choices.
-6. Write `.ai/constitution/roadmap.md` — ordered phases, one-line
-   description each, and a **Status** column (`not-planned` for all
-   of them initially — this file is the phase-level permanent record;
-   see
+6. Write `.ai/constitution/roadmap.md` as a table: `| ID | Title |
+   Depends on | Status |`, one row per phase, Status `not-planned` for
+   all of them initially (this file is the phase-level permanent
+   record; see
    [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-fast-pointer-and-the-permanent-record)).
-   No separate per-phase files here — phase detail lives in each
-   phase's own `.ai/phases/p{NN}-{name}.md` once planned.
+   Leave Depends-on empty unless a phase is already known to require
+   another one first — `define-phase` fills in or adjusts this as
+   phases actually get planned, the same way task-level dependencies
+   get filled in later (§11). Each phase should be feature-sized,
+   semantically-linked work, not a task list —
+   [.ai/workflow/workflow.md §4](.ai/workflow/workflow.md#4-artifact-hierarchy--context-rule)
+   defines what counts as a phase. No separate per-phase files here —
+   phase detail lives in each phase's own
+   `.ai/phases/p{NN}-{name}.md` once planned.
 7. Commit the draft (see
    [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)) —
    include `.ai/info.md`/`.ai/context/context.md`/

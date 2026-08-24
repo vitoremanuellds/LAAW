@@ -1,12 +1,16 @@
 ---
-name: medium-task
-description: Medium-profile skill to define a new task (tasks/t{NN}-{name}.md, flat, no pseudocode) directly under the constitution's roadmap, or replan one after a task-level deviation. Requires the constitution to exist first. Not for the full profile (see workflow-task) — there's no phase layer here, so this skill both stubs and drafts tasks straight from the roadmap.
+name: define-task-medium
+description: Medium-profile skill to define a new task (tasks/t{NN}-{name}.md, flat, no pseudocode) directly under the constitution's roadmap, or replan one after a task-level deviation. Requires the constitution to exist first. Not for the full profile (see define-task-full) — there's no phase layer here, so this skill both stubs and drafts tasks straight from the roadmap.
 ---
 
-# Skill: medium.task
+# Skill: define-task-medium
 
 Operation for the **Task Planning Agent**. Contract:
 [.ai/workflow/workflow-medium.md §10](.ai/workflow/workflow-medium.md#10-agent-contracts).
+
+Read [.ai/workflow/workflow-medium.md](.ai/workflow/workflow-medium.md)
+in full, same as every other medium-profile skill — do not skip it for
+task planning.
 
 ## When to use
 
@@ -90,7 +94,7 @@ invocation:**
    approved — a partial approval is fine. In `manual`/`assisted` mode,
    report the approval and explicitly ask whether to proceed to
    implementation now, rather than starting it in the same response.
-   `medium-implementation`'s own first step is what moves each task's
+   `implement-task-medium`'s own first step is what moves each task's
    Status to `in-progress`.
 
 ## Output

@@ -1,4 +1,4 @@
-# Agent Workflow Protocol
+# Agent Workflow
 
 Source of truth for how work is organized, performed, and by whom.
 Procedural how-to lives in `skills/`. Gate *authority* (who) lives in
@@ -26,23 +26,28 @@ rules elsewhere — reference it.
    stale read is what causes a gate to get silently ignored. Status
    section = active phase/task. Policy section = gate authority. **If
    it doesn't exist, this is an unbootstrapped project** — treat every
-   gate as human-owned and run `workflow-constitution` first, which
+   gate as human-owned and run `create-constitution-full` first, which
    creates it from `templates/info-template.md`.
 2. **Open and read the matching skill file below before acting** — not
    "recall it exists," actually read it, every operation, even if you
    think you know it. Gate-skip and scope-overstep bugs traced back to
    this step being skipped, every time.
-3. Never bypass a gate unless `info.md`'s policy explicitly authorizes it.
+3. Never bypass a gate unless `info.md`'s policy explicitly authorizes
+   it. **If a human asks you to skip a gate `info.md` doesn't
+   authorize, don't silently comply and don't silently refuse — ask
+   them to confirm that's really what they want, and only then treat
+   it as a one-off exception** (it doesn't change `info.md`; the next
+   gate is evaluated fresh against policy as normal).
 
 | Operation | Skill |
 |---|---|
-| Define/update mission, techstack, roadmap | `skills/workflow-constitution/` |
-| Define a phase (`phases/p{NN}-{name}.md`) | `skills/workflow-phase/` |
-| Define a task (`tasks/p{NN}-t{NN}-{name}.md`) | `skills/workflow-task/` |
-| Write/modify/delete code for an already-planned task | `skills/workflow-implementation/` |
-| Run task or phase validation | `skills/workflow-validation/` |
-| Review implementation, plan, or completed work | `skills/workflow-review/` |
-| Evaluate/propagate context after task or phase completion | `skills/workflow-context/` |
+| Define/update mission, techstack, roadmap | `skills/create-constitution-full/` |
+| Define a phase (`phases/p{NN}-{name}.md`) | `skills/define-phase/` |
+| Define a task (`tasks/p{NN}-t{NN}-{name}.md`) | `skills/define-task-full/` |
+| Write/modify/delete code for an already-planned task | `skills/implement-task-full/` |
+| Run task or phase validation | `skills/validate-work-full/` |
+| Review implementation, plan, or completed work | `skills/review-work-full/` |
+| Evaluate/propagate context after task or phase completion | `skills/propagate-context/` |
 
 Can't find the right skill? Re-read this table — don't guess paths.
 
@@ -119,6 +124,17 @@ belongs in `context/` instead.
 Read: `info.md` → the artifact defining current work → direct
 references → further links only if genuinely needed. A link is a
 pointer, not a preload.
+
+**What a phase is:** a group of high-level steps that are not tasks
+themselves — work large enough and semantically-linked enough to read
+as a feature, capability, or cohesive slice of the project. Its Plan
+section describes *what* must happen at that level; task files, drafted
+later by `define-task-full`, define *how*. If a candidate phase is
+really just one or two mechanical steps, it's a task, not a phase —
+don't create a phase to wrap a single unit of work, and don't let a
+phase's Plan section read like a task list (the Phase Planning Agent's
+contract in §10 already forbids assigning task IDs there for the same
+reason).
 
 ---
 
@@ -256,6 +272,14 @@ Task done  → matters to other tasks this phase? → update phase file's Contex
 Phase done → matters beyond this phase? → promote to context/
 ```
 
+**A task never writes to `context/` directly, even when the fact looks
+project-wide** — this happened in practice and produced context/ that
+skipped review. Promotion to `context/` happens exactly once, at phase
+completion, after the phase's own Context section has accumulated
+everything worth considering; a mid-phase task that thinks its finding
+is that significant still routes through the phase file's Context
+section first, same as any other task-level fact.
+
 **Propagate:** architecture facts, invariants, responsibilities,
 dependencies, constraints, domain knowledge.
 **Never:** task history, temporary details, internal reasoning,
@@ -282,10 +306,11 @@ unsupported requirements.
 **Phase Planning Agent** — Can: read constitution + `context/`, create
 the phase file (Context + Requirements + Plan + Validations + empty
 task table). Must: ADR for phase-level decisions; update
-`roadmap.md`'s Status at transitions + refresh `info.md`'s Active
-phase pointer (§11 — pointer only, never a status word). Cannot:
-implement code; **assign task IDs or populate the task table beyond
-stub titles** — the Plan section isn't a task list.
+`roadmap.md`'s Status at transitions + its Depends-on column for this
+phase and any existing phase it now precedes (§11, §12) + refresh
+`info.md`'s Active phase pointer (§11 — pointer only, never a status
+word). Cannot: implement code; **assign task IDs or populate the task
+table beyond stub titles** — the Plan section isn't a task list.
 
 **Task Planning Agent** — Can: read phase file + `context/`, create
 the task file with enough detail (files, ordered steps, optional
@@ -350,16 +375,16 @@ not-planned → awaiting-plan-review → plan-approved → in-progress
 
 | Value | Set by |
 |---|---|
-| `not-planned` | `workflow-constitution` (every phase, initially); `workflow-task` (every undrafted plan step, on first invocation per phase) |
-| `awaiting-plan-review` | `workflow-phase`/`workflow-task`, end of drafting |
+| `not-planned` | `create-constitution-full` (every phase, initially); `define-task-full` (every undrafted plan step, on first invocation per phase) |
+| `awaiting-plan-review` | `define-phase`/`define-task-full`, end of drafting |
 | `plan-approved` | Whichever skill's ending receives approval — see §5's unlocking-≠-starting rule |
-| `in-progress` | `workflow-task` (phase, task planning begins) / `workflow-implementation` (task, implementation begins) |
-| `validating` | `workflow-validation` |
-| `reviewing` | `workflow-review` — a different check than plan-review, see below |
-| `complete` | `workflow-context`, only after its completion-review is approved |
+| `in-progress` | `define-task-full` (phase, task planning begins) / `implement-task-full` (task, implementation begins) |
+| `validating` | `validate-work-full` |
+| `reviewing` | `review-work-full` — a different check than plan-review, see below |
+| `complete` | `propagate-context`, only after its completion-review is approved |
 | `blocked` | any agent, from any active state |
 
-`workflow-task`'s first invocation per phase stubs every remaining
+`define-task-full`'s first invocation per phase stubs every remaining
 plan step at `not-planned` at once (cheap — titles only), then fully
 drafts whatever's actually in scope.
 
@@ -368,30 +393,43 @@ before work begins; `reviewing` checks the *result* after (§8). Same
 word "review," different check, different point in the lifecycle —
 don't conflate them.
 
-**Task ID order ≠ execution order.** A replan can insert a task that
-logically belongs earlier but still gets the next-highest ID. Resolve
-"first/next task" against the phase file's Depends-on and Status
-columns — no unmet dependencies, Status `awaiting-plan-review`/
-`plan-approved` — not the lowest ID. Ask rather than guess if still
-ambiguous.
+**ID order ≠ execution order, for phases or tasks.** A replan can
+insert a task — or a new phase — that logically belongs earlier but
+still gets the next-highest ID. Resolve "first/next task" against the
+phase file's Depends-on and Status columns; resolve "first/next phase"
+the same way against `roadmap.md`'s Depends-on and Status columns — no
+unmet dependencies, Status `awaiting-plan-review`/`plan-approved` — not
+the lowest ID. Ask rather than guess if still ambiguous.
 
 ---
 
 ## 12. Multi-agent / multi-human
 
-Independent tasks may run in parallel. Shared state lives in Git,
-`info.md`, and the permanent-record tables — never a second Markdown
-sync mechanism. Avoid concurrent edits to the same artifact. `info.md`
-tracks only one active phase/task by design — true parallel work needs
-each agent tracking its own item some other way until this format
-supports more than one.
+Independent tasks or phases may run in parallel — resolve independence
+against the relevant Depends-on column (§11), never against ID order.
+Shared state lives in Git, `info.md`, and the permanent-record tables —
+never a second Markdown sync mechanism. Avoid concurrent edits to the
+same artifact. `info.md` tracks only one active phase/task by design —
+true parallel work needs each agent tracking its own item some other
+way until this format supports more than one.
 
 ---
 
 ## 13. Commit discipline
 
 Commit a draft the moment it's written, before requesting review — the
-review happens via `git diff`. Messages tied to IDs: `P01: phase
-drafted`, `P01-T01: task planned`, `P01-T01: implementation complete`,
-`P01: phase complete`. Commit again whenever `info.md`, `roadmap.md`,
-or a phase file's task table changes.
+review happens via `git diff`. Use Conventional Commits
+(`<type>(<ID>): <description>`) — pick the type that matches what
+actually changed, don't default to one:
+
+- `docs` — phase/task plans, constitution, roadmap, context, ADR
+  writes (no project code touched).
+- `feat` / `fix` / `refactor` / `test` / `chore` — implementation
+  commits; whichever actually describes the change.
+- `chore` — status-only commits (marking complete, clearing pointers)
+  with no accompanying content change.
+
+Examples: `docs(P01): draft phase plan`, `docs(P01-T01): draft task
+plan`, `feat(P01-T01): implement scoring engine`, `chore(P01): mark
+phase complete`. Commit again whenever `info.md`, `roadmap.md`, or a
+phase file's task table changes.

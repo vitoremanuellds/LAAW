@@ -5,7 +5,7 @@
 #
 # Adds any skill not already present; overwrites any that already
 # exist with the current version. Does NOT remove skills that were
-# deleted upstream — check manually after a protocol update if that
+# deleted upstream — check manually after a workflow update if that
 # matters to you.
 #
 # Usage:

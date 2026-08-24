@@ -1,12 +1,16 @@
 ---
-name: medium-validation
-description: Medium-profile skill to run task validation after implementation, before review — check requirements, report pass/fail. Not for fixing failing code (return to implementation), code-quality/architectural review (see medium-review), or the full profile (see workflow-validation).
+name: validate-work-medium
+description: Medium-profile skill to run task validation after implementation, before review — check requirements, report pass/fail. Not for fixing failing code (return to implementation), code-quality/architectural review (see review-work-medium), or the full profile (see validate-work-full).
 ---
 
-# Skill: medium.validation
+# Skill: validate-work-medium
 
 Operation for the **Validation Agent**. Contract:
 [.ai/workflow/workflow-medium.md §10](.ai/workflow/workflow-medium.md#10-agent-contracts).
+
+Read [.ai/workflow/workflow-medium.md](.ai/workflow/workflow-medium.md)
+in full, same as every other medium-profile skill — do not skip it for
+validation.
 
 **All `.ai/`-artifact paths below are relative to the project root, not
 to this skill file — write the full `.ai/...` path.** Status values you
@@ -34,8 +38,9 @@ The task file's Implementation section (validation instructions).
 ## Procedure
 
 1. Set the task's Status to `validating` in `.ai/constitution/
-   roadmap.md` if not already set, and update `.ai/info.md`'s Status
-   section to match.
+   roadmap.md` if not already set. `.ai/info.md`'s Active task pointer
+   should already name this task — leave it as the ID only; the status
+   word belongs in `roadmap.md`, never in `info.md` (§11).
 2. Read the task file's Implementation section (requirements + plan).
 3. Execute the validation instructions (automated tests, integration
    checks).
@@ -49,4 +54,5 @@ The task file's Implementation section (validation instructions).
 
 Pass/fail result recorded against the task's row in
 `.ai/constitution/roadmap.md` — not a separate permanent log file.
-`.ai/info.md` updated to match.
+`.ai/info.md`'s Active task pointer is unaffected — it already names
+this task; the status word lives only in `roadmap.md` (§11).

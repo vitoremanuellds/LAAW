@@ -75,6 +75,13 @@ Drafting a task's detail never needs prior approval; only passing
 passed and explicitly ask before the next step, even though the gate
 technically authorizes it; don't chain into it in the same turn.
 
+**Never bypass a gate unless `project.md`'s Policy block explicitly
+authorizes it.** If a human asks you to skip one it doesn't authorize,
+don't silently comply and don't silently refuse — ask them to confirm
+that's really what they want, and only then treat it as a one-off
+exception (it doesn't change the Policy block; the next gate is
+evaluated fresh as normal).
+
 ### Execution modes
 
 Set in `project.md`'s Policy block (`mode` + optional `overrides`):
@@ -173,9 +180,20 @@ sign you've misread the situation, not a reason to invent one.
 ## 6. Commit discipline
 
 Commit a draft the moment it's written, before requesting review — the
-review happens via `git diff`. Messages tied to IDs: `T01: task
-planned`, `T01: implementation complete`, `T01: task complete`. Commit
-again whenever `project.md`'s Status or Tasks table changes.
+review happens via `git diff`. Use Conventional Commits
+(`<type>(<ID>): <description>`) — pick the type that matches what
+actually changed, don't default to one:
+
+- `docs` — task plans and Decisions-log entries (no project code
+  touched).
+- `feat` / `fix` / `refactor` / `test` / `chore` — implementation
+  commits; whichever actually describes the change.
+- `chore` — status-only commits (marking complete, clearing pointers)
+  with no accompanying content change.
+
+Examples: `docs(T01): draft task plan`, `feat(T01): implement scoring
+engine`, `chore(T01): mark task complete`. Commit again whenever
+`project.md`'s Status or Tasks table changes.
 
 ## Output
 

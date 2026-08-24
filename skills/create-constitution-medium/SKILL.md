@@ -1,12 +1,16 @@
 ---
-name: medium-constitution
-description: Medium-profile skill to create or update a project's constitution (mission.md, techstack.md, roadmap.md-as-flat-task-index) under .ai/constitution/ — the first operation on a new medium-profile project; also bootstraps info.md, context/context.md, and decisions/decisions.md on first run. Not for the full profile (see workflow-constitution) or task planning (see medium-task).
+name: create-constitution-medium
+description: Medium-profile skill to create or update a project's constitution (mission.md, techstack.md, roadmap.md-as-flat-task-index) under .ai/constitution/ — the first operation on a new medium-profile project; also bootstraps info.md, context/context.md, and decisions/decisions.md on first run. Not for the full profile (see create-constitution-full) or task planning (see define-task-medium).
 ---
 
-# Skill: medium.constitution
+# Skill: create-constitution-medium
 
 Operation for the **Constitution Agent**. Contract:
 [.ai/workflow/workflow-medium.md §10](.ai/workflow/workflow-medium.md#10-agent-contracts).
+
+Read [.ai/workflow/workflow-medium.md](.ai/workflow/workflow-medium.md)
+in full, same as every other medium-profile skill — do not skip it for
+constitution work.
 
 ## When to use
 

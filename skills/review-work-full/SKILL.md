@@ -1,12 +1,15 @@
 ---
-name: workflow-review
-description: Use this skill to review a task or phase's implementation and validation results for scope, complexity, architecture, missing validation, or context issues — at task-completion-review/phase-completion-review, after validation passes. Distinct from task-review/phase-review (plan approval) and from workflow-validation (correctness). Never silently fix issues — report and stop for the gate.
+name: review-work-full
+description: Full-profile skill to review a task or phase's implementation and validation results for scope, complexity, architecture, missing validation, or context issues — at task-completion-review/phase-completion-review, after validation passes. Distinct from task-review/phase-review (plan approval) and from validate-work-full (correctness). Never silently fix issues — report and stop for the gate.
 ---
 
-# Skill: workflow.review
+# Skill: review-work-full
 
 Operation for the **Review Agent**. Contract:
 [.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts).
+
+Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
+as every other skill — do not skip it for review.
 
 **All `.ai/`-artifact paths below are relative to the project root,
 not to this skill file — write the full `.ai/...` path.** Status
@@ -41,7 +44,10 @@ naming note). Don't confuse the two just because both are called
    earlier in the session. Set Status to `reviewing` — in the task's
    row in its owning phase file's Tasks table for a task-level review,
    or the phase's row in `.ai/constitution/roadmap.md` for a
-   phase-level review. Update `.ai/info.md`'s Status section to match.
+   phase-level review. `.ai/info.md`'s Active task/phase pointer
+   should already name this item — leave it as the ID only; the status
+   word belongs in the phase file's table or `roadmap.md`, never in
+   `info.md` (§11).
 2. Confirm the change matches its stated scope — flag anything done
    that wasn't in the plan (scope violation) or required but missing
    (requirement mismatch).
@@ -75,13 +81,13 @@ naming note). Don't confuse the two just because both are called
    there's nothing to stop for until it comes back for review again.
 10. **When approval comes back, that's a separate turn:** in
     `manual`/`assisted` mode, report the approval and explicitly ask
-    whether to run `workflow-context` now to finalize completion,
+    whether to run `propagate-context` now to finalize completion,
     rather than starting it in the same response.
 
 ## Output
 
 A review verdict (approve / changes requested) with findings listed
 against the checks above. If approved: the task/phase left at Status
-`reviewing` in the relevant table and `.ai/info.md`, ready for
-`workflow-context` to mark it `complete` — review itself never sets
-Status to `complete`.
+`reviewing` in the relevant table (`.ai/info.md`'s pointer is
+unaffected — see §11), ready for `propagate-context` to mark it
+`complete` — review itself never sets Status to `complete`.

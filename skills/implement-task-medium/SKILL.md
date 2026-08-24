@@ -1,9 +1,9 @@
 ---
-name: medium-implementation
-description: Medium-profile skill to write, modify, or delete project code for a task with an already-approved task file. Requires task planning first — use medium-task if the task file doesn't exist. Not for the full profile (see workflow-implementation) or for planning what a task should do.
+name: implement-task-medium
+description: Medium-profile skill to write, modify, or delete project code for a task with an already-approved task file. Requires task planning first — use define-task-medium if the task file doesn't exist. Not for the full profile (see implement-task-full) or for planning what a task should do.
 ---
 
-# Skill: medium.implementation
+# Skill: implement-task-medium
 
 Operation for the **Implementation Agent**. Contract:
 [.ai/workflow/workflow-medium.md §10](.ai/workflow/workflow-medium.md#10-agent-contracts).
@@ -43,8 +43,10 @@ rely on a partial local summary being complete. Then read:
    row for it — the task file itself never tracks its own status. It
    should be `plan-approved` — if it's still `awaiting-plan-review`,
    task-review hasn't actually passed yet; stop and check before
-   proceeding. Once confirmed, set Status to `in-progress` there, and
-   update `.ai/info.md`'s Status section to match. **The Status enum
+   proceeding. Once confirmed, set Status to `in-progress` there.
+   `.ai/info.md`'s Active task pointer already names this task from
+   task planning — leave it as the ID only; the status word belongs in
+   `roadmap.md`, never in `info.md` (§11). **The Status enum
    is exactly these eight values, nothing else:** `not-planned` ·
    `awaiting-plan-review` · `plan-approved` · `in-progress` ·
    `validating` · `reviewing` · `complete` · `blocked`. If you find
@@ -69,12 +71,14 @@ rely on a partial local summary being complete. Then read:
 ## 3. Finishing
 
 1. Set the task's Status to `validating` (or `blocked` if stuck) in
-   `.ai/constitution/roadmap.md`, and update `.ai/info.md` to match.
+   `.ai/constitution/roadmap.md`. `.ai/info.md`'s Active task pointer
+   already names this task — leave it as the ID only; the status word
+   belongs in `roadmap.md`, never in `info.md` (§11).
 2. Commit (see
    [.ai/workflow/workflow-medium.md §13](.ai/workflow/workflow-medium.md#13-commit-discipline)).
    Stop for `task-validation` — see `.ai/info.md` (read fresh) for
    whether that's yours to run (→
-   [medium-validation](.ai/workflow/skills/medium-validation/SKILL.md))
+   [validate-work-medium](.ai/workflow/skills/validate-work-medium/SKILL.md))
    or a human's.
 3. Do not mark the task complete yourself — completion requires
    validation and review to pass first.
@@ -82,6 +86,6 @@ rely on a partial local summary being complete. Then read:
 ## Output
 
 Modified project files; an updated row in `.ai/constitution/
-roadmap.md`; `.ai/info.md` updated; a new ADR and
+roadmap.md` (`.ai/info.md`'s pointer is unaffected — see §11); a new ADR and
 `.ai/decisions/decisions.md` row if an architectural decision was
 made; the task ready for validation.

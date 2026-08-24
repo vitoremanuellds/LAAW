@@ -1,7 +1,10 @@
-# Agents With Local Models — Workflow
+# Local Model Agent Workflow
 
-A structured protocol for developing software with AI agents — tuned
-for local models (7B–35B, 48k–64k context) but not limited to them.
+A file-based workflow for developing software with AI coding agents.
+Built around the hardest constraints — small context windows, weaker
+instruction-following — so it holds up on local models (7B–35B,
+48k–64k context); the same discipline pays off on frontier models too,
+just with more slack to work with.
 
 It exists to solve four problems that get worse as models get smaller
 or context gets tighter: hallucination, wasted context, loss of human
@@ -32,36 +35,40 @@ defaults to — lives inside `workflow.md`, self-contained. See
 
 ## Choosing a profile
 
-Three profiles, same underlying ideas, different amounts of ceremony —
+Four profiles, same underlying ideas, different amounts of ceremony —
 pick one **before** bootstrapping, since it decides which files and
 skills the project uses from that point on. Each profile is a fully
 separate, self-contained document (and skill set) — not a flag that
 changes behavior inside a shared one:
 
-| | Full | Medium | Lite |
-|---|---|---|---|
-| Doc | [`workflow.md`](workflow.md) | [`workflow-medium.md`](workflow-medium.md) | [`skills/workflow-lite/SKILL.md`](skills/workflow-lite/SKILL.md) |
-| Hierarchy | Project → Phase → Task | Project → Task | one file |
-| Gates | 8 | 4 | 3 |
-| Good for | multi-phase projects, multi-agent/multi-human coordination, full audit trail | one project of moderate size, one primary agent + human, still wants ADRs/context but no phase grouping | prototypes, small tools, single-session work |
+| | Full | Medium | Lite | Minimal |
+|---|---|---|---|---|
+| Doc | [`workflow.md`](workflow.md) | [`workflow-medium.md`](workflow-medium.md) | [`skills/workflow-lite/SKILL.md`](skills/workflow-lite/SKILL.md) | [`skills/workflow-minimal/SKILL.md`](skills/workflow-minimal/SKILL.md) |
+| Hierarchy | Project → Phase → Task | Project → Task | one file | one file, no mission/tech-notes |
+| Gates | 8 | 4 | 3 | 1 |
+| Good for | multi-phase projects, multi-agent/multi-human coordination, full audit trail | one project of moderate size, one primary agent + human, still wants ADRs/context but no phase grouping | prototypes, small tools, single-session work | throwaway scripts, quick fixes, work too small or transient to justify even a Mission/Tech-notes section |
 
 Gate count isn't picked per profile — it falls out of hierarchy depth.
 Every non-top level always carries the same plan-review / validate /
 completion-review triad; the top level carries one bootstrap gate.
 Full has three levels, medium two, lite one (context propagation folds
 into completion-review once there's no phase layer to promote
-through). If a lite or medium project outgrows its structure, that's a
+through). Minimal has no bootstrap gate at all (no constitution to
+review) and collapses its one level's triad down to plan-review
+alone — validation and completion-review are folded into finishing
+implementation as a self-check, not separate stop-and-wait gates. If a
+minimal, lite, or medium project outgrows its structure, that's a
 signal to graduate profiles, not to bolt extra files onto the smaller
 one.
 
-There is deliberately no shared "core rules" file between the three —
+There is deliberately no shared "core rules" file between the four —
 that would mean an extra mandatory read on every single operation, for
 every profile, forever, with no context-thrift benefit. Each profile's
 doc is meant to be read on its own, start to finish.
 
 ## This repo is only the fixed half
 
-This repo contains **only** protocol content that never changes
+This repo contains **only** workflow content that never changes
 per-project: `workflow.md`, `templates/`, `skills/`. It gets installed
 as a git submodule mounted at `.ai/workflow/` inside your project — one
 level *inside* your project's `.ai/` folder, not the whole thing.
@@ -85,7 +92,7 @@ than once) — files moving, renaming, or being merged. Floating on the
 default branch means every one of those changes lands on you
 immediately, and a structural change can leave an already-checked-out
 submodule referencing paths that no longer exist. See **Updating the
-protocol** below before you pull.
+workflow** below before you pull.
 
 ## Bootstrapping into a project
 
@@ -104,16 +111,24 @@ one):
 
    ```markdown
    ## Agent Workflow
-   This project uses a structured agent workflow, one of three
+   This project uses a structured agent workflow, one of four
    independent profiles depending on what's already bootstrapped:
-   - `.ai/info.md` exists → read its `profile:` field, then follow
+   - `.ai/info.md` exists → read its `profile:` field, then open and
+     read in full — not "recall it exists," actually read it —
      [.ai/workflow/workflow.md](.ai/workflow/workflow.md) (full) or
      [.ai/workflow/workflow-medium.md](.ai/workflow/workflow-medium.md) (medium).
-   - `.ai/project.md` exists (no `info.md`) → follow
+   - `.ai/project.md` exists (no `info.md`) → open and read in full
      [.ai/workflow/skills/workflow-lite/SKILL.md](.ai/workflow/skills/workflow-lite/SKILL.md) (lite).
-   - Neither exists → unbootstrapped. Ask which profile before doing
-     anything else, then bootstrap accordingly (see this repo's
-     README, "Choosing a profile").
+   - `.ai/tasks.md` exists (no `info.md`, no `project.md`) → open and
+     read in full
+     [.ai/workflow/skills/workflow-minimal/SKILL.md](.ai/workflow/skills/workflow-minimal/SKILL.md) (minimal).
+   - None of the three exist → unbootstrapped. Ask which profile
+     before doing anything else, then bootstrap accordingly (see this
+     repo's README, "Choosing a profile").
+
+   Do this before acting, every session — not just once, and not from
+   memory of a previous read. Gate-skip and scope-overstep bugs have
+   consistently traced back to this step being skipped.
    ```
 
    That's enough — everything else (the skill lookup table, gates,
@@ -123,28 +138,32 @@ one):
    as part of its own procedure — a single session-start read turned
    out not to be reliable enough in practice across a long session
    (see Best Practices below). `.ai/info.md`/`.ai/project.md` need
-   rereading even more aggressively, since unlike the protocol doc
+   rereading even more aggressively, since unlike the workflow doc
    they can change mid-session.
 
 2. **Bootstrap the chosen profile.** Point an agent (or yourself) at
    the matching skill:
-   - **Full** — `.ai/workflow/skills/workflow-constitution/SKILL.md`.
+   - **Full** — `.ai/workflow/skills/create-constitution-full/SKILL.md`.
      Writes `.ai/constitution/mission.md`, `techstack.md`,
      `roadmap.md`, and bootstraps `.ai/info.md`,
      `.ai/context/context.md`, `.ai/decisions/decisions.md`.
-   - **Medium** — `.ai/workflow/skills/medium-constitution/SKILL.md`.
+   - **Medium** — `.ai/workflow/skills/create-constitution-medium/SKILL.md`.
      Same idea, `roadmap.md` is a flat task index instead of a phase
      list, and `.ai/info.md` comes from `medium-info-template.md`.
    - **Lite** — `.ai/workflow/skills/workflow-lite/SKILL.md`. Writes
      one file, `.ai/project.md`, from
      `lite-project-template.md` — no `info.md` at this profile.
+   - **Minimal** — `.ai/workflow/skills/workflow-minimal/SKILL.md`.
+     Writes one file, `.ai/tasks.md`, from
+     `minimal-tasks-template.md` — no `info.md`, no mission/tech
+     notes, at this profile.
 
-   Until this runs, neither `.ai/info.md` nor `.ai/project.md`
-   genuinely exists yet — that's expected, not a sign anything's
-   broken. This is the only step that can't be skipped — everything
-   downstream assumes the chosen profile's bootstrap file exists.
-   Defaults are safe/conservative (`mode: assisted`); edit the policy
-   block afterward once you're ready to delegate any gates.
+   Until this runs, none of `.ai/info.md`, `.ai/project.md`, or
+   `.ai/tasks.md` genuinely exists yet — that's expected, not a sign
+   anything's broken. This is the only step that can't be skipped —
+   everything downstream assumes the chosen profile's bootstrap file
+   exists. Defaults are safe/conservative (`mode: assisted`); edit the
+   policy block afterward once you're ready to delegate any gates.
 
 3. **Optional: sync skills to `.agents/skills/`.** If your harness
    auto-discovers skills from `.agents/skills/` rather than following
@@ -166,13 +185,15 @@ one):
    profile's own §2 lookup table works without it.
 
 Below, "the fast pointer" refers to `.ai/info.md`'s Status section
-(full/medium) or `.ai/project.md`'s Status block (lite) — IDs only, no
-status values, updated by every skill as its first and last action.
-The permanent record — every actual status value, not just what's
-active — lives in `.ai/constitution/roadmap.md` (full: phase-level;
-medium: flat task-level) or, for lite, the Tasks table in
-`.ai/project.md` itself. See each profile's own §11 for how the two
-stay in sync.
+(full/medium), `.ai/project.md`'s Status block (lite), or
+`.ai/tasks.md`'s Status block (minimal) — IDs only, no status values,
+updated by every skill as its first and last action. The permanent
+record — every actual status value, not just what's active — lives in
+`.ai/constitution/roadmap.md` (full: phase-level; medium: flat
+task-level) or, for lite/minimal, the Tasks table in
+`.ai/project.md`/`.ai/tasks.md` itself. See each profile's own doc
+(full/medium §11) or skill file (lite/minimal) for how the two stay in
+sync.
 
 From there the normal loop is, for full: plan a phase → get it
 reviewed → break it into tasks → implement → validate → review → let
@@ -182,9 +203,14 @@ a task → implement → validate → review (context propagates in the same
 step) → repeat
 ([`workflow-medium.md §5`](workflow-medium.md#5-lifecycle--gates)); for
 lite, the same shape collapsed into one file
-([`skills/workflow-lite/SKILL.md §4`](skills/workflow-lite/SKILL.md)).
+([`skills/workflow-lite/SKILL.md §4`](skills/workflow-lite/SKILL.md));
+for minimal, plan a task → get it reviewed → implement it, running its
+Validation section as a self-check while finishing rather than a
+separate gate, then mark complete directly — no validate or
+completion-review stop at all
+([`skills/workflow-minimal/SKILL.md §4`](skills/workflow-minimal/SKILL.md)).
 
-## Updating the protocol
+## Updating the workflow
 
 **Pin to a commit or tag, don't float on the branch head:**
 
@@ -194,7 +220,7 @@ git log --oneline -5        # find a commit you've actually reviewed
 cd ../..
 git -C .ai/workflow checkout <sha-or-tag>
 git add .ai/workflow
-git commit -m "Pin workflow protocol to <sha-or-tag>"
+git commit -m "Pin workflow to <sha-or-tag>"
 ```
 
 Review what changed before moving the pin — `git -C .ai/workflow log
@@ -222,13 +248,14 @@ never inside the submodule to begin with.
 
 | This repo (`.ai/workflow/`, submodule, never edited per-project) | Your project (`.ai/`, regular files, edit freely) |
 |---|---|
-| `workflow.md` (full) · `workflow-medium.md` (medium) — lite has no separate root doc, see below | `AGENTS.md` (has the snippet pasted in) |
+| `workflow.md` (full) · `workflow-medium.md` (medium) — lite and minimal have no separate root doc, see below | `AGENTS.md` (has the snippet pasted in) |
 | `templates/info-template.md`, `templates/context-template.md`, `templates/decisions-template.md`, `templates/adr-template.md` (full) | `info.md` — bootstrapped from template, then yours (full/medium only) |
 | `templates/medium-info-template.md` (medium) | `constitution/*`, `context/*` (full/medium) |
 | `templates/lite-project-template.md` (lite) | `phases/*` — full only, one flat file per phase, own Context section embedded |
-| `skills/*` — `workflow-*` (full), `medium-*` (medium), `workflow-lite` (lite, the whole profile in one skill) | `tasks/*` — full/medium, one flat file per task, own Context section embedded |
-| `sync-skills.sh` | `decisions/*` — full/medium, `decisions.md` bootstrapped from template, `adrNN-*.md` follow `templates/adr-template.md` |
-| | `project.md` — lite only, the entire project in one file |
+| `templates/minimal-tasks-template.md` (minimal) | `tasks/*` — full/medium, one flat file per task, own Context section embedded |
+| `skills/*` — full/medium skills named `<verb>-<noun>` with a `-full`/`-medium` suffix only where a name collides across the two, `workflow-lite` (lite, the whole profile in one skill), `workflow-minimal` (minimal, the whole profile in one skill) | `decisions/*` — full/medium, `decisions.md` bootstrapped from template, `adrNN-*.md` follow `templates/adr-template.md` |
+| `sync-skills.sh` | `project.md` — lite only, the entire project in one file |
+| | `tasks.md` — minimal only, the entire process state in one file, no mission/tech-notes/decisions |
 
 A third category, technically outside both sides: `.agents/skills/`, if
 you use `sync-skills.sh` — it's a generated copy of `skills/`, not
@@ -236,7 +263,7 @@ source of truth for either repo. Don't edit it directly and don't treat
 it as authoritative; re-run the script instead.
 
 If you find yourself editing anything under `.ai/workflow/` per-project,
-that's a signal the protocol itself needs a change — make it in this
+that's a signal the workflow itself needs a change — make it in this
 repo instead, so every project using it benefits, and so
 `git submodule update` doesn't just overwrite your edit next time.
 
@@ -244,7 +271,7 @@ repo instead, so every project using it benefits, and so
 
 ```
 README.md
-workflow.md                    ← full profile: the whole protocol, self-contained
+workflow.md                    ← full profile: the whole workflow, self-contained
 workflow-medium.md               ← medium profile: same role, independent document
 sync-skills.sh                   ← optional: mirrors skills/ to .agents/skills/
 templates/
@@ -253,21 +280,23 @@ templates/
 ├── decisions-template.md           ← full/medium: copied to .ai/decisions/decisions.md on first run
 ├── adr-template.md                  ← full/medium: ADR format, copied into decisions/ per decision
 ├── medium-info-template.md           ← medium: copied to .ai/info.md on first run
-└── lite-project-template.md           ← lite: copied to .ai/project.md on first run
+├── lite-project-template.md           ← lite: copied to .ai/project.md on first run
+└── minimal-tasks-template.md           ← minimal: copied to .ai/tasks.md on first run
 skills/
-├── workflow-constitution/    ┐
-├── workflow-phase/           │
-├── workflow-task/            │  full
-├── workflow-implementation/  │
-├── workflow-validation/      │
-├── workflow-review/          │
-├── workflow-context/         ┘
-├── medium-constitution/      ┐
-├── medium-task/              │
-├── medium-implementation/    │  medium
-├── medium-validation/        │
-├── medium-review/            ┘
-└── workflow-lite/               lite — the whole profile, one skill
+├── create-constitution-full/    ┐
+├── define-phase/                │
+├── define-task-full/            │  full
+├── implement-task-full/         │
+├── validate-work-full/          │
+├── review-work-full/            │
+├── propagate-context/           ┘
+├── create-constitution-medium/  ┐
+├── define-task-medium/          │
+├── implement-task-medium/       │  medium
+├── validate-work-medium/        │
+├── review-work-medium/          ┘
+├── workflow-lite/                  lite — the whole profile, one skill
+└── workflow-minimal/               minimal — the whole profile, one skill
 ```
 
 Once mounted at `.ai/workflow/` in a project, alongside it (in the
@@ -313,13 +342,23 @@ depending on the profile chosen at bootstrap — never a mix:
 └── project.md                ← the entire project: policy, status, mission, tasks, decisions log
 ```
 
+**Minimal:**
+```
+.ai/
+├── workflow/              ← this repo, as a submodule
+└── tasks.md                  ← the entire process state: policy, status,
+                                 flat task table, inline per-task detail —
+                                 no mission, tech notes, or decisions log
+```
+
 Every link inside this repo is relative and none hardcode `.ai/`, so it
 stays correct regardless of what your project names the mount point —
 though `.ai/workflow/` is the convention every skill and the `AGENTS.md`
 snippet assumes. Full layout and link conventions, per profile:
 [`workflow.md §3`](workflow.md#3-directory-structure) ·
 [`workflow-medium.md §3`](workflow-medium.md#3-directory-structure) ·
-[`skills/workflow-lite/SKILL.md §2`](skills/workflow-lite/SKILL.md).
+[`skills/workflow-lite/SKILL.md §2`](skills/workflow-lite/SKILL.md) ·
+[`skills/workflow-minimal/SKILL.md §2`](skills/workflow-minimal/SKILL.md).
 
 ## Best Practices
 
@@ -327,20 +366,21 @@ Learned from actually running this against a local model — update this
 section as more surfaces. Written against the full profile, since
 that's what's been field-tested — the underlying lessons (reread
 fresh, name things explicitly, one thread per unit of work) apply the
-same way to medium/lite's analogous skills, just with fewer of them.
+same way to medium/lite/minimal's analogous skills, just with fewer of
+them.
 
 **Reasoning effort should match the gate, not stay uniform.** If your
 harness lets you set a thinking/reasoning level per call (e.g. Ollama's
 OpenAI-compatible endpoint), don't leave it at the same setting for
 every skill:
 
-- **High/medium** — `workflow-constitution`, `workflow-phase`,
-  `workflow-task` (it now writes fairly detailed task files — files to
-  touch, ordered steps, sometimes pseudocode — and that detail is only
-  useful if it's actually correct), and any deviation or ADR decision.
-  These are exactly the places ambiguity is real and a wrong call
-  cascades into everything built on top.
-- **Low** — `workflow-implementation` and `workflow-validation`. The
+- **High/medium** — `create-constitution-full`, `define-phase`,
+  `define-task-full` (it now writes fairly detailed task files — files
+  to touch, ordered steps, sometimes pseudocode — and that detail is
+  only useful if it's actually correct), and any deviation or ADR
+  decision. These are exactly the places ambiguity is real and a wrong
+  call cascades into everything built on top.
+- **Low** — `implement-task-full` and `validate-work-full`. The
   hard thinking already happened at planning time; execution should be
   close to mechanical (follow the steps, adjust minor mismatches,
   escalate real deviations rather than reasoning your way around them).
@@ -358,7 +398,7 @@ split — it varies by model.
 **Call the skill explicitly, don't rely on it self-navigating.** Even
 though `workflow.md §2` names the skill-lookup table and instructs
 opening the file, it's cheaper and more reliable to just say "use
-workflow-task to plan this" than to phrase a request generically and
+define-task-full to plan this" than to phrase a request generically and
 hope it finds the right skill on its own. This has been the single
 most common failure point in testing (see below) — a five-word prompt
 addition avoids it entirely.
@@ -388,7 +428,7 @@ context budget close to just what that phase/task needs, rather than
 accumulating the full project history in one window.
 
 **Watch for skills reading one step ahead of where they should.** A
-model may read an adjacent skill (e.g. `workflow-phase` while still
+model may read an adjacent skill (e.g. `define-phase` while still
 doing constitution work) even when its own description says it requires
 the prior step to exist first. Usually harmless — it doesn't act
 prematurely, just previews — but if you see an agent *acting* on a
@@ -446,7 +486,7 @@ an earlier read — if you see a gate's behavior not match what you just
 changed in `info.md`, this is the first thing to check.
 
 **"Compiled into this skill" is a claim that needs to actually be
-true, not just asserted.** `workflow-implementation` used to skip
+true, not just asserted.** `implement-task-full` used to skip
 rereading `workflow.md`, on the assumption that its rules were fully
 summarized locally. They weren't — the skill only mentioned the status
 values *it* transitions through, never stated the enum was closed, and

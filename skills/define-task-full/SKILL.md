@@ -1,12 +1,15 @@
 ---
-name: workflow-task
-description: Use this skill to break a phase file's Plan section into individual tasks (tasks/p{NN}-t{NN}-{name}.md, flat), or replan one after a task-level deviation. Writes enough detail (files, ordered steps, optional pseudocode) that implementation is close to mechanical. On first use per phase, stubs every remaining plan step, then fully drafts whatever's in scope — one, several, or all. Requires an approved phase plan. Not for implementing code.
+name: define-task-full
+description: Full-profile skill to break a phase file's Plan section into individual tasks (tasks/p{NN}-t{NN}-{name}.md, flat), or replan one after a task-level deviation. Writes enough detail (files, ordered steps, optional pseudocode) that implementation is close to mechanical. On first use per phase, stubs every remaining plan step, then fully drafts whatever's in scope — one, several, or all. Requires an approved phase plan. Not for implementing code.
 ---
 
-# Skill: workflow.task
+# Skill: define-task-full
 
 Operation for the **Task Planning Agent**. Contract:
 [.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts).
+
+Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
+as every other skill — do not skip it for task planning.
 
 ## When to use
 
@@ -176,7 +179,7 @@ invocation:**
    response that reports the approval, even though `task-review`
    passing does technically authorize it (see
    [.ai/workflow/workflow.md §5](.ai/workflow/workflow.md#5-lifecycle--gates)).
-   `workflow-implementation`'s own first step is what finally moves
+   `implement-task-full`'s own first step is what finally moves
    each task's Status to `in-progress`, once you actually start it.
 
 ## Output

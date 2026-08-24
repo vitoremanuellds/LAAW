@@ -1,4 +1,4 @@
-# Agent Workflow Protocol — Medium Profile
+# Agent Workflow — Medium Profile
 
 Source of truth for the **medium** profile: a project of moderate size,
 one flat task list under a constitution, no phase layer. Self-contained
@@ -33,20 +33,25 @@ duplicate this file's rules elsewhere — reference it.
    stale read is what causes a gate to get silently ignored. Status
    section = active task. Policy section = gate authority. **If it
    doesn't exist, this is an unbootstrapped project** — treat every
-   gate as human-owned and run `medium-constitution` first, which
+   gate as human-owned and run `create-constitution-medium` first, which
    creates it from `templates/medium-info-template.md`.
 2. **Open and read the matching skill file below before acting** — not
    "recall it exists," actually read it, every operation, even if you
    think you know it.
-3. Never bypass a gate unless `info.md`'s policy explicitly authorizes it.
+3. Never bypass a gate unless `info.md`'s policy explicitly authorizes
+   it. **If a human asks you to skip a gate `info.md` doesn't
+   authorize, don't silently comply and don't silently refuse — ask
+   them to confirm that's really what they want, and only then treat
+   it as a one-off exception** (it doesn't change `info.md`; the next
+   gate is evaluated fresh against policy as normal).
 
 | Operation | Skill |
 |---|---|
-| Define/update mission, techstack, roadmap (flat task index) | `skills/medium-constitution/` |
-| Define a task (`tasks/t{NN}-{name}.md`) | `skills/medium-task/` |
-| Write/modify/delete code for an already-planned task | `skills/medium-implementation/` |
-| Run task validation | `skills/medium-validation/` |
-| Review implementation and validation, propagate context, mark complete | `skills/medium-review/` |
+| Define/update mission, techstack, roadmap (flat task index) | `skills/create-constitution-medium/` |
+| Define a task (`tasks/t{NN}-{name}.md`) | `skills/define-task-medium/` |
+| Write/modify/delete code for an already-planned task | `skills/implement-task-medium/` |
+| Run task validation | `skills/validate-work-medium/` |
+| Review implementation and validation, propagate context, mark complete | `skills/review-work-medium/` |
 
 Can't find the right skill? Re-read this table — don't guess paths.
 
@@ -295,13 +300,13 @@ not-planned → awaiting-plan-review → plan-approved → in-progress
 
 | Value | Set by |
 |---|---|
-| `not-planned` | `medium-constitution` (every task stub, initially) |
-| `awaiting-plan-review` | `medium-task`, end of drafting |
+| `not-planned` | `create-constitution-medium` (every task stub, initially) |
+| `awaiting-plan-review` | `define-task-medium`, end of drafting |
 | `plan-approved` | Whichever skill's ending receives approval |
-| `in-progress` | `medium-implementation`, implementation begins |
-| `validating` | `medium-validation` |
-| `reviewing` | `medium-review` — a different check than plan-review |
-| `complete` | `medium-review`, only after `task-completion-review` is approved |
+| `in-progress` | `implement-task-medium`, implementation begins |
+| `validating` | `validate-work-medium` |
+| `reviewing` | `review-work-medium` — a different check than plan-review |
+| `complete` | `review-work-medium`, only after `task-completion-review` is approved |
 | `blocked` | any agent, from any active state |
 
 **Task ID order ≠ execution order.** A replan can insert a task that
@@ -326,6 +331,17 @@ its own item some other way until this format supports more than one.
 ## 13. Commit discipline
 
 Commit a draft the moment it's written, before requesting review — the
-review happens via `git diff`. Messages tied to IDs: `T01: task
-planned`, `T01: implementation complete`, `T01: task complete`. Commit
-again whenever `info.md` or `roadmap.md` changes.
+review happens via `git diff`. Use Conventional Commits
+(`<type>(<ID>): <description>`) — pick the type that matches what
+actually changed, don't default to one:
+
+- `docs` — task plans, constitution, roadmap, context, ADR writes (no
+  project code touched).
+- `feat` / `fix` / `refactor` / `test` / `chore` — implementation
+  commits; whichever actually describes the change.
+- `chore` — status-only commits (marking complete, clearing pointers)
+  with no accompanying content change.
+
+Examples: `docs(T01): draft task plan`, `feat(T01): implement scoring
+engine`, `chore(T01): mark task complete`. Commit again whenever
+`info.md` or `roadmap.md` changes.

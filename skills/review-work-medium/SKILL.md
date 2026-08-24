@@ -1,14 +1,18 @@
 ---
-name: medium-review
-description: Medium-profile skill to review a task's implementation and validation results for scope, complexity, architecture, missing validation, or context issues at task-completion-review, then — once approved — propagate context and mark the task complete. Combines what the full profile splits across workflow-review and workflow-context, since there's no phase layer here to justify a separate context-propagation gate. Never silently fix issues — report and stop for the gate.
+name: review-work-medium
+description: Medium-profile skill to review a task's implementation and validation results for scope, complexity, architecture, missing validation, or context issues at task-completion-review, then — once approved — propagate context and mark the task complete. Combines what the full profile splits across review-work-full and propagate-context, since there's no phase layer here to justify a separate context-propagation gate. Never silently fix issues — report and stop for the gate.
 ---
 
-# Skill: medium.review
+# Skill: review-work-medium
 
 Operation for the **Review Agent**. Contract:
 [.ai/workflow/workflow-medium.md §10](.ai/workflow/workflow-medium.md#10-agent-contracts).
 Two parts — the review itself (gated), and finalization (only after
 approval, a separate turn).
+
+Read [.ai/workflow/workflow-medium.md](.ai/workflow/workflow-medium.md)
+in full, same as every other medium-profile skill — do not skip it for
+review.
 
 **All `.ai/`-artifact paths below are relative to the project root, not
 to this skill file — write the full `.ai/...` path.** Status values you
@@ -37,7 +41,9 @@ implementation happens). Distinct from validation too: see
 1. Read `.ai/info.md` fresh — confirms `task-completion-review`
    authority; don't rely on a read from earlier in the session. Set
    Status to `reviewing` in the task's row in `.ai/constitution/
-   roadmap.md`. Update `.ai/info.md`'s Status section to match.
+   roadmap.md`. `.ai/info.md`'s Active task pointer should already
+   name this task — leave it as the ID only; the status word belongs
+   in `roadmap.md`, never in `info.md` (§11).
 2. Confirm the change matches its stated scope — flag anything done
    that wasn't in the plan or required but missing.
 3. Check for unnecessary complexity relative to the stated objective.

@@ -1,13 +1,16 @@
 ---
-name: workflow-context
-description: Use this skill to propagate reusable knowledge into context files after a task or phase completes, and to finalize status (mark complete in the phase file's task table or roadmap.md, clear info.md) — but only after its completion-review gate is already approved via workflow-review. Not for task history, temporary implementation details, or internal reasoning.
+name: propagate-context
+description: Full-profile skill to propagate reusable knowledge into context files after a task or phase completes, and to finalize status (mark complete in the phase file's task table or roadmap.md, clear info.md) — but only after its completion-review gate is already approved via review-work-full. Not for task history, temporary implementation details, or internal reasoning.
 ---
 
-# Skill: workflow.context
+# Skill: propagate-context
 
 Operation for the **Context Agent**. Contract:
 [.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts). Three
 sub-operations — use whichever matches the trigger.
+
+Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
+as every other skill — do not skip it for context propagation.
 
 **All `.ai/`-artifact paths below are relative to the project root,
 not to this skill file — write the full `.ai/...` path.** Status
@@ -16,11 +19,11 @@ enum — see
 [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-fast-pointer-and-the-permanent-record)
 for the full list; never invent one not on it.
 
-## workflow.context.task — on task completion
+## propagate-context.task — on task completion
 
 **Precondition:** the task's Status must already be `reviewing` with
 an approved `task-completion-review` (see
-[workflow-review](.ai/workflow/skills/workflow-review/SKILL.md)) — this operation
+[review-work-full](.ai/workflow/skills/review-work-full/SKILL.md)) — this operation
 finalizes an already-approved review, it doesn't substitute for one.
 If Status isn't `reviewing` with approval confirmed, that gate hasn't
 passed yet; don't mark complete regardless of how the task looks.
@@ -29,26 +32,28 @@ passed yet; don't mark complete regardless of how the task looks.
 2. Ask: does anything discovered here matter to *other tasks in this
    phase*? If not, skip to step 4 — not every task needs this.
 3. If yes, update the owning phase file's own Context section with the
-   persistent fact (not the task's history or reasoning). If the fact
-   is general enough to matter beyond this one phase, put it under
-   `.ai/context/` instead (new or existing file) — see the propagation
-   rule in
-   [.ai/workflow/workflow.md §9](.ai/workflow/workflow.md#9-context-propagation). If
-   you touch `.ai/context/`, update its row (or add one) in
-   `.ai/context/context.md`'s table in the same step.
+   persistent fact (not the task's history or reasoning). **Never write
+   to `.ai/context/` directly from this sub-operation, even if the fact
+   looks like it matters beyond this one phase** — promotion to
+   `.ai/context/` happens only once, in `propagate-context.project`
+   below, which reviews everything the phase's Context section
+   accumulated at once. Writing to `.ai/context/` mid-phase skips that
+   review and is exactly the shortcut the hierarchy in
+   [.ai/workflow/workflow.md §9](.ai/workflow/workflow.md#9-context-propagation)
+   exists to prevent.
 4. Set the task's Status to `complete` in its owning phase file's
    Tasks table — this is the actual "task complete" marker. Clear it
    as the active task in `.ai/info.md`'s Status section (leave `Active
    phase` alone if the phase itself isn't done).
 
-## workflow.context.phase — reconciling during a phase
+## propagate-context.phase — reconciling during a phase
 
 Run periodically or when a task's context-agent step flags something
 phase-wide. Ensure the phase file's own Context section still
 accurately describes shared architecture, constraints, and task
 relationships as the phase progresses.
 
-## workflow.context.project — on phase completion
+## propagate-context.project — on phase completion
 
 **Precondition:** the phase's Status must already be `reviewing` with
 an approved `phase-completion-review`, and all tasks in the phase
@@ -77,10 +82,11 @@ recorded elsewhere, internal reasoning, progress reports. See
 
 ## Output
 
-Updated context at the appropriate level only — a phase file's own
-Context section, or a file under `.ai/context/` (plus its row in
-`.ai/context/context.md`'s table). The relevant Status set to
-`complete` in its owning phase file's Tasks table or
-`.ai/constitution/roadmap.md`, and `.ai/info.md`'s Status section
-updated to match. Do not write to more than one context level per
-invocation unless the fact genuinely applies at both.
+Updated context at the appropriate level only — `propagate-context.task`
+writes only to the phase file's own Context section, never
+`.ai/context/` directly; `propagate-context.project` writes only to
+`.ai/context/` (plus its row in `.ai/context/context.md`'s table), once
+per finished phase. The relevant Status set to `complete` in its owning
+phase file's Tasks table or `.ai/constitution/roadmap.md`, and
+`.ai/info.md`'s Active task/phase pointer cleared accordingly — never a
+status word written there (§11).

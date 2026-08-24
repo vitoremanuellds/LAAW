@@ -1,18 +1,18 @@
-# Project: {name}
+# Tasks: {name}
 
-Copy this to `.ai/project.md` in your project and edit — this is the
-**only** workflow file a lite-profile project has. Read it fresh at
+Copy this to `.ai/tasks.md` in your project and edit — this is the
+**only** workflow file a minimal-profile project has. Read it fresh at
 the start of every operation; it can change between sessions and a
 stale read is what causes a gate to get silently ignored. Full rules:
-[`.ai/workflow/skills/workflow-lite/SKILL.md`](.ai/workflow/skills/workflow-lite/SKILL.md).
+[`.ai/workflow/skills/workflow-minimal/SKILL.md`](.ai/workflow/skills/workflow-minimal/SKILL.md).
 
 ```yaml
-profile: lite
+profile: minimal
 mode: assisted   # manual | assisted | delegated | autonomous
 
 overrides:
   # Only needed for exceptions to your mode's default — see
-  # .ai/workflow/skills/workflow-lite/SKILL.md for what each mode
+  # .ai/workflow/skills/workflow-minimal/SKILL.md for what each mode
   # defaults to. In delegated mode this list *is* your actual policy.
 ```
 
@@ -23,24 +23,14 @@ Active task: —
 Blocked: none
 ```
 
-## Mission
-
-<!-- 1-2 sentences: what this project is, who it's for. -->
-
-## Tech notes
-
-<!-- Brief: language/framework/runtime, only what actually constrains
-     how tasks get implemented. -->
-
 ## Tasks
 
 | ID | Title | Status |
 |---|---|---|
-<!-- T01 | Scaffold project | not-planned -->
+<!-- T01 | Scaffold script | not-planned -->
 
 Status enum: `not-planned → awaiting-plan-review → plan-approved →
-in-progress → validating → reviewing → complete` (`blocked` from any
-active state).
+in-progress → complete` (`blocked` from any active state).
 
 ## Task detail
 
@@ -55,16 +45,11 @@ active state).
 
 **Steps:** ordered, literal actions.
 
-**Validation:** how to check this task actually works.
+**Validation:** how to check this task actually works — this is a
+self-check run as part of finishing implementation, not a separate
+gate.
 
 **Deviation (if any):** Expected / Discovered / Why it fails /
 Proposed fix — delete once resolved, the fix already lives in the
 steps above once incorporated.
 -->
-
-## Decisions
-
-<!-- Short bullet log, newest last, for anything a later task genuinely
-     needs to know about ("chose SQLite over Postgres: single-user,
-     no need for a server"). Not a history of what happened — only
-     decisions future work depends on. -->
