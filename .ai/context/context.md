@@ -11,7 +11,7 @@ folder of classes.
 
 | File | Description | Status | Relations |
 |---|---|---|---|
-| [workflow-doc-conventions.md](workflow-doc-conventions.md) | workflow.md section-stability rule + reference/ file convention (established P02) | active | — |
+| [workflow-doc-conventions.md](workflow-doc-conventions.md) | workflow.md section-stability rule + reference/ file convention (P02) + multi-sub-operation skill shape (P04) | active | — |
 | [template-bootstrap-conventions.md](template-bootstrap-conventions.md) | Template → destination → copying-skill map; "templates hold only artifact content" rule (established P01) | active | — |
 | [task-phase-output-structure.md](task-phase-output-structure.md) | Section order for define-task-full/define-phase's output, why the flexible-detail marker is task-only (established P03) | active | — |
 

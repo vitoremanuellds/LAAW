@@ -41,3 +41,16 @@ concept (not fewer/larger files). Each reference file:
 
 A reference file with no inbound link from core is a bug (orphaned),
 same severity as a broken cross-reference in the other direction.
+
+## Multi-sub-operation skill shape
+
+Established during P04. When a skill covers several related but
+distinct operations (not just one linear procedure), name each
+sub-operation `<skill-name>.<sub-operation>` and document each as its
+own subsection — `propagate-context.task`/`.phase`/`.project` and
+`build-context.assess`/`.plan`/`.iterate` are the two examples so far.
+Each sub-operation states its own precondition and inputs rather than
+inheriting them implicitly from the skill's general "When to use." Add
+one new agent-Can line in `workflow.md §10` for the responsible
+agent role rather than inventing a new role — a skill is an
+*operation*, not automatically a new kind of agent.
