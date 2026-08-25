@@ -1,6 +1,6 @@
 ---
 name: define-phase
-description: Full-profile skill to define a new phase (phases/p{NN}-{name}.md — Context, Requirements, Plan, Validations, embedded task table) or replan one after a phase-level deviation. Requires the constitution to exist first. Not for task breakdown or task ID assignment, even though the Plan section looks task-like — see define-task-full, invoked only after this phase's plan is reviewed.
+description: Full-profile skill to define a new phase (phases/p{NN}-{name}.md — Context, In scope, Out of scope, Requirements, Plan, Automatic validations, Manual validations, embedded task table) or replan one after a phase-level deviation. Requires the constitution to exist first. Not for task breakdown or task ID assignment, even though the Plan section looks task-like — see define-task-full, invoked only after this phase's plan is reviewed.
 ---
 
 # Skill: define-phase
@@ -53,6 +53,13 @@ stopping for anything. Only step 8 is gated.
    - **Context** — architecture, modules, domain concepts, constraints
      specific to *this* phase. Don't repeat `.ai/context/context.md` —
      link to the specific files there instead.
+   - **In scope** — a short bullet list of exactly what this phase
+     covers.
+   - **Out of scope** — a short bullet list of adjacent things this
+     phase deliberately does *not* cover — things a reader might
+     otherwise assume are included, given the title/Context. Name a
+     separate phase explicitly where relevant, rather than leaving the
+     boundary implicit.
    - **Requirements** — outcomes that must be true for the phase to be
      complete. Outcomes, not steps.
    - **Plan** — the ordered sequence of work. Defines *what* must
@@ -60,8 +67,13 @@ stopping for anything. Only step 8 is gated.
      a feature or semantically-linked slice, not a task list (see
      [.ai/workflow/workflow.md §4](.ai/workflow/workflow.md#4-artifact-hierarchy--context-rule)
      for what distinguishes a phase from a task).
-   - **Validations** — automated/integration/manual validations,
-     acceptance criteria, known edge cases.
+   - **Automatic validations** — mechanically checkable: a command, a
+     grep, a test run, literal enough to run without judgment.
+   - **Manual validations** — requires a human or agent judgment call
+     that can't be scripted (architecture coherence, whether scope was
+     actually honored, acceptance criteria that need eyes on them).
+     Both kinds present where applicable — never merge them back into
+     one undifferentiated "Validations" list.
    - **Tasks** — a table, initially with **no rows** (or, if
      replanning, only the rows that already existed): `| ID | Title |
      Purpose | Depends on | Status |`. Leave it empty/unchanged here —

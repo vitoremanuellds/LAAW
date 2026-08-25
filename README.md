@@ -327,7 +327,7 @@ depending on the profile chosen at bootstrap — never a mix:
 │   ├── context.md              ← entry point, table of everything else here
 │   └── (however many files fit this project's actual architecture)
 ├── phases/
-│   └── p01-name.md              ← one flat file per phase: own Context + Requirements + Plan + Validations + task table
+│   └── p01-name.md              ← one flat file per phase: own Context + In/Out of scope + Requirements + Plan + Automatic/Manual validations + task table
 ├── tasks/
 │   └── p01-t01-name.md            ← one flat file per task: own Context + Implementation, no per-phase subfolder
 └── decisions/

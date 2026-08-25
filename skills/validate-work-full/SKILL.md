@@ -62,12 +62,17 @@ still current.
    Active phase pointer should already name this phase — leave it as
    the ID only; the status word belongs in `roadmap.md`, never in
    `info.md` (§11).
-2. Read the phase file's Validations section and its Tasks table (every
-   task's result in the phase).
-3. Check cross-task/integration behavior and phase acceptance criteria.
-4. Report pass/fail per validation item, not just an overall verdict.
-   On failure, set Status back to `in-progress` in both places rather
-   than leaving it at `validating`.
+2. Read the phase file's Automatic validations and Manual validations
+   sections (separately — never treat them as one merged list) and its
+   Tasks table (every task's result in the phase).
+3. Run every Automatic validation item first, exactly as written —
+   these are mechanical, no judgment involved. Then work through every
+   Manual validation item, applying judgment; cross-task/integration
+   behavior and phase acceptance criteria belong in this Manual pass.
+4. Report pass/fail per validation item, **grouped by Automatic vs.
+   Manual, not merged into one overall verdict.** On failure, set
+   Status back to `in-progress` in both places rather than leaving it
+   at `validating`.
 
 ## Output
 
