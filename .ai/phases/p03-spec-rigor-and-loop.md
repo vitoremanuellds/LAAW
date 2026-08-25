@@ -188,4 +188,4 @@ completion-side counterpart).
 | P03-T01 | Task-file rigor: In-scope/Out-of-scope + Automatic/Manual validations | Plan step 1: define-task-full's output structure + implement-task-full's flexibility language + workflow.md §6's deviation definition | — | complete |
 | P03-T02 | Phase-file rigor: In-scope/Out-of-scope + Automatic/Manual validations | Plan step 2: define-phase's output structure + validate-work-full's phase-validation steps | — | complete |
 | P03-T03 | Document the spontaneous-phase-planning pattern | Plan step 3: name the bare-roadmap-row → define-phase pattern in workflow.md/README.md, using P02 as the worked example | — | complete |
-| P03-T04 | Closing-loop questions in propagate-context | Plan step 4: propagate-context.task asks if the phase needs more tasks; propagate-context.project asks if the project needs another phase | — | validating |
+| P03-T04 | Closing-loop questions in propagate-context | Plan step 4: propagate-context.task asks if the phase needs more tasks; propagate-context.project asks if the project needs another phase | — | complete |
