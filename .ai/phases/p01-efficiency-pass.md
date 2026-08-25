@@ -127,4 +127,4 @@ below.
 
 | ID | Title | Purpose | Depends on | Status |
 |---|---|---|---|---|
-| P01-T01 | Strip bootstrap prose from templates | Remove agent-facing "copy this to X" paragraphs from the 5 templates that carry them; keep decisions-template.md's usage guidance; re-confirm no skill/doc depends on the removed text | — | validating |
+| P01-T01 | Strip bootstrap prose from templates | Remove agent-facing "copy this to X" paragraphs from the 5 templates that carry them; keep decisions-template.md's usage guidance; re-confirm no skill/doc depends on the removed text | — | complete |
