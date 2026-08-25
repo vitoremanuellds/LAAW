@@ -13,3 +13,5 @@ for a phase than its title states.
 |---|---|---|---|
 | P01 | Efficiency pass: reduce token/context overhead and mistake rate across skills, bootstrap, and artifact templates | — | complete |
 | P02 | Workflow doc precision: core/reference split, append mechanism, info.md/roadmap.md layout, planning-completeness check | — | complete |
+| P03 | Task/phase specification rigor + closing the planning loop: in-scope/out-of-scope and automatic/manual validations for tasks and phases, tighter deviation-flexibility language, formalize the spontaneous-phase-planning pattern from P02, ask-if-more-to-plan at task/phase completion | — | not-planned |
+| P04 | Brownfield context-building skill: iterative, staged process to populate .ai/context/ for an existing/recently-bootstrapped project (file-listing-only assumption pass, human annotation without deletion, configurable read-iteration plan with a queued/read status tracker) | — | not-planned |
