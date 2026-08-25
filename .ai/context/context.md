@@ -11,7 +11,7 @@ folder of classes.
 
 | File | Description | Status | Relations |
 |---|---|---|---|
-<!-- auth-module.md | Auth flow, session handling, token lifecycle | active | related: score-engine.md -->
+| [workflow-doc-conventions.md](workflow-doc-conventions.md) | workflow.md section-stability rule + reference/ file convention (established P02) | active | — |
 
 **Status** is `active` or `superseded`. When an architecture changes,
 don't delete the old file — mark it superseded and point to what
