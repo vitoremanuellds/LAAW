@@ -137,6 +137,27 @@ draft before it goes to review. Purpose: batch review, not react to
 whatever was asked and only that, redundant with how this session
 already works ad hoc.
 
+## Context (accumulated during the phase)
+
+**From T01 (workflow.md restructure, complete):** every one of
+`workflow.md`'s 13 section headings/numbers is now stable — T01
+deliberately preserved every heading byte-for-byte so no cross-
+reference anywhere in the repo needed editing. Later tasks that touch
+`workflow.md` should preserve this property: prefer adding content as
+a new subsection within an existing section (like §5's `### Execution
+modes`) over inserting a brand-new numbered section, since a new
+section shifts every following section's number and reintroduces the
+exact cross-reference risk T01 just eliminated. If a genuinely new
+top-level section is unavoidable (e.g. T02's append-vs-replan
+mechanism, if it doesn't fit as a §6 subsection), redo the full
+cross-reference sweep T01 did, don't assume it's still safe.
+
+`reference/` file convention established by T01: each file opens with
+a one-line "what this is for, referenced from workflow.md §N" pointer,
+and is linked from the *specific* core sentence that needs it — not
+just dropped in the folder. Follow this for any new reference file a
+later task adds.
+
 ## Requirements
 
 1. `workflow.md`'s core is materially shorter and contains no
@@ -258,7 +279,7 @@ task since they're both small, additive edits to the same file.
 
 | ID | Title | Purpose | Depends on | Status |
 |---|---|---|---|---|
-| P02-T01 | Restructure workflow.md into core + reference/, fix all cross-references | Plan step 1 (A+B): trim core to what-is only, new compact gate-list format, build .ai/workflow/reference/, sweep every cross-reference in skills/*-full, README.md, and the 4 Full templates | — | validating |
+| P02-T01 | Restructure workflow.md into core + reference/, fix all cross-references | Plan step 1 (A+B): trim core to what-is only, new compact gate-list format, build .ai/workflow/reference/, sweep every cross-reference in skills/*-full, README.md, and the 4 Full templates | — | complete |
 | P02-T02 | Add append-not-replan mechanism | Plan step 2 (C): new workflow.md subsection + define-phase/define-task-full procedure branches | P02-T01 | not-planned |
 | P02-T03 | info.md/roadmap.md layout fix | Plan step 3 (D): profile: full field, tables/status moved after their explanatory prose, in both info-template.md and create-constitution-full's roadmap.md-generation step | — | not-planned |
 | P02-T04 | Add "anything else to add?" step to planning skills | Plan step 4 (E): create-constitution-full, define-phase, define-task-full each get this sub-step before their gate-stop | — | not-planned |
