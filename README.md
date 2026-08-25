@@ -249,6 +249,7 @@ never inside the submodule to begin with.
 | This repo (`.ai/workflow/`, submodule, never edited per-project) | Your project (`.ai/`, regular files, edit freely) |
 |---|---|
 | `workflow.md` (full) · `workflow-medium.md` (medium) — lite and minimal have no separate root doc, see below | `AGENTS.md` (has the snippet pasted in) |
+| `reference/*` (full only) — occasional-need detail behind `workflow.md`'s core, one file per concept | |
 | `templates/info-template.md`, `templates/context-template.md`, `templates/decisions-template.md`, `templates/adr-template.md` (full) | `info.md` — bootstrapped from template, then yours (full/medium only) |
 | `templates/medium-info-template.md` (medium) | `constitution/*`, `context/*` (full/medium) |
 | `templates/lite-project-template.md` (lite) | `phases/*` — full only, one flat file per phase, own Context section embedded |
@@ -274,6 +275,10 @@ README.md
 workflow.md                    ← full profile: the whole workflow, self-contained
 workflow-medium.md               ← medium profile: same role, independent document
 sync-skills.sh                   ← optional: mirrors skills/ to .agents/skills/
+reference/                       ← full profile only: occasional-need detail,
+│                                    one file per concept, linked from workflow.md
+├── directory-and-links.md          ← §3 detail: path/link-rule incident history
+└── status-and-info.md              ← §11 detail: set-by table, ID-order reasoning
 templates/
 ├── info-template.md              ← full: copied to .ai/info.md on first run
 ├── context-template.md            ← full/medium: copied to .ai/context/context.md on first run

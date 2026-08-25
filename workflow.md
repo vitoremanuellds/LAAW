@@ -5,6 +5,13 @@ Procedural how-to lives in `skills/`. Gate *authority* (who) lives in
 [`../info.md`](../info.md), not here. Do not duplicate this file's
 rules elsewhere — reference it.
 
+This file holds only what every operation needs to know. Detailed
+rationale, lookup tables, and historical context that's genuinely
+occasional-need lives in `reference/`, one file per concept, linked
+from the specific place below that needs it — you don't need to read
+`reference/` to follow the rules here, only to understand *why* a
+specific rule exists or to look something up you're unsure of.
+
 ---
 
 ## 1. Principles
@@ -59,6 +66,7 @@ Can't find the right skill? Re-read this table — don't guess paths.
 .ai/
 ├── workflow/                 ◄── submodule boundary — never written to
 │   ├── workflow.md
+│   ├── reference/              detail files, one per concept
 │   ├── templates/            info, context, decisions, adr
 │   └── skills/                7 skills, see table above
 │
@@ -75,31 +83,13 @@ index, no shared per-phase/per-task context file, one merged
 config/status file. A task's status lives in exactly one place — its
 phase file's table — never duplicated into the task's own file.
 
-**Every bare mention below** of `info.md`, `roadmap.md`, `phases/`,
-`tasks/`, `context/`, `decisions/`, or `constitution/` refers to that
-file/folder under `.ai/` as shown above — this document is a reference
-for understanding the rules, not a literal sequence of write-tool
-calls. When a **skill** instructs an actual write/read, it spells out
-the full `.ai/`-prefixed path explicitly and states this same rule
-again at the point of use — treat any bare mention there, or here, as
-shorthand, never as a literal path to hand a write tool without
-resolving it against the project root first. This distinction is not
-academic: a bare or dot-relative path handed directly to a write tool
-resolves against the agent's working directory, not against where any
-instruction was read from — that mismatch has already caused a phase
-file to be created outside `.ai/` in practice.
-
-**Link rule:** every skill's cross-references to `workflow.md`, sibling
-skills, and templates use `.ai/workflow/`-anchored paths, not
-dot-relative ones — this is a deliberate change from an earlier,
-purely-relative convention, made after a mirrored skill copy (see
-`sync-skills.sh`) demonstrated that dot-relative links silently break
-once a file is copied somewhere other than its designed location.
-`.ai/workflow/` is the fixed, documented mount point every skill and
-the `AGENTS.md` snippet assumes — not arbitrary. Per-project artifact
-references follow the same rule: always `.ai/`-prefixed, never bare or
-dot-relative, so a write/read target never depends on resolving
-"relative to what."
+**Every path is `.ai/`-prefixed, resolved against the project root —
+never bare or dot-relative,** and every skill's cross-references (to
+`workflow.md`, sibling skills, templates) are `.ai/workflow/`-anchored,
+not dot-relative. See
+[reference/directory-and-links.md](reference/directory-and-links.md)
+for why both rules exist — each is the fix for a bug that actually
+happened, not a stylistic preference.
 
 **Naming:** phases `p{NN}-{kebab-name}.md`; tasks
 `p{NN}-t{NN}-{kebab-name}.md` (flat); decisions `adr{NN}-{kebab-name}.md`.
@@ -148,28 +138,34 @@ Constitution → Constitution Review → Phase → Phase Plan Review
   → Phase Complete
 ```
 
-Diagram labels favor readability over `info.md`'s exact YAML keys:
+Gates, in lifecycle order — the name in backticks is the exact
+`info.md` Policy key:
 
-| Diagram label | Gate key | Distinct from |
-|---|---|---|
-| Constitution Review | `constitution-review` | — |
-| Phase Plan Review | `phase-review` | Phase Completion Review (below) |
-| Task Plan Review | `task-review` | unqualified Review (below) |
-| (unqualified) Review | `task-completion-review` | `task-review` above |
-| Phase Completion Review | `phase-completion-review` | `phase-review` above |
-
-Full gate list: `constitution-review` · `phase-review` · `task-review`
-· `task-validation` · `phase-validation` · `task-completion-review` ·
-`phase-completion-review` · `context-update`.
+- **`constitution-review`** — after the constitution draft (mission/
+  techstack/roadmap, or a new phase row added to `roadmap.md`).
+  Unlocks phase planning.
+- **`phase-review`** — after a phase plan draft. Unlocks task planning
+  for that phase only.
+- **`task-review`** — after a task-batch plan draft. Unlocks
+  implementation of those tasks only.
+- **`task-validation`** — after implementation. Mechanical: does it
+  meet the task's requirements?
+- **`task-completion-review`** — after validation passes. Judgment: is
+  it appropriate/coherent? Unlocks marking the task complete.
+- **`phase-validation`** — after every task in a phase is complete.
+  Mechanical, phase-wide.
+- **`phase-completion-review`** — after phase validation passes.
+  Judgment, phase-wide. Unlocks marking the phase complete.
+- **`context-update`** — evaluating what to propagate; runs alongside
+  task/phase completion, not a separate blocking step in the diagram
+  above.
 
 **Gates block *advancing past* a draft, never *producing* one.**
 Drafting never needs prior approval; only passing review does. Unsure
 if you're "allowed" to draft? Yes — check the skill.
 
-**Each gate unlocks only the next operation, nothing further.**
-`phase-review` → task planning, not implementation. `task-review` →
-implementation of *that* task only. Completion-review gates unlock
-marking complete, nothing retroactive.
+**Each gate unlocks only the next operation, nothing further** — see
+each bullet above for exactly what it unlocks.
 
 **Unlocking ≠ starting.** In `manual`/`assisted` mode: report the gate
 passed, update `info.md`, then explicitly ask before the next
@@ -254,7 +250,7 @@ the old one — Git keeps history; the table shows the current chain.
 
 ---
 
-## 8. Validation vs. Review
+## 8. Validation vs Review
 
 - **Validation** — does it satisfy requirements?
 - **Review** — is it appropriate, coherent, consistent with direction?
@@ -329,9 +325,8 @@ requirements/plan.
 
 **Validation Agent** — Can: run validation, report failures; set
 Status `validating` in the phase file, refresh `info.md`'s pointer
-(§11 — no status word there). Must: read `info.md` fresh before
-trusting a gate's authority — never a cached read. Should not: edit
-implementation to force a pass.
+(§11). Must: read `info.md` fresh before trusting a gate's authority —
+never a cached read. Should not: edit implementation to force a pass.
 
 **Review Agent** — Can: inspect everything, flag scope/requirement/
 complexity/architecture/validation/context issues and undocumented
@@ -373,33 +368,15 @@ not-planned → awaiting-plan-review → plan-approved → in-progress
 (blocked applies from any active state)
 ```
 
-| Value | Set by |
-|---|---|
-| `not-planned` | `create-constitution-full` (every phase, initially); `define-task-full` (every undrafted plan step, on first invocation per phase) |
-| `awaiting-plan-review` | `define-phase`/`define-task-full`, end of drafting |
-| `plan-approved` | Whichever skill's ending receives approval — see §5's unlocking-≠-starting rule |
-| `in-progress` | `define-task-full` (phase, task planning begins) / `implement-task-full` (task, implementation begins) |
-| `validating` | `validate-work-full` |
-| `reviewing` | `review-work-full` — a different check than plan-review, see below |
-| `complete` | `propagate-context`, only after its completion-review is approved |
-| `blocked` | any agent, from any active state |
-
-`define-task-full`'s first invocation per phase stubs every remaining
-plan step at `not-planned` at once (cheap — titles only), then fully
-drafts whatever's actually in scope.
-
-Plan-review (`awaiting-plan-review`/`plan-approved`) checks a *plan*
-before work begins; `reviewing` checks the *result* after (§8). Same
-word "review," different check, different point in the lifecycle —
-don't conflate them.
+Which skill sets which value, the plan-review-vs-`reviewing`
+distinction, and the full ID-order-≠-execution-order reasoning:
+[reference/status-and-info.md](reference/status-and-info.md).
 
 **ID order ≠ execution order, for phases or tasks.** A replan can
 insert a task — or a new phase — that logically belongs earlier but
-still gets the next-highest ID. Resolve "first/next task" against the
-phase file's Depends-on and Status columns; resolve "first/next phase"
-the same way against `roadmap.md`'s Depends-on and Status columns — no
-unmet dependencies, Status `awaiting-plan-review`/`plan-approved` — not
-the lowest ID. Ask rather than guess if still ambiguous.
+still gets the next-highest ID. Resolve "first/next" against
+Depends-on + Status columns, never the lowest ID — ask rather than
+guess if still ambiguous.
 
 ---
 
