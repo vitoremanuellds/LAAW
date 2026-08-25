@@ -69,10 +69,15 @@ is not worth an agent inventing rules. Then read:
 4. Follow the task's Files-to-modify/Files-to-create and Steps in
    order. If Pseudocode is present, treat it as guidance for the
    approach, not a literal script — adapt it to what you actually find
-   in the codebase. Minor mismatches (a function living in a different
-   file than expected, or an implementation detail that differs from
-   the pseudocode's specifics) — adjust and continue, no deviation
-   needed; see [.ai/workflow/workflow.md §6](.ai/workflow/workflow.md#6-deviations).
+   in the codebase; this is its own, separate, unconditional latitude
+   (pseudocode is meant to be translated, not copied), not tied to the
+   marking convention below. **For Steps specifically: adjust freely
+   only where the task file explicitly marked a detail flexible**
+   (e.g. `(flexible: ...)`) — everything else that doesn't match, even
+   something that would once have read as a small, adjustable mismatch
+   (a function living in a different file than expected), gets raised
+   as a deviation per step 5 below, not silently adjusted; see
+   [.ai/workflow/workflow.md §6](.ai/workflow/workflow.md#6-deviations).
 5. If the plan turns out wrong in a way that changes scope, the
    library/API doesn't support what was planned, or the strategy
    itself has to change — stop and raise a deviation. Do not silently

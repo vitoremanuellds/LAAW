@@ -204,10 +204,14 @@ mode (coherence/judgment), unlike `-validation`/`context-update`
 
 ## 6. Deviations
 
-Deviation = work materially differs from the approved plan. A wrong
-file or small mismatch is not one — adjust and continue. Record one
-when a planned approach fails, scope changes materially, or an
-architectural assumption breaks:
+Deviation = work materially differs from the approved plan. A mismatch
+against a detail the task file explicitly marked flexible is not
+one — adjust and continue; everything else that doesn't match the
+approved plan is, even something that would once have read as a
+small, adjustable mismatch — see `define-task-full`'s task-file
+conventions for how flexible details get marked. Record one when a
+planned approach fails, scope changes materially, or an architectural
+assumption breaks:
 
 ```
 Expected / Discovered / Why it fails / Proposed fix / Replan? (task/phase/project)

@@ -91,6 +91,11 @@ invocation:**
    - **Implementation** — detailed enough that implementation can be
      close to mechanical, not just described in prose:
      - **Objective** — one or two sentences, what this task achieves.
+     - **In scope** — a short bullet list of exactly what this task
+       covers.
+     - **Out of scope** — a short bullet list of adjacent things this
+       task deliberately does *not* do — things a reader might
+       otherwise assume are included, given the Objective.
      - **Files to modify** — explicit paths, one line each on what
        changes and why. These are real project source paths, relative
        to the project root like normal source code — not `.ai/`
@@ -101,7 +106,13 @@ invocation:**
      - **Steps** — ordered, literal actions, not high-level
        description. "Add a `resetPassword` method to
        `auth.service.ts` that calls `/api/auth/reset`" not "handle
-       password reset."
+       password reset." **Mark any step detail that's genuinely
+       low-importance/flexible explicitly inline** — e.g. "(flexible:
+       exact variable name)". Unmarked details are binding: a mismatch
+       against them during implementation is a deviation
+       ([.ai/workflow/workflow.md §6](.ai/workflow/workflow.md#6-deviations)),
+       not a minor adjustment. Mark sparingly — the default is binding,
+       not flexible.
      - **Pseudocode** — optional, only when the logic isn't obvious
        from the steps alone (a new algorithm, a non-trivial data
        transform). Skip it when it would just restate the steps in a
@@ -129,8 +140,13 @@ invocation:**
        items.filter(i => i.status !== 'archived')
          .reduce((acc, i) => { acc[i.category] ??= []; acc[i.category].push(i); return acc; }, {} as Record<string, Item[]>)
        ```
-     - **Dependencies**, **expected result**, **validation
-       instructions**.
+     - **Dependencies**, **expected result**.
+     - **Automatic validations** — mechanically checkable: a command,
+       a grep, a test run, literal enough to run without judgment.
+     - **Manual validations** — requires a human or agent judgment
+       call that can't be scripted. Both kinds present where
+       applicable — never merge them back into one undifferentiated
+       "validation instructions" list.
 
    Do not add a Status field to this file — status for every task lives
    exclusively in the owning phase file's Tasks table (step 6), never
