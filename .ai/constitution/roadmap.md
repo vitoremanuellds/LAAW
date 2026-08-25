@@ -7,7 +7,7 @@ truth for every phase's actual state.
 
 | ID | Title | Depends on | Status |
 |---|---|---|---|
-| P01 | Efficiency pass: reduce token/context overhead and mistake rate across skills, bootstrap, and artifact templates | — | awaiting-plan-review |
+| P01 | Efficiency pass: reduce token/context overhead and mistake rate across skills, bootstrap, and artifact templates | — | in-progress |
 
 No detail beyond the title lives here — P01's own file
 (`.ai/phases/p01-{name}.md`, created by `define-phase`) will hold its

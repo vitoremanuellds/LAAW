@@ -27,7 +27,7 @@ overrides:
 
 ```
 Active phase: P01
-Active task: —
+Active task: P01-T01
 Blocked: none
 ```
 
