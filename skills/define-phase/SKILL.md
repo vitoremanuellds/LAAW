@@ -13,8 +13,10 @@ as every other skill — do not skip it for phase planning.
 
 ## When to use
 
-Defining a new phase, or replanning one after a phase-level deviation
-(see [.ai/workflow/workflow.md §6](.ai/workflow/workflow.md#6-deviations)).
+Defining a new phase; replanning one after a phase-level deviation
+(see [.ai/workflow/workflow.md §6](.ai/workflow/workflow.md#6-deviations));
+or appending new Plan items to an already-approved phase where nothing
+went wrong — an addition, not a deviation, same section.
 
 ## Inputs
 
@@ -42,9 +44,11 @@ stopping for anything. Only step 7 is gated.
 
 1. Read the roadmap entry for this phase. Don't touch its Status yet —
    whether this is a first draft (already `not-planned`, set by
-   `create-constitution-full`) or a replan (already `in-progress`), leave
-   it as-is until step 6. Read only the `.ai/context/` files relevant
-   to this phase — do not read the whole `context/` tree.
+   `create-constitution-full`), a replan (already `in-progress`), or an
+   append (already `plan-approved`/`in-progress`/`complete` — nothing
+   went wrong, just more scope), leave it as-is until step 6. Read only
+   the `.ai/context/` files relevant to this phase — do not read the
+   whole `context/` tree.
 2. Write `.ai/phases/p{NN}-{name}.md` in one file, with these sections:
    - **Context** — architecture, modules, domain concepts, constraints
      specific to *this* phase. Don't repeat `.ai/context/context.md` —
@@ -74,24 +78,26 @@ stopping for anything. Only step 7 is gated.
    an unresolved task-level dependency does (see
    [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-fast-pointer-and-the-permanent-record)) —
    ID order alone won't reflect the real sequence once this happens.
-4. If replanning: fold in what's already complete rather than
-   discarding it; note the change in the file itself (Git carries the
-   prior version). The existing Tasks table rows carry over unchanged —
-   replanning the phase doesn't touch task rows.
+4. If replanning or appending: fold in what's already complete rather
+   than discarding it; note the change in the file itself (Git carries
+   the prior version). The existing Tasks table rows carry over
+   unchanged — neither a replan nor an append touches existing task
+   rows. For an append specifically, there's no deviation to
+   reference — just add the new Plan item(s) where they logically fit.
 5. Update `.ai/info.md`'s Status section: set `Active phase` to this
    phase's ID (Status *values* live only in `.ai/constitution/roadmap.md`,
    not here — see
    [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-fast-pointer-and-the-permanent-record)).
 6. **Set the phase's Status to `awaiting-plan-review` in
    `.ai/constitution/roadmap.md` — unconditionally, including when
-   replanning mid-phase with tasks actively `in-progress`.** This is
-   not a contradiction: Status tracks whether *this plan* has been
-   reviewed, not whether execution is happening. A replanned phase file
-   is a fresh draft and needs its own review regardless of what
-   unaffected tasks are doing. Do not reason "it's already in-progress,
-   so nothing needs to change" — that conflates two different things
-   this one field can't both represent, and the review requirement
-   wins.
+   replanning or appending mid-phase with tasks actively
+   `in-progress`.** This is not a contradiction: Status tracks whether
+   *this plan* has been reviewed, not whether execution is happening. A
+   replanned or appended-to phase file is a fresh draft and needs its
+   own review regardless of what unaffected tasks are doing. Do not
+   reason "it's already in-progress, so nothing needs to change" — that
+   conflates two different things this one field can't both represent,
+   and the review requirement wins.
 7. Commit the draft (see
    [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)). Stop for
    phase plan review (`phase-review` gate) — see `.ai/info.md` (read

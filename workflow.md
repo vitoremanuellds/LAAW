@@ -226,6 +226,13 @@ underlying *approach* being wrong triggers one.
   carry over); ADR if architecturally significant.
 - **Project-level** → Constitution Agent replans, always writes an ADR.
 
+Adding new, working-as-planned scope to already-approved work — a new
+phase, or new tasks in an existing phase's Plan — is not a deviation
+(nothing broke) and doesn't require replanning what's already
+`plan-approved`/`in-progress`/`complete`. It still needs its own
+`phase-review`/`task-review` for the new material specifically. See
+`define-phase`/`define-task-full` for how an append is drafted.
+
 ---
 
 ## 7. Decisions (ADRs)

@@ -13,8 +13,14 @@ as every other skill — do not skip it for task planning.
 
 ## When to use
 
-Breaking a phase's plan into individual tasks, or replanning one task
-after a task-level deviation. **Scope is whatever was actually asked**
+Breaking a phase's plan into individual tasks; replanning one task
+after a task-level deviation; or drafting tasks for Plan items a
+phase's append (`define-phase`, not tied to a deviation — see
+[.ai/workflow/workflow.md §6](.ai/workflow/workflow.md#6-deviations))
+just added — same mechanics as any other invocation, since step 1
+below already stubs a row for any Plan item that doesn't have one yet,
+regardless of whether it arrived via the phase's initial plan or a
+later append. **Scope is whatever was actually asked**
 — "plan the first task" means exactly one; "plan the tasks for this
 phase" or "break down the whole plan" means all remaining steps in one
 pass. If the request is ambiguous about scope, ask rather than
