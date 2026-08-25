@@ -39,8 +39,8 @@ eight in a closed enum — see
 [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-fast-pointer-and-the-permanent-record)
 for the full list; never invent one not on it.
 
-Steps 1–6 require no prior approval — draft the whole file before
-stopping for anything. Only step 7 is gated.
+Steps 1–7 require no prior approval — draft the whole file before
+stopping for anything. Only step 8 is gated.
 
 1. Read the roadmap entry for this phase. Don't touch its Status yet —
    whether this is a first draft (already `not-planned`, set by
@@ -98,7 +98,10 @@ stopping for anything. Only step 7 is gated.
    reason "it's already in-progress, so nothing needs to change" — that
    conflates two different things this one field can't both represent,
    and the review requirement wins.
-7. Commit the draft (see
+7. Ask the user whether there's anything else to add to this phase's
+   Context/Requirements/Plan/Validations before requesting review —
+   batch it in now rather than triggering a second review cycle later.
+8. Commit the draft (see
    [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)). Stop for
    phase plan review (`phase-review` gate) — see `.ai/info.md` (read
    fresh, not from memory). Stop your turn here. Do not continue into

@@ -31,8 +31,8 @@ Creating or updating `.ai/constitution/mission.md`, `techstack.md`, or
 ## Procedure
 
 All paths below are `.ai/`-prefixed and relative to the project root —
-not relative to this skill file. Steps 1–6 require no prior approval —
-draft everything before stopping for anything. Only step 7 is gated.
+not relative to this skill file. Steps 1–7 require no prior approval —
+draft everything before stopping for anything. Only step 8 is gated.
 
 1. Read existing constitution files if present — do not overwrite blind.
 2. **First run only:** if `.ai/info.md` doesn't exist, copy
@@ -73,7 +73,11 @@ draft everything before stopping for anything. Only step 7 is gated.
    already-existing `roadmap.md`, not just the initial full write —
    merge any new context into the existing intro paragraph rather than
    tacking a note on after the table.
-7. Commit the draft (see
+7. Ask the user whether there's anything else to add to this draft
+   (mission, techstack, or roadmap) before requesting review — batch
+   it in now rather than triggering a second review cycle later for
+   something that could have been included in this one.
+8. Commit the draft (see
    [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)) —
    include `.ai/info.md`/`.ai/context/context.md`/
    `.ai/decisions/decisions.md` in this same commit if you just

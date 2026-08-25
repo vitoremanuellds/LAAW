@@ -48,8 +48,8 @@ closed enum — see
 [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-fast-pointer-and-the-permanent-record)
 for the full list; never invent one not on it.
 
-Steps 1–7 require no prior approval — draft everything for this
-invocation before stopping for anything. Only step 8 is gated, and
+Steps 1–8 require no prior approval — draft everything for this
+invocation before stopping for anything. Only step 9 is gated, and
 it's a single stop for the whole batch, not one per task — don't make
 the human approve four tasks one at a time when they asked for all
 four together.
@@ -168,10 +168,15 @@ invocation:**
    — use the last one drafted, or the one most likely to be
    implemented next.
 
-8. **Once every task in scope for this invocation is drafted**, commit
-   everything together — the new stubs from step 1, the fully-drafted
-   task files, the phase file's updated table, `.ai/info.md`, all of it
-   (see [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
+8. **Once every task in scope for this invocation is drafted**, ask
+   the user whether there's more to add — more tasks to draft this
+   invocation, or scope missing from the ones just drafted — before
+   requesting review; batch it in now rather than triggering a second
+   review cycle later.
+9. Commit everything together — the new stubs from step 1, the
+   fully-drafted task files, the phase file's updated table,
+   `.ai/info.md`, all of it (see
+   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
    Stop for task plan review (`task-review` gate) — see `.ai/info.md`
    (read fresh) — covering only the tasks actually drafted this
    invocation, not the stubs (nothing to review in a title-only row).
