@@ -72,7 +72,16 @@ draft everything before stopping for anything. Only step 8 is gated.
    equally when appending a single new phase row to an
    already-existing `roadmap.md`, not just the initial full write —
    merge any new context into the existing intro paragraph rather than
-   tacking a note on after the table.
+   tacking a note on after the table. **When appending one new phase
+   row to an already-existing `roadmap.md` (not the initial full
+   write, where every phase gets stubbed together during the same
+   interview as mission/techstack) — that row is title-only; the
+   phase's actual Context/Requirements/Plan/Validations don't exist
+   yet and won't until `define-phase` drafts them, later, possibly in
+   a different session. Tell the user this explicitly, and ask if they
+   want to share any context/detail for the new phase now — a session
+   that ends before `define-phase` runs may lose anything that was
+   only ever stated in conversation, not yet captured in a file.**
 7. Ask the user whether there's anything else to add to this draft
    (mission, techstack, or roadmap) before requesting review — batch
    it in now rather than triggering a second review cycle later for

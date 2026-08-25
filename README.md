@@ -210,6 +210,15 @@ separate gate, then mark complete directly — no validate or
 completion-review stop at all
 ([`skills/workflow-minimal/SKILL.md §4`](skills/workflow-minimal/SKILL.md)).
 
+For the full profile specifically: a phase enters `roadmap.md` as a
+title-only row (via `create-constitution-full`) before it has any
+detail — its actual Context/Requirements/Plan/Validations get drafted
+separately, by `define-phase`, sometimes in a later session entirely.
+If you already know what that phase should cover, say so when the row
+is added rather than waiting for the planning step — a session that
+ends in between can lose anything that was only ever stated in
+conversation, not yet captured in a file.
+
 ## Updating the workflow
 
 **Pin to a commit or tag, don't float on the branch head:**
