@@ -30,6 +30,6 @@ phase's own file's task table (task). See
 
 ```
 Active phase: P02
-Active task: P02-T03
+Active task: P02-T04
 Blocked: none
 ```
