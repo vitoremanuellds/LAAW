@@ -26,7 +26,7 @@ overrides:
 ## Status — the fast pointer
 
 ```
-Active phase: P01
+Active phase: P02
 Active task: —
 Blocked: none
 ```
