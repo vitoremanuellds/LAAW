@@ -69,6 +69,17 @@ worked example.
   increments without needing a second new mechanism; only the
   documentation/naming (this phase's Plan step 3) is new.
 
+## Context (accumulated during the phase)
+
+**From T01 (task-file rigor, complete):** the exact wording/placement
+conventions to mirror at phase level in T02: In scope/Out of scope go
+right after Objective (or the phase-level equivalent); Automatic/Manual
+validations replace any single undifferentiated validation list, never
+merged; a flexible-detail marker uses the literal form `(flexible: ...)`
+inline. Pseudocode-equivalent content (if the Plan section ever has
+any) keeps its own separate, unconditional adaptation latitude — don't
+fold it into whatever the phase-level marking convention ends up being.
+
 ## Requirements
 
 1. A freshly-drafted task file states, explicitly, what's in scope and
@@ -174,7 +185,7 @@ completion-side counterpart).
 
 | ID | Title | Purpose | Depends on | Status |
 |---|---|---|---|---|
-| P03-T01 | Task-file rigor: In-scope/Out-of-scope + Automatic/Manual validations | Plan step 1: define-task-full's output structure + implement-task-full's flexibility language + workflow.md §6's deviation definition | — | validating |
+| P03-T01 | Task-file rigor: In-scope/Out-of-scope + Automatic/Manual validations | Plan step 1: define-task-full's output structure + implement-task-full's flexibility language + workflow.md §6's deviation definition | — | complete |
 | P03-T02 | Phase-file rigor: In-scope/Out-of-scope + Automatic/Manual validations | Plan step 2: define-phase's output structure + validate-work-full's phase-validation steps | — | not-planned |
 | P03-T03 | Document the spontaneous-phase-planning pattern | Plan step 3: name the bare-roadmap-row → define-phase pattern in workflow.md/README.md, using P02 as the worked example | — | not-planned |
 | P03-T04 | Closing-loop questions in propagate-context | Plan step 4: propagate-context.task asks if the phase needs more tasks; propagate-context.project asks if the project needs another phase | — | not-planned |
