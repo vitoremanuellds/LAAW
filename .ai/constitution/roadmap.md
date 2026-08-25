@@ -11,5 +11,5 @@ for a phase than its title states.
 
 | ID | Title | Depends on | Status |
 |---|---|---|---|
-| P01 | Efficiency pass: reduce token/context overhead and mistake rate across skills, bootstrap, and artifact templates | — | validating |
+| P01 | Efficiency pass: reduce token/context overhead and mistake rate across skills, bootstrap, and artifact templates | — | complete |
 | P02 | Workflow doc precision: core/reference split, append mechanism, info.md/roadmap.md layout, planning-completeness check | — | complete |

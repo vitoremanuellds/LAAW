@@ -12,6 +12,7 @@ folder of classes.
 | File | Description | Status | Relations |
 |---|---|---|---|
 | [workflow-doc-conventions.md](workflow-doc-conventions.md) | workflow.md section-stability rule + reference/ file convention (established P02) | active | — |
+| [template-bootstrap-conventions.md](template-bootstrap-conventions.md) | Template → destination → copying-skill map; "templates hold only artifact content" rule (established P01) | active | — |
 
 **Status** is `active` or `superseded`. When an architecture changes,
 don't delete the old file — mark it superseded and point to what
