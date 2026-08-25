@@ -11,9 +11,12 @@ Full gate list and explanations live in `.ai/workflow/workflow.md §5`
 short.
 
 ```yaml
-mode: assisted   # manual | assisted | delegated | autonomous
+mode: autonomous   # manual | assisted | delegated | autonomous
 
 overrides:
+  - phase-completion-review
+  - constitution-review
+  - phase-review
   # Only needed for exceptions to your mode's default (see
   # .ai/workflow/workflow.md §5 for what each mode defaults to). In
   # delegated mode this list *is* your actual policy — every gate you

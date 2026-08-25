@@ -55,6 +55,7 @@ specific rule exists or to look something up you're unsure of.
 | Run task or phase validation | `skills/validate-work-full/` |
 | Review implementation, plan, or completed work | `skills/review-work-full/` |
 | Evaluate/propagate context after task or phase completion | `skills/propagate-context/` |
+| Populate `.ai/context/` for a project with little context yet | `skills/build-context-full/` |
 
 Can't find the right skill? Re-read this table — don't guess paths.
 
@@ -363,10 +364,13 @@ Should not: silently fix, or write a missing ADR itself.
 
 **Context Agent** — Can: propagate reusable knowledge to a phase
 file's Context or `context/`; mark rows complete in the phase file +
-`roadmap.md`; clear `info.md`'s pointer (§11). Must: verify the
-completion-review gate was actually approved before marking
-complete — finalizes, doesn't substitute. Should not: copy task
-history; duplicate info; record reasoning.
+`roadmap.md`; clear `info.md`'s pointer (§11); also runs
+`build-context-full`'s assumption/iteration process to populate
+`context/` by surveying an existing codebase, a second operation
+distinct from propagation. Must: verify the completion-review gate was
+actually approved before marking complete — finalizes, doesn't
+substitute. Should not: copy task history; duplicate info; record
+reasoning.
 
 ---
 
