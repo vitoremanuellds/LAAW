@@ -1,11 +1,8 @@
 # Info
 
-Copy this to `.ai/info.md` in your project and edit — this file is
-yours, never touched by a submodule update. It's read at the start of
-every operation (see `.ai/workflow/workflow.md §2`) — always read it
-fresh, never rely on what you saw earlier in a session; it can change
-mid-session and stale memory of it is exactly what causes a gate to
-get ignored.
+```yaml
+profile: full   # fixed — this file is only ever used for the full profile
+```
 
 ## Policy — who's authorized for each gate
 
@@ -25,14 +22,14 @@ overrides:
 
 ## Status — the fast pointer
 
-```
-Active phase: P02
-Active task: P02-T03
-Blocked: none
-```
-
 IDs only, no status values — this just tells you which two files to
 open next. The actual status of the active phase/task lives in the
 permanent record: `.ai/constitution/roadmap.md` (phase) and that
 phase's own file's task table (task). See
 `.ai/workflow/workflow.md §11`.
+
+```
+Active phase: P02
+Active task: P02-T03
+Blocked: none
+```

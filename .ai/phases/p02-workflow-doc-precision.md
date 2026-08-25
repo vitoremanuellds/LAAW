@@ -281,6 +281,6 @@ task since they're both small, additive edits to the same file.
 |---|---|---|---|---|
 | P02-T01 | Restructure workflow.md into core + reference/, fix all cross-references | Plan step 1 (A+B): trim core to what-is only, new compact gate-list format, build .ai/workflow/reference/, sweep every cross-reference in skills/*-full, README.md, and the 4 Full templates | — | complete |
 | P02-T02 | Add append-not-replan mechanism | Plan step 2 (C): workflow.md §6 addition + define-phase/define-task-full "When to use" clarification (scope narrowed at task-planning — mostly framing, not new mechanism) | P02-T01 (complete) | complete |
-| P02-T03 | info.md/roadmap.md layout fix | Plan step 3 (D): profile: full field, tables/status moved after their explanatory prose, in info-template.md, create-constitution-full's roadmap.md step, and this project's own .ai/info.md + roadmap.md | — | awaiting-plan-review |
+| P02-T03 | info.md/roadmap.md layout fix | Plan step 3 (D): profile: full field, tables/status moved after their explanatory prose, in info-template.md, create-constitution-full's roadmap.md step, and this project's own .ai/info.md + roadmap.md | — | validating |
 | P02-T04 | Add "anything else to add?" step to planning skills | Plan step 4 (E): create-constitution-full, define-phase, define-task-full each get this sub-step before their gate-stop | — | awaiting-plan-review |
 | P02-T05 | Document bare-title roadmap-append notice | Plan step 5 (F): README.md + create-constitution-full's procedure | — | awaiting-plan-review |

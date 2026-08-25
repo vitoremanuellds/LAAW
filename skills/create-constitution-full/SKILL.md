@@ -66,7 +66,13 @@ draft everything before stopping for anything. Only step 7 is gated.
    [.ai/workflow/workflow.md §4](.ai/workflow/workflow.md#4-artifact-hierarchy--context-rule)
    defines what counts as a phase. No separate per-phase files here —
    phase detail lives in each phase's own
-   `.ai/phases/p{NN}-{name}.md` once planned.
+   `.ai/phases/p{NN}-{name}.md` once planned. **Layout: any
+   explanatory/intro prose about the roadmap goes before the table,
+   never after — the table is the file's last element.** This applies
+   equally when appending a single new phase row to an
+   already-existing `roadmap.md`, not just the initial full write —
+   merge any new context into the existing intro paragraph rather than
+   tacking a note on after the table.
 7. Commit the draft (see
    [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)) —
    include `.ai/info.md`/`.ai/context/context.md`/

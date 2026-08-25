@@ -1,5 +1,9 @@
 # Info
 
+```yaml
+profile: full   # fixed — this file is only ever used for the full profile
+```
+
 ## Policy — who's authorized for each gate
 
 Full gate list and explanations live in `.ai/workflow/workflow.md §5`
@@ -18,14 +22,14 @@ overrides:
 
 ## Status — the fast pointer
 
-```
-Active phase: —
-Active task: —
-Blocked: none
-```
-
 IDs only, no status values — this just tells you which two files to
 open next. The actual status of the active phase/task lives in the
 permanent record: `.ai/constitution/roadmap.md` (phase) and that
 phase's own file's task table (task). See
 `.ai/workflow/workflow.md §11`.
+
+```
+Active phase: —
+Active task: —
+Blocked: none
+```
