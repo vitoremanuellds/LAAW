@@ -212,12 +212,16 @@ completion-review stop at all
 
 For the full profile specifically: a phase enters `roadmap.md` as a
 title-only row (via `create-constitution-full`) before it has any
-detail — its actual Context/Requirements/Plan/Validations get drafted
-separately, by `define-phase`, sometimes in a later session entirely.
-If you already know what that phase should cover, say so when the row
-is added rather than waiting for the planning step — a session that
-ends in between can lose anything that was only ever stated in
-conversation, not yet captured in a file.
+detail — its actual Context, In/Out of scope, Requirements, Plan, and
+Automatic/Manual validations get drafted separately, by `define-phase`,
+sometimes in a later session entirely. If you already know what that
+phase should cover, say so when the row is added rather than waiting
+for the planning step — a session that ends in between can lose
+anything that was only ever stated in conversation, not yet captured
+in a file. Planning one phase at a time like this, rather than the
+whole project up front, is itself an intentional supported mode, not a
+workaround — see
+[`workflow.md §5`, "Starting without a plan"](workflow.md#5-lifecycle--gates).
 
 ## Updating the workflow
 

@@ -200,6 +200,20 @@ implementation, completion after. Both default `human` in `assisted`
 mode (coherence/judgment), unlike `-validation`/`context-update`
 (mechanical, default `agent`).
 
+### Starting without a plan
+
+Not every project has a fully-formed roadmap up front, and it doesn't
+need one to start. Planning one phase at a time — instead of the whole
+project up front — is a normal, intentional way to work, not a
+workaround: `create-constitution-full` appends a single title-only row
+to `roadmap.md` for whatever's next, with no pre-existing Plan detail
+required; `define-phase` then drafts that phase's full
+Context/In-scope/Out-of-scope/Requirements/Plan/Validations straight
+from the live conversation, not from anything already written down.
+This repo's own `roadmap.md` is the worked example — P02 through P05
+each started exactly this way: name the next phase, plan it, implement
+it, then plan the next one.
+
 ---
 
 ## 6. Deviations
