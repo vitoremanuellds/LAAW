@@ -147,4 +147,4 @@ concrete enough to see the natural seams.
 
 | ID | Title | Purpose | Depends on | Status |
 |---|---|---|---|---|
-| P04-T01 | Design and write the build-context-full skill | Plan steps 1-4: the skill (3 sub-operations), 2 templates, workflow.md §2/§10 wiring | — | validating |
+| P04-T01 | Design and write the build-context-full skill | Plan steps 1-4: the skill (3 sub-operations), 2 templates, workflow.md §2/§10 wiring | — | complete |
