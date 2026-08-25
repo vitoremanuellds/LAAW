@@ -45,6 +45,11 @@ passed yet; don't mark complete regardless of how the task looks.
    Tasks table — this is the actual "task complete" marker. Clear it
    as the active task in `.ai/info.md`'s Status section (leave `Active
    phase` alone if the phase itself isn't done).
+5. Ask whether the phase needs more tasks — does the phase file's Plan
+   still look sufficient, or is there something to add before this
+   unit of work is really closed? A plain question, not a gate — it
+   sets no Status on its own. If the answer is yes, that's a normal
+   `define-task-full` invocation next, same as any other.
 
 ## propagate-context.phase — reconciling during a phase
 
@@ -73,6 +78,12 @@ above.
    already starting in the same breath.
 5. Commit (see
    [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
+6. Ask whether the project needs another phase, or is done for now — a
+   plain question, not a gate. If the answer is yes, the normal next
+   step is appending a new bare title row via `create-constitution-full`
+   (see
+   [.ai/workflow/workflow.md §5](.ai/workflow/workflow.md#5-lifecycle--gates),
+   "Starting without a plan"), not re-deriving the whole mechanism here.
 
 ## Never propagate
 
