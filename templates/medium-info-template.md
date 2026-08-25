@@ -1,12 +1,5 @@
 # Info (medium profile)
 
-Copy this to `.ai/info.md` in your project and edit — this file is
-yours, never touched by a submodule update. It's read at the start of
-every operation (see `.ai/workflow/workflow-medium.md §2`) — always
-read it fresh, never rely on what you saw earlier in a session; it can
-change mid-session and stale memory of it is exactly what causes a
-gate to get ignored.
-
 ```yaml
 profile: medium   # fixed — this file is only ever used for the medium profile
 ```

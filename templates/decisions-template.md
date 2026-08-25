@@ -1,8 +1,7 @@
 # Decisions
 
-Copy this to `.ai/decisions/decisions.md` in your project. One row per
-ADR. Check here before writing a new one — a related decision may
-already exist (see `.ai/workflow/workflow.md §7`).
+One row per ADR. Check here before writing a new one — a related
+decision may already exist (see `.ai/workflow/workflow.md §7`).
 
 **Kept current by whoever writes the ADR** — Constitution Agent, Phase
 Planning Agent, or Implementation Agent (see

@@ -1,12 +1,5 @@
 # Info
 
-Copy this to `.ai/info.md` in your project and edit — this file is
-yours, never touched by a submodule update. It's read at the start of
-every operation (see `.ai/workflow/workflow.md §2`) — always read it
-fresh, never rely on what you saw earlier in a session; it can change
-mid-session and stale memory of it is exactly what causes a gate to
-get ignored.
-
 ## Policy — who's authorized for each gate
 
 Full gate list and explanations live in `.ai/workflow/workflow.md §5`

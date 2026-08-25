@@ -1,11 +1,5 @@
 # Project: {name}
 
-Copy this to `.ai/project.md` in your project and edit — this is the
-**only** workflow file a lite-profile project has. Read it fresh at
-the start of every operation; it can change between sessions and a
-stale read is what causes a gate to get silently ignored. Full rules:
-[`.ai/workflow/skills/workflow-lite/SKILL.md`](.ai/workflow/skills/workflow-lite/SKILL.md).
-
 ```yaml
 profile: lite
 mode: assisted   # manual | assisted | delegated | autonomous

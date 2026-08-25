@@ -1,11 +1,5 @@
 # Tasks: {name}
 
-Copy this to `.ai/tasks.md` in your project and edit — this is the
-**only** workflow file a minimal-profile project has. Read it fresh at
-the start of every operation; it can change between sessions and a
-stale read is what causes a gate to get silently ignored. Full rules:
-[`.ai/workflow/skills/workflow-minimal/SKILL.md`](.ai/workflow/skills/workflow-minimal/SKILL.md).
-
 ```yaml
 profile: minimal
 mode: assisted   # manual | assisted | delegated | autonomous
