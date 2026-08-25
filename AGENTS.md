@@ -20,11 +20,16 @@ consistently traced back to this step being skipped.
 
 This project uses the **full** profile — `.ai/info.md` exists.
 
-Note: `.ai/workflow/` is a self-referential submodule — this repo
-mounts itself, pinned to a prior commit, since this is the workflow's
-own source repo. Never edit anything under `.ai/workflow/`; edit the
-real files at the repo root instead (`workflow.md`, `skills/`,
-`templates/`, etc.), same as any other change to this project's own
-source. The pin only advances when someone deliberately re-runs the
-"Updating the workflow" procedure in README.md against the newer root
-commit.
+Note: `.ai/workflow/` is a self-referential **plain copy**, not a git
+submodule — this repo mounts itself, since this is the workflow's own
+source repo, and a submodule doesn't work here: any commit after this
+project's own `.ai/` was bootstrapped contains `.ai/` itself, so
+pinning the submodule to a recent commit would nest a stale copy of
+`.ai/` inside `.ai/workflow/`, breaking the "never written to"
+boundary. Instead, `.ai/workflow/` is refreshed by directly copying
+the current root `workflow.md`, `workflow-medium.md`, `README.md`,
+`sync-skills.sh`, `templates/`, `skills/`, and `reference/` over it
+whenever they change meaningfully — a manual sync, not a version pin.
+Never edit anything under `.ai/workflow/` directly; edit the real
+files at the repo root instead, same as any other change to this
+project's own source, then re-copy.

@@ -1,3 +1,0 @@
-[submodule ".ai/workflow"]
-	path = .ai/workflow
-	url = https://github.com/vitoremanuellds/local-model-agent-workflow.git
