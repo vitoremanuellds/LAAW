@@ -5,8 +5,9 @@ description: Full-profile skill to review a task or phase's implementation and v
 
 # Skill: review-work-full
 
-Operation for the **Review Agent**. Contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts).
+This skill performs the **review** operation. Its Can/Must/Cannot
+contract:
+[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts).
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for review.
@@ -61,8 +62,8 @@ naming note). Don't confuse the two just because both are called
    describe the result — flag context inconsistencies for the context
    skill to fix.
 7. Check for undocumented decisions — an architectural choice with no
-   corresponding ADR. Flag it back to the agent whose scope produced
-   it (see [.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts)) —
+   corresponding ADR. Flag it back to whichever operation produced it
+   (see [.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts)) —
    do not write the ADR yourself.
 8. Report findings — approve, or changes requested. Do not silently
    fix issues yourself unless your entry in `.ai/info.md` explicitly

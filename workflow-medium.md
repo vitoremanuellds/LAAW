@@ -175,7 +175,8 @@ Lifecycle: `OPEN → ADDRESSED → INCORPORATED`, then delete — the fact
 must already live in the plan, implementation, or an ADR.
 
 - **Task-level** → back to the implementation loop.
-- **Project-level** → Constitution Agent replans, always writes an ADR.
+- **Project-level** → replanned via `create-constitution-medium`,
+  always writes an ADR.
 
 There is no phase-level tier here — a deviation too big for the task
 loop escalates straight to the project level, since there's no phase
@@ -188,13 +189,13 @@ in between to absorb it.
 Write one when a decision is deliberate and future work needs to know
 it. Not every deviation produces one; not every ADR comes from one.
 
-**Ownership — whoever's scope produced the decision writes it:**
-Constitution Agent (project) · Implementation Agent (during
-implementation). No one else writes one — Review Agent flags a missing
-ADR back to the owning scope. Task Planning Agent cannot write one —
-a decision surfacing during task planning escalates as a project-level
-deviation to the Constitution Agent, since there's no phase level to
-absorb it first.
+**Ownership — whoever's scope produced the decision writes it:** the
+constitution operation (project) · the implementation operation
+(during implementation). No other operation writes one — review flags
+a missing ADR back to the owning scope. The task-planning operation
+cannot write one — a decision surfacing during task planning escalates
+as a project-level deviation to the constitution operation, since
+there's no phase level to absorb it first.
 
 Check `../decisions/decisions.md` first. Copy
 [`templates/adr-template.md`](templates/adr-template.md) to
@@ -238,45 +239,50 @@ in the same step, same as the full profile.
 
 ---
 
-## 10. Agent contracts
+## 10. Operation contracts
 
 No agent determines its own authority — gate authority comes from
 `../info.md`.
 
-**Constitution Agent** — Can: constitution artifacts, ask
-clarification. Must: ADR for project-level decisions; first run,
-bootstrap `info.md`/`context/context.md`/`decisions/decisions.md`
-unedited, never overwrite existing. Cannot: touch code; invent
-unsupported requirements.
+**Constitution operation** (`create-constitution-medium`) — Can:
+constitution artifacts, ask clarification. Must: ADR for project-level
+decisions; first run, bootstrap
+`info.md`/`context/context.md`/`decisions/decisions.md` unedited,
+never overwrite existing. Cannot: touch code; invent unsupported
+requirements.
 
-**Task Planning Agent** — Can: read constitution + `context/`, create
-the task file with enough detail (files, ordered steps — no
-pseudocode at this profile) that implementation is close to
-mechanical. Must: update `roadmap.md`'s row at every status change —
-status never lives in the task file itself, nor in `info.md`; there,
-only refresh the Active task pointer (§11). Cannot: implement code;
-write an ADR — escalate as a project-level deviation (§6, §7).
+**Task-planning operation** (`define-task-medium`) — Can: read
+constitution + `context/`, create the task file with enough detail
+(files, ordered steps — no pseudocode at this profile) that
+implementation is close to mechanical. Must: update `roadmap.md`'s row
+at every status change — status never lives in the task file itself,
+nor in `info.md`; there, only refresh the Active task pointer (§11).
+Cannot: implement code; write an ADR — escalate as a project-level
+deviation (§6, §7).
 
-**Implementation Agent** — Can: read task file + context, modify
-project files, run tools. Must: update `roadmap.md`'s row (status) +
-refresh `info.md`'s pointer (§11) as it progresses; ADR for decisions
-made along the way (check the index first); treat deviations per §6.
-Cannot: silently change approved requirements/plan.
+**Implementation operation** (`implement-task-medium`) — Can: read
+task file + context, modify project files, run tools. Must: update
+`roadmap.md`'s row (status) + refresh `info.md`'s pointer (§11) as it
+progresses; ADR for decisions made along the way (check the index
+first); treat deviations per §6. Cannot: silently change approved
+requirements/plan.
 
-**Validation Agent** — Can: run validation, report failures; set
-Status `validating` in `roadmap.md`, refresh `info.md`'s pointer.
-Must: read `info.md` fresh before trusting a gate's authority — never
-a cached read. Should not: edit implementation to force a pass.
+**Validation operation** (`validate-work-medium`) — Can: run
+validation, report failures; set Status `validating` in `roadmap.md`,
+refresh `info.md`'s pointer. Must: read `info.md` fresh before
+trusting a gate's authority — never a cached read. Should not: edit
+implementation to force a pass.
 
-**Review Agent** — Can: inspect everything, flag scope/requirement/
-complexity/architecture/validation/context issues and undocumented
-decisions; set Status `reviewing` in `roadmap.md`, refresh `info.md`'s
-pointer; once `task-completion-review` is approved, propagate context
-(§9), set Status `complete` in `roadmap.md`, clear `info.md`'s
-pointer. Must: stop for `task-completion-review` after reporting, even
-clean findings — never treat "no problems" as approval itself. Should
-not: silently fix, or write a missing ADR itself, or mark complete
-before approval is actually confirmed.
+**Review operation** (`review-work-medium`) — Can: inspect everything,
+flag scope/requirement/complexity/architecture/validation/context
+issues and undocumented decisions; set Status `reviewing` in
+`roadmap.md`, refresh `info.md`'s pointer; once `task-completion-review`
+is approved, propagate context (§9), set Status `complete` in
+`roadmap.md`, clear `info.md`'s pointer. Must: stop for
+`task-completion-review` after reporting, even clean findings — never
+treat "no problems" as approval itself. Should not: silently fix, or
+write a missing ADR itself, or mark complete before approval is
+actually confirmed.
 
 ---
 

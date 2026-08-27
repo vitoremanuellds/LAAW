@@ -163,7 +163,7 @@ Repo survey findings that shape the Plan:
 
 | ID | Title | Purpose | Depends on | Status |
 |---|---|---|---|---|
-| P06-T01 | Collapse agent-role framing to role-agnostic operation contracts | Remove named-agent-persona framing from workflow.md/workflow-medium.md §10 (+ their other role mentions) and all 13 full/medium skill headers, keeping every Can/Must/Cannot bullet's content unchanged | — | in-progress |
+| P06-T01 | Collapse agent-role framing to role-agnostic operation contracts | Remove named-agent-persona framing from workflow.md/workflow-medium.md §10 (+ their other role mentions) and all 13 full/medium skill headers, keeping every Can/Must/Cannot bullet's content unchanged | — | validating |
 | P06-T02 | Merge Validation and Review into one gate per task/phase, still running two internal checks | Consolidate task/phase lifecycle gates while preserving assisted mode's auto-pass-mechanical / hold-for-human split | P06-T01 | not-planned |
 | P06-T03 | Adjust ADR timing: write when decided, propagate to context/ only at phase completion | Separate "write the ADR" from "propagate it," matching §9's existing phase-completion timing | P06-T01 | not-planned |
 | P06-T04 | Relocate the gate-skip/scope-overstep bug-traced lesson to reference/ | Preserve the lesson without keeping it in workflow.md's always-read path | — | plan-approved |

@@ -5,7 +5,8 @@ description: Full-profile skill to populate .ai/context/ for a project that's un
 
 # Skill: build-context-full
 
-Operation for the **Context Agent** ([.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts))
+This skill performs the **context** operation
+([.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts))
 — a second operation alongside `propagate-context`: this one builds
 context by surveying an existing codebase, not by propagating what a
 completed task/phase learned.

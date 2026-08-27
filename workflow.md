@@ -5,12 +5,16 @@ Procedural how-to lives in `skills/`. Gate *authority* (who) lives in
 [`../info.md`](../info.md), not here. Do not duplicate this file's
 rules elsewhere — reference it.
 
+[HUMAN] This is not a README, only place valiable information for the agent. The only relevant information here is the warning to not duplicate the rules. The Procedural part there is no need, as well have a table later in this document. Same with the gate thing.
+
 This file holds only what every operation needs to know. Detailed
 rationale, lookup tables, and historical context that's genuinely
 occasional-need lives in `reference/`, one file per concept, linked
 from the specific place below that needs it — you don't need to read
 `reference/` to follow the rules here, only to understand *why* a
 specific rule exists or to look something up you're unsure of.
+
+[HUMAN] Maybe the only information needed here is about the references.
 
 ---
 
@@ -22,7 +26,7 @@ specific rule exists or to look something up you're unsure of.
    tree speculatively.
 4. Use terminal tools (`tree`, `find`, `ls`, `grep`) to discover the
    actual project structure — no separate structure map to maintain or
-   trust over the real filesystem.
+   trust over the real filesystem. [HUMAN] No need to specify this anymore, let the agent work his way.
 
 ---
 
@@ -34,11 +38,11 @@ specific rule exists or to look something up you're unsure of.
    section = active phase/task. Policy section = gate authority. **If
    it doesn't exist, this is an unbootstrapped project** — treat every
    gate as human-owned and run `create-constitution-full` first, which
-   creates it from `templates/info-template.md`.
+   creates it from `templates/info-template.md`. [HUMAN] Maybe replace the word status for something like info.
 2. **Open and read the matching skill file below before acting** — not
    "recall it exists," actually read it, every operation, even if you
    think you know it. Gate-skip and scope-overstep bugs traced back to
-   this step being skipped, every time.
+   this step being skipped, every time. [HUMAN] The last phrase is not need, we do not need to explain why the rule exists.
 3. Never bypass a gate unless `info.md`'s policy explicitly authorizes
    it. **If a human asks you to skip a gate `info.md` doesn't
    authorize, don't silently comply and don't silently refuse — ask
@@ -90,7 +94,7 @@ never bare or dot-relative,** and every skill's cross-references (to
 not dot-relative. See
 [reference/directory-and-links.md](reference/directory-and-links.md)
 for why both rules exist — each is the fix for a bug that actually
-happened, not a stylistic preference.
+happened, not a stylistic preference. [HUMAN] No need to explain that this is a fix.
 
 **Naming:** phases `p{NN}-{kebab-name}.md`; tasks
 `p{NN}-t{NN}-{kebab-name}.md` (flat); decisions `adr{NN}-{kebab-name}.md`.
@@ -123,9 +127,11 @@ section describes *what* must happen at that level; task files, drafted
 later by `define-task-full`, define *how*. If a candidate phase is
 really just one or two mechanical steps, it's a task, not a phase —
 don't create a phase to wrap a single unit of work, and don't let a
-phase's Plan section read like a task list (the Phase Planning Agent's
+phase's Plan section read like a task list (the phase-planning
 contract in §10 already forbids assigning task IDs there for the same
 reason).
+
+[HUMAN] Maybe we can create a list of definitions, something like `phase: description; task: description`.
 
 ---
 
@@ -160,6 +166,8 @@ Gates, in lifecycle order — the name in backticks is the exact
 - **`context-update`** — evaluating what to propagate; runs alongside
   task/phase completion, not a separate blocking step in the diagram
   above.
+
+[HUMAN] Inside [feedback](feedback.md) I have written something about the simplifying the gates, lifecycle and status.
 
 **Gates block *advancing past* a draft, never *producing* one.**
 Drafting never needs prior approval; only passing review does. Unsure
@@ -236,14 +244,19 @@ File: `tasks/p01-t03-{name}-deviation.md`, next to the task it
 concerns. Lifecycle: `OPEN → ADDRESSED → INCORPORATED`, then delete —
 the fact must already live in the plan, implementation, or an ADR.
 
+[HUMAN] Maybe we can simplify it, leave it inside the task markdown file.
+
 A task file's optional pseudocode is guidance, not a contract —
 implementing it differently isn't a deviation by itself; only the
 underlying *approach* being wrong triggers one.
 
 - **Task-level** → back to the implementation loop.
-- **Phase-level** → Phase Planning Agent replans (completed tasks
+- **Phase-level** → replanned via `define-phase` (completed tasks
   carry over); ADR if architecturally significant.
-- **Project-level** → Constitution Agent replans, always writes an ADR.
+- **Project-level** → replanned via `create-constitution-full`, always
+  writes an ADR.
+
+[HUMAN] Maybe we can remove this part from here, as it is kind of a rule that should live inside the skill.
 
 Adding new, working-as-planned scope to already-approved work — a new
 phase, or new tasks in an existing phase's Plan — is not a deviation
@@ -252,6 +265,8 @@ phase, or new tasks in an existing phase's Plan — is not a deviation
 `phase-review`/`task-review` for the new material specifically. See
 `define-phase`/`define-task-full` for how an append is drafted.
 
+[HUMAN] Maybe there is no need for this.
+
 ---
 
 ## 7. Decisions (ADRs)
@@ -259,10 +274,13 @@ phase, or new tasks in an existing phase's Plan — is not a deviation
 Write one when a decision is deliberate and future work needs to know
 it. Not every deviation produces one; not every ADR comes from one.
 
-**Ownership — whoever's scope produced the decision writes it:**
-Constitution Agent (project) · Phase Planning Agent (phase) ·
-Implementation Agent (during implementation). No one else writes one —
-Review Agent flags a missing ADR back to the owning scope.
+**Ownership — whoever's scope produced the decision writes it:** the
+constitution operation (project) · the phase-planning operation
+(phase) · the implementation operation (during implementation). No
+other operation writes one — review flags a missing ADR back to the
+owning scope.
+
+[HUMAN] ADRs maybe must be written only at the phase context propagation process.
 
 Check `../decisions/decisions.md` first. Copy
 [`templates/adr-template.md`](templates/adr-template.md) to
@@ -271,8 +289,12 @@ Name, Description, Status `valid`, Relations) in the same step.
 Template fields: Decision, Context (link the deviation if any),
 Alternatives Considered, Consequences.
 
+[HUMAN] This is a "how to" rule, place it inside a relatable skill
+
 A superseding ADR updates both rows' Relations rather than deleting
 the old one — Git keeps history; the table shows the current chain.
+
+[HUMAN] Rule on how to, move to skill.
 
 ---
 
@@ -284,6 +306,8 @@ the old one — Git keeps history; the table shows the current chain.
 Both required, both distinct. Validation never edits to force a pass —
 return to the implementation loop. Review never silently fixes unless
 `info.md` grants implementation authority.
+
+[HUMAN] Based on feedback, we will merge this.
 
 ---
 
@@ -302,75 +326,84 @@ everything worth considering; a mid-phase task that thinks its finding
 is that significant still routes through the phase file's Context
 section first, same as any other task-level fact.
 
+[HUMAN] How to, move to skill.
+
 **Propagate:** architecture facts, invariants, responsibilities,
 dependencies, constraints, domain knowledge.
 **Never:** task history, temporary details, internal reasoning,
 progress reports, anything recorded elsewhere.
+
+[HUMAN] More how to, move it as well.
 
 No lateral shared-context files exist (§4) — a fact belongs in the
 specific phase/task file, or gets promoted to `context/`. Touching
 `context/` means updating its row in `context/context.md`'s table in
 the same step.
 
+[HUMAN] This section should only explain this step and why it exists, how to do it should live inside skill.
+
 ---
 
-## 10. Agent contracts
+## 10. Operation contracts
 
 No agent determines its own authority — gate authority comes from
 `../info.md`.
 
-**Constitution Agent** — Can: constitution artifacts, ask
-clarification. Must: ADR for project-level decisions; first run,
-bootstrap `info.md`/`context/context.md`/`decisions/decisions.md`
-unedited, never overwrite existing. Cannot: touch code; invent
-unsupported requirements.
+**Constitution operation** (`create-constitution-full`) — Can:
+constitution artifacts, ask clarification. Must: ADR for project-level
+decisions; first run, bootstrap
+`info.md`/`context/context.md`/`decisions/decisions.md` unedited,
+never overwrite existing. Cannot: touch code; invent unsupported
+requirements.
 
-**Phase Planning Agent** — Can: read constitution + `context/`, create
-the phase file (Context + Requirements + Plan + Validations + empty
-task table). Must: ADR for phase-level decisions; update
-`roadmap.md`'s Status at transitions + its Depends-on column for this
-phase and any existing phase it now precedes (§11, §12) + refresh
-`info.md`'s Active phase pointer (§11 — pointer only, never a status
-word). Cannot: implement code; **assign task IDs or populate the task
-table beyond stub titles** — the Plan section isn't a task list.
+**Phase-planning operation** (`define-phase`) — Can: read constitution
++ `context/`, create the phase file (Context + Requirements + Plan +
+Validations + empty task table). Must: ADR for phase-level decisions;
+update `roadmap.md`'s Status at transitions + its Depends-on column
+for this phase and any existing phase it now precedes (§11, §12) +
+refresh `info.md`'s Active phase pointer (§11 — pointer only, never a
+status word). Cannot: implement code; **assign task IDs or populate
+the task table beyond stub titles** — the Plan section isn't a task
+list.
 
-**Task Planning Agent** — Can: read phase file + `context/`, create
-the task file with enough detail (files, ordered steps, optional
-pseudocode) that implementation is close to mechanical. Must: update
-the phase file's task table at every status change — status never
-lives in the task file itself, nor in `info.md`; there, only refresh
-the Active task pointer (§11). Cannot: implement code; write an ADR —
-escalate as a phase-level deviation.
+**Task-planning operation** (`define-task-full`) — Can: read phase
+file + `context/`, create the task file with enough detail (files,
+ordered steps, optional pseudocode) that implementation is close to
+mechanical. Must: update the phase file's task table at every status
+change — status never lives in the task file itself, nor in
+`info.md`; there, only refresh the Active task pointer (§11). Cannot:
+implement code; write an ADR — escalate as a phase-level deviation.
 
-**Implementation Agent** — Can: read task file + context, modify
-project files, run tools. Must: update the phase file's task table
-(status) + refresh `info.md`'s pointer (§11) as it progresses; ADR
-for decisions made along the way (check the index first); treat
-pseudocode as guidance (§6). Cannot: silently change approved
-requirements/plan.
+**Implementation operation** (`implement-task-full`) — Can: read task
+file + context, modify project files, run tools. Must: update the
+phase file's task table (status) + refresh `info.md`'s pointer (§11)
+as it progresses; ADR for decisions made along the way (check the
+index first); treat pseudocode as guidance (§6). Cannot: silently
+change approved requirements/plan.
 
-**Validation Agent** — Can: run validation, report failures; set
-Status `validating` in the phase file, refresh `info.md`'s pointer
-(§11). Must: read `info.md` fresh before trusting a gate's authority —
-never a cached read. Should not: edit implementation to force a pass.
+**Validation operation** (`validate-work-full`) — Can: run validation,
+report failures; set Status `validating` in the phase file, refresh
+`info.md`'s pointer (§11). Must: read `info.md` fresh before trusting
+a gate's authority — never a cached read. Should not: edit
+implementation to force a pass.
 
-**Review Agent** — Can: inspect everything, flag scope/requirement/
-complexity/architecture/validation/context issues and undocumented
-decisions; set Status `reviewing` in the phase file, refresh
-`info.md`'s pointer (§11). Must: stop for
+**Review operation** (`review-work-full`) — Can: inspect everything,
+flag scope/requirement/complexity/architecture/validation/context
+issues and undocumented decisions; set Status `reviewing` in the phase
+file, refresh `info.md`'s pointer (§11). Must: stop for
 `task-completion-review`/`phase-completion-review` after reporting,
 even clean findings — never treat "no problems" as approval itself.
 Should not: silently fix, or write a missing ADR itself.
 
-**Context Agent** — Can: propagate reusable knowledge to a phase
-file's Context or `context/`; mark rows complete in the phase file +
-`roadmap.md`; clear `info.md`'s pointer (§11); also runs
-`build-context-full`'s assumption/iteration process to populate
-`context/` by surveying an existing codebase, a second operation
-distinct from propagation. Must: verify the completion-review gate was
-actually approved before marking complete — finalizes, doesn't
-substitute. Should not: copy task history; duplicate info; record
-reasoning.
+**Context operation** (`propagate-context`, `build-context-full`) —
+Can: propagate reusable knowledge to a phase file's Context or
+`context/`; mark rows complete in the phase file + `roadmap.md`; clear
+`info.md`'s pointer (§11); also runs `build-context-full`'s
+assumption/iteration process to populate `context/` by surveying an
+existing codebase, a second operation distinct from propagation. Must:
+verify the completion-review gate was actually approved before marking
+complete — finalizes, doesn't substitute. Should not: copy task
+history; duplicate info; record reasoning.
 
 ---
 
@@ -385,6 +418,8 @@ into this section, even next to the ID — `Active task: p01-t02
 (awaiting-plan-review)` is wrong; `Active task: p01-t02` is right. The
 status lives only in the permanent record below.
 
+[HUMAN] Lets get rid of the word status, as it may mislead the agent.
+
 **Permanent record** — every status value, everything, not just
 active: `roadmap.md`'s Status column, each phase file's task table.
 Check here for "what's the state of X," not just what's active.
@@ -397,9 +432,13 @@ not-planned → awaiting-plan-review → plan-approved → in-progress
 (blocked applies from any active state)
 ```
 
+[HUMAN] The active phase should be set at the start of the planning of a phase, and be unset at the end. Same as tasks.
+
 Which skill sets which value, the plan-review-vs-`reviewing`
 distinction, and the full ID-order-≠-execution-order reasoning:
 [reference/status-and-info.md](reference/status-and-info.md).
+
+[HUMAN] Maybe we do not need to say this, let the agent discover when it uses the skill.
 
 **ID order ≠ execution order, for phases or tasks.** A replan can
 insert a task — or a new phase — that logically belongs earlier but
@@ -418,6 +457,8 @@ never a second Markdown sync mechanism. Avoid concurrent edits to the
 same artifact. `info.md` tracks only one active phase/task by design —
 true parallel work needs each agent tracking its own item some other
 way until this format supports more than one.
+
+[HUMAN] No need to say this here, the workflow usage by a team is not our problem.
 
 ---
 
@@ -439,3 +480,13 @@ Examples: `docs(P01): draft phase plan`, `docs(P01-T01): draft task
 plan`, `feat(P01-T01): implement scoring engine`, `chore(P01): mark
 phase complete`. Commit again whenever `info.md`, `roadmap.md`, or a
 phase file's task table changes.
+
+[HUMAN] We must maintain the discipline of committing what was done, but maybe move it to the skills as a step. We can drop the conventional commits thing, let the own user set it on its AGENTS.md as a rule.
+
+[HUMAN]
+
+# General comments
+
+We need to prune this document, as it gets read every call, or at least it should. Lets move all the how to to skills and let only the descriptive things inside this file.
+
+[HUMAN]

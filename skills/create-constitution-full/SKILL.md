@@ -5,8 +5,9 @@ description: Full-profile skill to create or update a project's constitution (mi
 
 # Skill: create-constitution-full
 
-Operation for the **Constitution Agent**. Contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts).
+This skill performs the **constitution** operation. Its Can/Must/Cannot
+contract:
+[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts).
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for constitution work.

@@ -5,8 +5,9 @@ description: Full-profile skill to write, modify, or delete project code for a t
 
 # Skill: implement-task-full
 
-Operation for the **Implementation Agent**. Contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts).
+This skill performs the **implementation** operation. Its
+Can/Must/Cannot contract:
+[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts).
 
 This is the most frequently invoked skill in the workflow — it runs
 once per task, potentially many times per phase.

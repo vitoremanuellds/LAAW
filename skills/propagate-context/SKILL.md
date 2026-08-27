@@ -5,8 +5,9 @@ description: Full-profile skill to propagate reusable knowledge into context fil
 
 # Skill: propagate-context
 
-Operation for the **Context Agent**. Contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts). Three
+This skill performs the **context** operation. Its Can/Must/Cannot
+contract:
+[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts). Three
 sub-operations — use whichever matches the trigger.
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same

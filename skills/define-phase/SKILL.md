@@ -5,8 +5,9 @@ description: Full-profile skill to define a new phase (phases/p{NN}-{name}.md �
 
 # Skill: define-phase
 
-Operation for the **Phase Planning Agent**. Contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts).
+This skill performs the **phase-planning** operation. Its
+Can/Must/Cannot contract:
+[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts).
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for phase planning.

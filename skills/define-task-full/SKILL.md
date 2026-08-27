@@ -5,8 +5,9 @@ description: Full-profile skill to break a phase file's Plan section into indivi
 
 # Skill: define-task-full
 
-Operation for the **Task Planning Agent**. Contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts).
+This skill performs the **task-planning** operation. Its
+Can/Must/Cannot contract:
+[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts).
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for task planning.
@@ -117,7 +118,8 @@ invocation:**
        from the steps alone (a new algorithm, a non-trivial data
        transform). Skip it when it would just restate the steps in a
        different font (a config change, a route registration). This
-       is guidance for the Implementation Agent, not a literal script
+       is guidance for the implementation operation, not a literal
+       script
        — see [.ai/workflow/workflow.md §6](.ai/workflow/workflow.md#6-deviations)
        for why deviating from its specifics isn't automatically a
        deviation. **Write it in informal, language-agnostic
