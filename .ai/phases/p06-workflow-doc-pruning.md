@@ -187,7 +187,7 @@ already-renamed `define-phase`/`create-constitution-full` mentions
 | P06-T02 | Merge Validation and Review into one gate per task/phase, still running two internal checks | Consolidate task/phase lifecycle gates while preserving assisted mode's auto-pass-mechanical / hold-for-human split | P06-T01 | not-planned |
 | P06-T03 | Adjust ADR timing: write when decided, propagate to context/ only at phase completion | Separate "write the ADR" from "propagate it," matching §9's existing phase-completion timing | P06-T01 | not-planned |
 | P06-T04 | Relocate the gate-skip/scope-overstep bug-traced lesson to reference/ | Preserve the lesson without keeping it in workflow.md's always-read path | — | complete |
-| P06-T05 | Trim the new-scope-isn't-a-deviation clarification to one line | Keep the rule in workflow.md §6; move "how an append is drafted" detail to define-phase/define-task-full | — | plan-approved |
+| P06-T05 | Trim the new-scope-isn't-a-deviation clarification to one line | Keep the rule in workflow.md §6; move "how an append is drafted" detail to define-phase/define-task-full | — | complete |
 | P06-T06 | Add explicit active-pointer-lifecycle statement to §11 | Documentation clarity only — no behavior change | — | plan-approved |
 | P06-T07 | Keep the one-line ID-order-≠-execution-order rule in §11 | Keep the operating rule in workflow.md; reasoning/examples stay only in reference/status-and-info.md | — | plan-approved |
 | P06-T08 | Fold §12's single-active-item constraint into §11; delete the rest of §12 (renumber §13→§12) | Preserve the one real constraint, drop the multi-agent advisory content | — | plan-approved |

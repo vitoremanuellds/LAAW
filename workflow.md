@@ -259,14 +259,10 @@ underlying *approach* being wrong triggers one.
 
 [HUMAN] Maybe we can remove this part from here, as it is kind of a rule that should live inside the skill.
 
-Adding new, working-as-planned scope to already-approved work — a new
-phase, or new tasks in an existing phase's Plan — is not a deviation
-(nothing broke) and doesn't require replanning what's already
-`plan-approved`/`in-progress`/`complete`. It still needs its own
-`phase-review`/`task-review` for the new material specifically. See
-`define-phase`/`define-task-full` for how an append is drafted.
-
-[HUMAN] Maybe there is no need for this.
+Adding new, working-as-planned scope to already-approved work (a new
+phase, or new tasks in an existing phase's Plan) is not a deviation —
+it still needs its own `phase-review`/`task-review` for the new
+material, drafted per `define-phase`/`define-task-full`.
 
 ---
 
