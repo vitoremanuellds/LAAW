@@ -10,10 +10,10 @@ step to each skill's own procedure and trims workflow.md's section to one
 cross-cutting line, dropping the Conventional-Commits mandate (left to the
 user's own `AGENTS.md`).
 
-This section may be numbered §13 or §12 by the time this task runs, depending
-on whether `P06-T08` (which deletes §12 and renumbers §13→§12) has already run
-— check the live file for the current heading/anchor rather than assuming
-either number.
+This section stays §13 regardless of `P06-T08` — that task was revised to
+delete §12 without renumbering §13 (per
+`.ai/context/workflow-doc-conventions.md`'s section-stability convention), so
+this task can rely on `§13`/`#13-commit-discipline` staying fixed.
 
 ## Implementation
 
@@ -25,15 +25,13 @@ commit-discipline section to one rule, without a mandated message format.
 
 ### In scope
 
-- The commit-discipline section's content in `workflow.md` (whichever number
-  it currently has).
+- workflow.md §13's content (heading, anchor, and number unchanged).
 - Each of the 8 full-profile skills' existing "Commit the draft (see
   workflow.md §13)" step.
 
 ### Out of scope
 
-- The section's heading number/anchor itself — that's `P06-T08`'s concern; this
-  task edits the section's *content* regardless of what it's numbered.
+- §13's heading, number, or anchor — unchanged by this task and by `P06-T08`.
 - Medium-profile skills / `workflow-medium.md`'s own commit-discipline section —
   not part of this phase's scope (see the phase file's Out of scope).
 - `workflow-lite`/`workflow-minimal` — already self-contained on this point.
@@ -52,12 +50,12 @@ commit-discipline section to one rule, without a mandated message format.
 
 ### Steps
 
-1. Grep `workflow.md` for "Commit discipline" to find the section's current
-   number, then replace its content with: "Commit each draft immediately,
-   before requesting review — the review happens via `git diff`. Message
-   format and type selection are your project's own convention (see your
-   `AGENTS.md`); each skill's own commit step says what to stage." Remove the
-   Conventional-Commits examples and the `[HUMAN]` comment beneath them.
+1. Replace §13's content with: "Commit each draft immediately, before
+   requesting review — the review happens via `git diff`. Message format and
+   type selection are your project's own convention (see your `AGENTS.md`);
+   each skill's own commit step says what to stage." Remove the
+   Conventional-Commits examples and the `[HUMAN]` comment beneath them. Leave
+   the `## 13. Commit discipline` heading itself untouched.
 2. For each of the 8 skill files listed above, find its existing commit
    instruction (currently phrased like "Commit the draft (see
    [.ai/workflow/workflow.md §13](...))") and replace it with a self-contained
@@ -67,15 +65,12 @@ commit-discipline section to one rule, without a mandated message format.
    `.ai/info.md` changes from this step; the message should say what phase was
    drafted and why." (flexible: exact wording per skill — binding: it must
    name the actual files that skill's procedure just touched, not a generic
-   placeholder).
-3. Update each skill's anchor link to the commit-discipline section to match
-   whatever number `workflow.md` currently uses for it (re-check at
-   implementation time — don't hardcode §13 or §12 from memory).
+   placeholder). The `§13`/`#13-commit-discipline` link itself stays as-is —
+   only the sentence around it changes.
 
 ### Dependencies
 
-None (order-independent with `P06-T08`; both re-read the live file rather than
-assuming section numbers).
+None (independent of `P06-T08`; §13's number/anchor is fixed either way).
 
 ### Expected result
 
