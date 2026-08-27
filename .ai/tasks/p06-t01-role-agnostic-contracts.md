@@ -174,8 +174,10 @@ byte-identical to before, just relabeled.
 - `grep -rn "#10-agent-contracts" workflow.md workflow-medium.md skills/*/SKILL.md`
   returns no matches (confirms the anchor rename propagated everywhere it was
   referenced).
-- `grep -c "10-operation-contracts" workflow.md` and the same for
-  `workflow-medium.md` each return at least 1 (the heading's own anchor exists).
+- `grep -n "^## 10\. Operation contracts" workflow.md workflow-medium.md`
+  each return one match (heading renamed); `grep -rlc "10-operation-contracts"
+  skills/*/SKILL.md | grep -v ":0" | wc -l` returns 13 (every skill's header
+  references the new anchor).
 
 ### Manual validations
 

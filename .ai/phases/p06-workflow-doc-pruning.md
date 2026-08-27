@@ -31,6 +31,26 @@ Repo survey findings that shape the Plan:
   framing) currently open with "Operation for the **Named Agent**," linking to §10
   for that role's contract — 13 hits total across full-profile skills.
 
+**P06-T01 result (for T02/T03/T10, which edit text this task touched):**
+§10 is now headed `## 10. Operation contracts` (anchor
+`#10-operation-contracts`, not the old `#10-agent-contracts`). Each
+contract is labeled `**{Operation} operation** (\`{skill-name}\`)` —
+Constitution (`create-constitution-full`), Phase-planning
+(`define-phase`), Task-planning (`define-task-full`), Implementation
+(`implement-task-full`), Validation (`validate-work-full`), Review
+(`review-work-full`), Context (`propagate-context`,
+`build-context-full`) — same pattern in `workflow-medium.md` minus
+Phase-planning/Context. Every skill header now reads "This skill
+performs the **{operation}** operation. Its Can/Must/Cannot contract:
+[...§10](...#10-operation-contracts)." T02 should merge the Validation
+and Review paragraphs under this labeling; T03 should edit the ADR
+ownership line's "the constitution operation (project) · the
+phase-planning operation (phase) · the implementation operation
+(during implementation)" phrasing (§7); T10 should edit the
+already-renamed `define-phase`/`create-constitution-full` mentions
+"replanned via `define-phase`" / "replanned via
+`create-constitution-full`" in §6's escalation bullets.
+
 ## In scope
 
 - Rewriting `workflow.md` per the 9 resolved decisions (Plan, items 1–9).
@@ -163,7 +183,7 @@ Repo survey findings that shape the Plan:
 
 | ID | Title | Purpose | Depends on | Status |
 |---|---|---|---|---|
-| P06-T01 | Collapse agent-role framing to role-agnostic operation contracts | Remove named-agent-persona framing from workflow.md/workflow-medium.md §10 (+ their other role mentions) and all 13 full/medium skill headers, keeping every Can/Must/Cannot bullet's content unchanged | — | validating |
+| P06-T01 | Collapse agent-role framing to role-agnostic operation contracts | Remove named-agent-persona framing from workflow.md/workflow-medium.md §10 (+ their other role mentions) and all 13 full/medium skill headers, keeping every Can/Must/Cannot bullet's content unchanged | — | complete |
 | P06-T02 | Merge Validation and Review into one gate per task/phase, still running two internal checks | Consolidate task/phase lifecycle gates while preserving assisted mode's auto-pass-mechanical / hold-for-human split | P06-T01 | not-planned |
 | P06-T03 | Adjust ADR timing: write when decided, propagate to context/ only at phase completion | Separate "write the ADR" from "propagate it," matching §9's existing phase-completion timing | P06-T01 | not-planned |
 | P06-T04 | Relocate the gate-skip/scope-overstep bug-traced lesson to reference/ | Preserve the lesson without keeping it in workflow.md's always-read path | — | plan-approved |
