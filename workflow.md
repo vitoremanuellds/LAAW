@@ -41,8 +41,9 @@ specific rule exists or to look something up you're unsure of.
    creates it from `templates/info-template.md`. [HUMAN] Maybe replace the word status for something like info.
 2. **Open and read the matching skill file below before acting** — not
    "recall it exists," actually read it, every operation, even if you
-   think you know it. Gate-skip and scope-overstep bugs traced back to
-   this step being skipped, every time. [HUMAN] The last phrase is not need, we do not need to explain why the rule exists.
+   think you know it. See
+   [reference/reread-skill-discipline.md](reference/reread-skill-discipline.md)
+   for why.
 3. Never bypass a gate unless `info.md`'s policy explicitly authorizes
    it. **If a human asks you to skip a gate `info.md` doesn't
    authorize, don't silently comply and don't silently refuse — ask
