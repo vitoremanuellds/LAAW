@@ -182,7 +182,7 @@ invocation:**
 7. Update `.ai/info.md`'s Status section: set `Active task` to this
    task's ID. If multiple tasks are in scope this invocation, the
    Status section can only reflect one at a time (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-multi-agent--multi-human))
+   [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-fast-pointer-and-the-permanent-record))
    — use the last one drafted, or the one most likely to be
    implemented next.
 

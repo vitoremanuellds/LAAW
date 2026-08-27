@@ -417,7 +417,10 @@ status lives only in the permanent record below. The Active phase
 pointer is set the moment phase planning starts (`define-phase`) and
 cleared once the phase is marked complete (`propagate-context`);
 Active task follows the same pattern one level down (`define-task-full`
-sets it, `propagate-context` clears it).
+sets it, `propagate-context` clears it). `info.md` tracks only one
+active phase/task by design; genuinely parallel work needs each agent
+tracking its own item some other way until this format supports more
+than one.
 
 [HUMAN] Lets get rid of the word status, as it may mislead the agent.
 
@@ -442,20 +445,6 @@ insert a task — or a new phase — that logically belongs earlier but
 still gets the next-highest ID. Resolve "first/next" against
 Depends-on + Status columns, never the lowest ID — ask rather than
 guess if still ambiguous.
-
----
-
-## 12. Multi-agent / multi-human
-
-Independent tasks or phases may run in parallel — resolve independence
-against the relevant Depends-on column (§11), never against ID order.
-Shared state lives in Git, `info.md`, and the permanent-record tables —
-never a second Markdown sync mechanism. Avoid concurrent edits to the
-same artifact. `info.md` tracks only one active phase/task by design —
-true parallel work needs each agent tracking its own item some other
-way until this format supports more than one.
-
-[HUMAN] No need to say this here, the workflow usage by a team is not our problem.
 
 ---
 

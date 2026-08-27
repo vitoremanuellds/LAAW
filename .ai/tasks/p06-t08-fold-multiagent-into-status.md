@@ -86,6 +86,12 @@ existing cross-reference to it.
 
 - Confirm §11 reads coherently with the added sentence, whether or not
   `P06-T06`'s sentence is already present.
-- Confirm no skill or template anywhere had to change because of this task —
-  if any cross-reference sweep seems necessary, that's a sign this task
-  drifted back toward renumbering; stop and reconsider rather than sweeping.
+- **Correction found during implementation:** deleting §12 outright (not just
+  renumbering) still broke two inbound links — `define-phase` and
+  `define-task-full` both linked to `#12-multi-agent--multi-human` for
+  concepts now covered by §11. Fixing dangling anchors from a section
+  *deletion* is not the same risk this task's original note warned about
+  (renumbering ripple) — it's just completing the deletion correctly. Grep
+  `workflow.md §12\|#12-multi-agent` across `skills/*/SKILL.md`, `README.md`,
+  and `templates/*.md` to confirm zero remaining references before calling
+  this done.

@@ -82,8 +82,8 @@ stopping for anything. Only step 8 is gated.
 3. Note dependencies on other phases explicitly if they exist, in
    `.ai/constitution/roadmap.md`'s Depends-on column (`P03 depends on
    P01`) — this is what determines which phases can actually be worked
-   on in parallel (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-multi-agent--multi-human)).
+   on in parallel, resolved against Depends-on, never ID order (see
+   [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-fast-pointer-and-the-permanent-record)).
    **If this phase logically precedes phases that already exist**, this
    new phase's own Depends-on may stay empty, but go back and add it to
    the Depends-on column of every existing phase that now needs it done
