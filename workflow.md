@@ -433,13 +433,9 @@ not-planned → awaiting-plan-review → plan-approved → in-progress
 (blocked applies from any active state)
 ```
 
-[HUMAN] The active phase should be set at the start of the planning of a phase, and be unset at the end. Same as tasks.
-
 Which skill sets which value, the plan-review-vs-`reviewing`
 distinction, and the full ID-order-≠-execution-order reasoning:
 [reference/status-and-info.md](reference/status-and-info.md).
-
-[HUMAN] Maybe we do not need to say this, let the agent discover when it uses the skill.
 
 **ID order ≠ execution order, for phases or tasks.** A replan can
 insert a task — or a new phase — that logically belongs earlier but
