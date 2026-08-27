@@ -51,6 +51,18 @@ already-renamed `define-phase`/`create-constitution-full` mentions
 "replanned via `define-phase`" / "replanned via
 `create-constitution-full`" in §6's escalation bullets.
 
+**Open gap found during T06 (not yet an approved Plan item):** the
+original `[HUMAN]` comments at workflow.md §2 (line 41, "replace the
+word status for something like info") and §11 ("let's get rid of the
+word status, as it may mislead the agent") propose renaming `info.md`'s
+Status section to disambiguate it from the Status *column/enum* used
+in `roadmap.md`/phase files — flagged as a real naming-collision fix
+during this phase's initial analysis, but it was never turned into a
+numbered Plan item or resolved as one of the 9 decisions, so it isn't
+in scope for any current P06 task. Both `[HUMAN]` comments are still
+in workflow.md, unaddressed. Worth a deliberate decision (and a
+P06-T14, or a separate phase) if the human wants it done.
+
 ## In scope
 
 - Rewriting `workflow.md` per the 9 resolved decisions (Plan, items 1–9).
@@ -188,7 +200,7 @@ already-renamed `define-phase`/`create-constitution-full` mentions
 | P06-T03 | Adjust ADR timing: write when decided, propagate to context/ only at phase completion | Separate "write the ADR" from "propagate it," matching §9's existing phase-completion timing | P06-T01 | not-planned |
 | P06-T04 | Relocate the gate-skip/scope-overstep bug-traced lesson to reference/ | Preserve the lesson without keeping it in workflow.md's always-read path | — | complete |
 | P06-T05 | Trim the new-scope-isn't-a-deviation clarification to one line | Keep the rule in workflow.md §6; move "how an append is drafted" detail to define-phase/define-task-full | — | complete |
-| P06-T06 | Add explicit active-pointer-lifecycle statement to §11 | Documentation clarity only — no behavior change | — | plan-approved |
+| P06-T06 | Add explicit active-pointer-lifecycle statement to §11 | Documentation clarity only — no behavior change | — | complete |
 | P06-T07 | Keep the one-line ID-order-≠-execution-order rule in §11 | Keep the operating rule in workflow.md; reasoning/examples stay only in reference/status-and-info.md | — | plan-approved |
 | P06-T08 | Fold §12's single-active-item constraint into §11; delete the rest of §12 (renumber §13→§12) | Preserve the one real constraint, drop the multi-agent advisory content | — | plan-approved |
 | P06-T09 | Migrate commit-step detail into each of the 8 full-profile skills; trim the commit-discipline section to one line | Drop the Conventional-Commits mandate from workflow.md; keep "commit each draft immediately" as the one cross-cutting rule | — | plan-approved |

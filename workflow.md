@@ -413,7 +413,11 @@ duplicating status values here is what made the earlier version
 untrustworthy. Never write a status word (e.g. `awaiting-plan-review`)
 into this section, even next to the ID — `Active task: p01-t02
 (awaiting-plan-review)` is wrong; `Active task: p01-t02` is right. The
-status lives only in the permanent record below.
+status lives only in the permanent record below. The Active phase
+pointer is set the moment phase planning starts (`define-phase`) and
+cleared once the phase is marked complete (`propagate-context`);
+Active task follows the same pattern one level down (`define-task-full`
+sets it, `propagate-context` clears it).
 
 [HUMAN] Lets get rid of the word status, as it may mislead the agent.
 
