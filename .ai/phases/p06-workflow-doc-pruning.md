@@ -163,3 +163,16 @@ Repo survey findings that shape the Plan:
 
 | ID | Title | Purpose | Depends on | Status |
 |---|---|---|---|---|
+| P06-T01 | Collapse agent-role framing to role-agnostic operation contracts | Remove named-agent-persona framing from workflow.md/workflow-medium.md §10 (+ their other role mentions) and all 13 full/medium skill headers, keeping every Can/Must/Cannot bullet's content unchanged | — | in-progress |
+| P06-T02 | Merge Validation and Review into one gate per task/phase, still running two internal checks | Consolidate task/phase lifecycle gates while preserving assisted mode's auto-pass-mechanical / hold-for-human split | P06-T01 | not-planned |
+| P06-T03 | Adjust ADR timing: write when decided, propagate to context/ only at phase completion | Separate "write the ADR" from "propagate it," matching §9's existing phase-completion timing | P06-T01 | not-planned |
+| P06-T04 | Relocate the gate-skip/scope-overstep bug-traced lesson to reference/ | Preserve the lesson without keeping it in workflow.md's always-read path | — | plan-approved |
+| P06-T05 | Trim the new-scope-isn't-a-deviation clarification to one line | Keep the rule in workflow.md §6; move "how an append is drafted" detail to define-phase/define-task-full | — | plan-approved |
+| P06-T06 | Add explicit active-pointer-lifecycle statement to §11 | Documentation clarity only — no behavior change | — | plan-approved |
+| P06-T07 | Keep the one-line ID-order-≠-execution-order rule in §11 | Keep the operating rule in workflow.md; reasoning/examples stay only in reference/status-and-info.md | — | plan-approved |
+| P06-T08 | Fold §12's single-active-item constraint into §11; delete the rest of §12 (renumber §13→§12) | Preserve the one real constraint, drop the multi-agent advisory content | — | plan-approved |
+| P06-T09 | Migrate commit-step detail into each of the 8 full-profile skills; trim the commit-discipline section to one line | Drop the Conventional-Commits mandate from workflow.md; keep "commit each draft immediately" as the one cross-cutting rule | — | plan-approved |
+| P06-T10 | Define an inline in-task-file deviation convention; update §6 | Replace the separate deviation-file mechanism, precedented by lite/minimal's inline field | P06-T01 | not-planned |
+| P06-T11 | Add an explicit context-resolution search-order rule | New rule: follow the task/phase file's own links first, don't search the codebase for context docs | — | plan-approved |
+| P06-T12 | Apply remaining confirmed-safe trims (opening/§1, §3, §4 glossary, §9) | Low-risk cleanup already confirmed safe against reference/ and propagate-context's existing content | — | plan-approved |
+| P06-T13 | Sync mirrors: run sync-skills.sh and refresh .ai/workflow/'s copy | Keep .agents/skills/ and .ai/workflow/ byte-identical to the canonical root copies | P06-T01…T12 | not-planned |
