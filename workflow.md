@@ -130,10 +130,11 @@ reason).
 
 ```
 Constitution → Constitution Review → Phase → Phase Plan Review
-  → Tasks → Task Plan Review → Implement → Validate → Review
-  → Context Evaluation → Task Complete → (repeat) → Phase Validation
-  → Phase Completion Review → Reconcile Phase/Project Context
-  → Phase Complete
+  → Tasks → Task Plan Review → Implement
+  → Task Completion Review (validate, then review)
+  → Context Evaluation → Task Complete → (repeat)
+  → Phase Completion Review (validate, then review)
+  → Reconcile Phase/Project Context → Phase Complete
 ```
 
 Gates, in lifecycle order — the name in backticks is the exact
@@ -146,14 +147,13 @@ Gates, in lifecycle order — the name in backticks is the exact
   for that phase only.
 - **`task-review`** — after a task-batch plan draft. Unlocks
   implementation of those tasks only.
-- **`task-validation`** — after implementation. Mechanical: does it
-  meet the task's requirements?
-- **`task-completion-review`** — after validation passes. Judgment: is
-  it appropriate/coherent? Unlocks marking the task complete.
-- **`phase-validation`** — after every task in a phase is complete.
-  Mechanical, phase-wide.
-- **`phase-completion-review`** — after phase validation passes.
-  Judgment, phase-wide. Unlocks marking the phase complete.
+- **`task-completion-review`** — after implementation, one gate running
+  two checks in order: first mechanical (does it meet the task's
+  requirements?), then judgment (is it appropriate/coherent?). Unlocks
+  marking the task complete.
+- **`phase-completion-review`** — after every task in a phase is
+  complete, the same two-check sequence, phase-wide: mechanical first,
+  then judgment. Unlocks marking the phase complete.
 - **`context-update`** — evaluating what to propagate; runs alongside
   task/phase completion, not a separate blocking step in the diagram
   above.
@@ -179,26 +179,29 @@ straight through, that's the point of those modes.
 `info.md` sets `mode` + optional `overrides`:
 
 - **`manual`** — all gates default `human`.
-- **`assisted`** (recommended default) — `task-validation`,
-  `phase-validation`, `context-update` default `agent`; rest `human`.
+- **`assisted`** (recommended default) — within `task-completion-review`/
+  `phase-completion-review`, the mechanical check defaults `agent` and
+  the judgment check defaults `human`; `context-update` also defaults
+  `agent`; rest `human`.
 - **`delegated`** — no default; every gate must be listed in
   `overrides`, unlisted falls back to `human`.
 - **`autonomous`** — all gates default `agent`; list any you want held
   back at `human`.
 
-**Task complete requires:** implementation + validation +
-`task-completion-review` + context evaluated + phase file's row marked
-complete + `info.md` cleared.
+**Task complete requires:** implementation + `task-completion-review`
+(both checks) + context evaluated + phase file's row marked complete +
+`info.md` cleared.
 
-**Phase complete requires:** all tasks complete + requirements/
-validations satisfied + `phase-completion-review` + context reconciled
-+ required ADRs exist + `roadmap.md` row marked complete + `info.md`
+**Phase complete requires:** all tasks complete +
+`phase-completion-review` (both checks) + context reconciled +
+required ADRs exist + `roadmap.md` row marked complete + `info.md`
 cleared.
 
 Completion-review gates ≠ plan-review gates — plan before
-implementation, completion after. Both default `human` in `assisted`
-mode (coherence/judgment), unlike `-validation`/`context-update`
-(mechanical, default `agent`).
+implementation, completion after. Within `assisted` mode, a
+completion-review gate's judgment check defaults `human`
+(coherence/judgment), same as every plan-review gate; its internal
+mechanical check defaults `agent`, same as `context-update`.
 
 ### Starting without a plan
 
@@ -287,14 +290,12 @@ the old one — Git keeps history; the table shows the current chain.
 
 ## 8. Validation vs Review
 
-- **Validation** — does it satisfy requirements?
-- **Review** — is it appropriate, coherent, consistent with direction?
-
-Both required, both distinct. Validation never edits to force a pass —
-return to the implementation loop. Review never silently fixes unless
-`info.md` grants implementation authority.
-
-[HUMAN] Based on feedback, we will merge this.
+The completion-review gate's two internal checks, in order: **validation**
+— does it satisfy requirements (mechanical)? — then **review** — is it
+appropriate, coherent, consistent with direction (judgment)? Both
+required, both distinct. Validation never edits to force a pass — return
+to the implementation loop. Review never silently fixes unless `info.md`
+grants implementation authority.
 
 ---
 
@@ -361,19 +362,18 @@ as it progresses; ADR for decisions made along the way (check the
 index first); treat pseudocode as guidance (§6). Cannot: silently
 change approved requirements/plan.
 
-**Validation operation** (`validate-work-full`) — Can: run validation,
-report failures; set Status `validating` in the phase file, refresh
-`info.md`'s pointer (§11). Must: read `info.md` fresh before trusting
-a gate's authority — never a cached read. Should not: edit
-implementation to force a pass.
-
-**Review operation** (`review-work-full`) — Can: inspect everything,
-flag scope/requirement/complexity/architecture/validation/context
-issues and undocumented decisions; set Status `reviewing` in the phase
-file, refresh `info.md`'s pointer (§11). Must: stop for
-`task-completion-review`/`phase-completion-review` after reporting,
-even clean findings — never treat "no problems" as approval itself.
-Should not: silently fix, or write a missing ADR itself.
+**Validation-review operation** (`validate-work-full`,
+`review-work-full`) — the completion-review gate's two internal checks
+(§8): validation runs first, review second. Can: run validation, report
+failures, set Status `validating` in the phase file; inspect everything,
+flag scope/requirement/complexity/architecture/validation/context issues
+and undocumented decisions, set Status `reviewing` in the phase file;
+both refresh `info.md`'s pointer (§11). Must: read `info.md` fresh
+before trusting a gate's authority — never a cached read; stop for
+`task-completion-review`/`phase-completion-review` after reporting, even
+clean findings — never treat "no problems" as approval itself. Should
+not: edit implementation to force a pass; silently fix issues, or write
+a missing ADR itself.
 
 **Context operation** (`propagate-context`, `build-context-full`) —
 Can: propagate reusable knowledge to a phase file's Context or
