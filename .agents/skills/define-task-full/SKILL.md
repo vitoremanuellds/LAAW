@@ -5,8 +5,9 @@ description: Full-profile skill to break a phase file's Plan section into indivi
 
 # Skill: define-task-full
 
-Operation for the **Task Planning Agent**. Contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts).
+This skill performs the **task-planning** operation. Its
+Can/Must/Cannot contract:
+[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts).
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for task planning.
@@ -117,7 +118,8 @@ invocation:**
        from the steps alone (a new algorithm, a non-trivial data
        transform). Skip it when it would just restate the steps in a
        different font (a config change, a route registration). This
-       is guidance for the Implementation Agent, not a literal script
+       is guidance for the implementation operation, not a literal
+       script
        — see [.ai/workflow/workflow.md §6](.ai/workflow/workflow.md#6-deviations)
        for why deviating from its specifics isn't automatically a
        deviation. **Write it in informal, language-agnostic
@@ -180,7 +182,7 @@ invocation:**
 7. Update `.ai/info.md`'s Status section: set `Active task` to this
    task's ID. If multiple tasks are in scope this invocation, the
    Status section can only reflect one at a time (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-multi-agent--multi-human))
+   [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-fast-pointer-and-the-permanent-record))
    — use the last one drafted, or the one most likely to be
    implemented next.
 
@@ -189,9 +191,12 @@ invocation:**
    invocation, or scope missing from the ones just drafted — before
    requesting review; batch it in now rather than triggering a second
    review cycle later.
-9. Commit everything together — the new stubs from step 1, the
-   fully-drafted task files, the phase file's updated table,
-   `.ai/info.md`, all of it (see
+9. Commit everything together: stage every drafted
+   `.ai/tasks/p{NN}-t{NN}-{name}.md`, the owning
+   `.ai/phases/p{NN}-{name}.md`'s updated Tasks table (stub rows and
+   all), `.ai/info.md`, and `.ai/constitution/roadmap.md` if this was
+   the phase's first task planned; the message should say which tasks
+   were drafted (see
    [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
    Stop for task plan review (`task-review` gate) — see `.ai/info.md`
    (read fresh) — covering only the tasks actually drafted this
@@ -208,6 +213,17 @@ invocation:**
    [.ai/workflow/workflow.md §5](.ai/workflow/workflow.md#5-lifecycle--gates)).
    `implement-task-full`'s own first step is what finally moves
    each task's Status to `in-progress`, once you actually start it.
+
+**Deviations convention:** a deviation
+([.ai/workflow/workflow.md §6](.ai/workflow/workflow.md#6-deviations))
+is recorded inline in the task file, not a separate file — append (or
+update) a `## Deviations` subsection with one entry per deviation:
+`Expected / Discovered / Why it fails / Proposed fix / Replan?
+(task/phase/project)`, lifecycle `OPEN → ADDRESSED → INCORPORATED`,
+then delete the entry once its fact already lives in the plan,
+implementation, or an ADR. This subsection doesn't exist in a freshly
+drafted task file — you don't create it while planning; it's added
+later, by whichever operation actually raises the deviation.
 
 ## Output
 

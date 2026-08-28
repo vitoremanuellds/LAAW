@@ -6,10 +6,11 @@ What was deliberately decided.
 
 ## Context
 
-What situation or deviation prompted this decision. Link the deviation
-if one exists, e.g. `../tasks/p01-t03-{name}-deviation.md`
-(before it was deleted — mention it in prose if the file is already
-gone).
+What situation or deviation prompted this decision. If a deviation
+prompted it, reference the task file's own `## Deviations` subsection
+(before its entry is deleted — mention it in prose, e.g. "see P01-T03's
+deviation," if the entry has already been removed by the time this ADR
+is written).
 
 ## Alternatives Considered
 

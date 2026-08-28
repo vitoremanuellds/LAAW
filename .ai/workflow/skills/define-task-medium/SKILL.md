@@ -5,8 +5,9 @@ description: Medium-profile skill to define a new task (tasks/t{NN}-{name}.md, f
 
 # Skill: define-task-medium
 
-Operation for the **Task Planning Agent**. Contract:
-[.ai/workflow/workflow-medium.md §10](.ai/workflow/workflow-medium.md#10-agent-contracts).
+This skill performs the **task-planning** operation. Its
+Can/Must/Cannot contract:
+[.ai/workflow/workflow-medium.md §10](.ai/workflow/workflow-medium.md#10-operation-contracts).
 
 Read [.ai/workflow/workflow-medium.md](.ai/workflow/workflow-medium.md)
 in full, same as every other medium-profile skill — do not skip it for
@@ -96,6 +97,17 @@ invocation:**
    implementation now, rather than starting it in the same response.
    `implement-task-medium`'s own first step is what moves each task's
    Status to `in-progress`.
+
+**Deviations convention:** a deviation
+([.ai/workflow/workflow-medium.md §6](.ai/workflow/workflow-medium.md#6-deviations))
+is recorded inline in the task file, not a separate file — append (or
+update) a `## Deviations` subsection with one entry per deviation:
+`Expected / Discovered / Why it fails / Proposed fix / Replan?
+(task/project)`, lifecycle `OPEN → ADDRESSED → INCORPORATED`, then
+delete the entry once its fact already lives in the plan,
+implementation, or an ADR. This subsection doesn't exist in a freshly
+drafted task file — you don't create it while planning; it's added
+later, by whichever operation actually raises the deviation.
 
 ## Output
 

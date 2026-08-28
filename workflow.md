@@ -61,7 +61,7 @@ Can't find the right skill? Re-read this table — don't guess paths.
 │   ├── workflow.md
 │   ├── reference/              detail files, one per concept
 │   ├── templates/            info, context, decisions, adr
-│   └── skills/                7 skills, see table above
+│   └── skills/                8 skills, see table above
 │
 ├── info.md                    Policy + Status, merged
 ├── constitution/               mission, techstack, roadmap (phase index)

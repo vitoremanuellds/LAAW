@@ -5,8 +5,9 @@ description: Medium-profile skill to write, modify, or delete project code for a
 
 # Skill: implement-task-medium
 
-Operation for the **Implementation Agent**. Contract:
-[.ai/workflow/workflow-medium.md §10](.ai/workflow/workflow-medium.md#10-agent-contracts).
+This skill performs the **implementation** operation. Its
+Can/Must/Cannot contract:
+[.ai/workflow/workflow-medium.md §10](.ai/workflow/workflow-medium.md#10-operation-contracts).
 
 This is the most frequently invoked skill in this profile — it runs
 once per task.

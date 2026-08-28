@@ -98,6 +98,17 @@ invocation:**
    `implement-task-medium`'s own first step is what moves each task's
    Status to `in-progress`.
 
+**Deviations convention:** a deviation
+([.ai/workflow/workflow-medium.md §6](.ai/workflow/workflow-medium.md#6-deviations))
+is recorded inline in the task file, not a separate file — append (or
+update) a `## Deviations` subsection with one entry per deviation:
+`Expected / Discovered / Why it fails / Proposed fix / Replan?
+(task/project)`, lifecycle `OPEN → ADDRESSED → INCORPORATED`, then
+delete the entry once its fact already lives in the plan,
+implementation, or an ADR. This subsection doesn't exist in a freshly
+drafted task file — you don't create it while planning; it's added
+later, by whichever operation actually raises the deviation.
+
 ## Output
 
 One `.ai/tasks/t{NN}-{name}.md` per task actually drafted this

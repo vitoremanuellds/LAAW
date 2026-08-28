@@ -170,9 +170,11 @@ assumption breaks:
 Expected / Discovered / Why it fails / Proposed fix / Replan? (task/project)
 ```
 
-File: `tasks/t03-{name}-deviation.md`, next to the task it concerns.
-Lifecycle: `OPEN → ADDRESSED → INCORPORATED`, then delete — the fact
-must already live in the plan, implementation, or an ADR.
+Recorded inline, as a `## Deviations` subsection appended to the task
+file itself — never a separate file. Lifecycle: `OPEN → ADDRESSED →
+INCORPORATED`, then delete the entry — the fact must already live in
+the plan, implementation, or an ADR. See `define-task-medium`'s
+task-file conventions for the exact subsection format.
 
 - **Task-level** → back to the implementation loop.
 - **Project-level** → replanned via `create-constitution-medium`,

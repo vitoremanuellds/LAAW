@@ -5,8 +5,9 @@ description: Full-profile skill to write, modify, or delete project code for a t
 
 # Skill: implement-task-full
 
-Operation for the **Implementation Agent**. Contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts).
+This skill performs the **implementation** operation. Its
+Can/Must/Cannot contract:
+[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts).
 
 This is the most frequently invoked skill in the workflow — it runs
 once per task, potentially many times per phase.
@@ -98,7 +99,11 @@ is not worth an agent inventing rules. Then read:
    pointer already names this task — leave it as the ID only; the
    status word belongs only in the phase file's table, never in
    `info.md` (§11).
-2. Commit (see [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
+2. Commit: stage the modified/created project files, the owning phase
+   file's updated Tasks table row, and any new ADR +
+   `.ai/decisions/decisions.md` row you wrote; the message should say
+   what was implemented (see
+   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
    Stop for `task-validation` — see `.ai/info.md` (read fresh) for
    whether that's yours to run (→
    [validate-work-full](.ai/workflow/skills/validate-work-full/SKILL.md)) or a human's.

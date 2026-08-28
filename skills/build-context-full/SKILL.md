@@ -97,11 +97,11 @@ first — don't skip ahead.
 3. For each file: reconcile it against `context.temp.md`'s
    assumptions — confirm, correct, or flag a discrepancy — and write
    or update the relevant `.ai/context/*.md` file(s). Group by
-   module/domain, not one file per source file — same organizing
-   principle as
-   [.ai/context/workflow-doc-conventions.md](.ai/context/workflow-doc-conventions.md)
-   already uses. Update `context/context.md`'s table for every file
-   touched, in the same step.
+   module/domain, not one file per source file — a `context/` file
+   should read as "everything about this architectural layer or
+   feature-level concept," not as a per-source-file mirror. Update
+   `context/context.md`'s table for every file touched, in the same
+   step.
 4. Set each processed file's row to `read` in `build-plan.md`.
 5. Commit: stage the updated `.ai/context/*.md` file(s),
    `context.md`'s table, and `build-plan.md`'s Status column changes

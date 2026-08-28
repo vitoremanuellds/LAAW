@@ -5,8 +5,9 @@ description: Medium-profile skill to review a task's implementation and validati
 
 # Skill: review-work-medium
 
-Operation for the **Review Agent**. Contract:
-[.ai/workflow/workflow-medium.md §10](.ai/workflow/workflow-medium.md#10-agent-contracts).
+This skill performs the **review** operation. Its Can/Must/Cannot
+contract:
+[.ai/workflow/workflow-medium.md §10](.ai/workflow/workflow-medium.md#10-operation-contracts).
 Two parts — the review itself (gated), and finalization (only after
 approval, a separate turn).
 

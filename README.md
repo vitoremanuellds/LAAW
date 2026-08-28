@@ -263,7 +263,7 @@ never inside the submodule to begin with.
 |---|---|
 | `workflow.md` (full) · `workflow-medium.md` (medium) — lite and minimal have no separate root doc, see below | `AGENTS.md` (has the snippet pasted in) |
 | `reference/*` (full only) — occasional-need detail behind `workflow.md`'s core, one file per concept | |
-| `templates/info-template.md`, `templates/context-template.md`, `templates/decisions-template.md`, `templates/adr-template.md` (full) | `info.md` — bootstrapped from template, then yours (full/medium only) |
+| `templates/info-template.md` (full) · `templates/context-template.md`, `templates/decisions-template.md`, `templates/adr-template.md` (full/medium) | `info.md` — bootstrapped from template, then yours (full/medium only) |
 | `templates/medium-info-template.md` (medium) | `constitution/*`, `context/*` (full/medium) |
 | `templates/lite-project-template.md` (lite) | `phases/*` — full only, one flat file per phase, own Context section embedded |
 | `templates/minimal-tasks-template.md` (minimal) | `tasks/*` — full/medium, one flat file per task, own Context section embedded |
@@ -307,7 +307,8 @@ skills/
 ├── implement-task-full/         │
 ├── validate-work-full/          │
 ├── review-work-full/            │
-├── propagate-context/           ┘
+├── propagate-context/           │
+├── build-context-full/          ┘
 ├── create-constitution-medium/  ┐
 ├── define-task-medium/          │
 ├── implement-task-medium/       │  medium
@@ -443,7 +444,10 @@ project understanding) and is worth spending a large chunk of context
 on, since everything downstream reads the result rather than repeating
 the work. Starting fresh threads for subsequent phases keeps each one's
 context budget close to just what that phase/task needs, rather than
-accumulating the full project history in one window.
+accumulating the full project history in one window. This isn't an
+absolute rule, though: if the thread is already long, start a new one;
+but if the thread is still small and the model is capable, it's fine
+to try staying in the same thread rather than splitting reflexively.
 
 **Watch for skills reading one step ahead of where they should.** A
 model may read an adjacent skill (e.g. `define-phase` while still

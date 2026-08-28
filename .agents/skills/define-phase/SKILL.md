@@ -5,8 +5,9 @@ description: Full-profile skill to define a new phase (phases/p{NN}-{name}.md �
 
 # Skill: define-phase
 
-Operation for the **Phase Planning Agent**. Contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts).
+This skill performs the **phase-planning** operation. Its
+Can/Must/Cannot contract:
+[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts).
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for phase planning.
@@ -39,8 +40,8 @@ eight in a closed enum — see
 [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-fast-pointer-and-the-permanent-record)
 for the full list; never invent one not on it.
 
-Steps 1–7 require no prior approval — draft the whole file before
-stopping for anything. Only step 8 is gated.
+Steps 1–8 require no prior approval — draft the whole file before
+stopping for anything. Only step 9 is gated.
 
 1. Read the roadmap entry for this phase. Don't touch its Status yet —
    whether this is a first draft (already `not-planned`, set by
@@ -81,8 +82,8 @@ stopping for anything. Only step 8 is gated.
 3. Note dependencies on other phases explicitly if they exist, in
    `.ai/constitution/roadmap.md`'s Depends-on column (`P03 depends on
    P01`) — this is what determines which phases can actually be worked
-   on in parallel (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-multi-agent--multi-human)).
+   on in parallel, resolved against Depends-on, never ID order (see
+   [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-fast-pointer-and-the-permanent-record)).
    **If this phase logically precedes phases that already exist**, this
    new phase's own Depends-on may stay empty, but go back and add it to
    the Depends-on column of every existing phase that now needs it done
@@ -113,7 +114,17 @@ stopping for anything. Only step 8 is gated.
 7. Ask the user whether there's anything else to add to this phase's
    Context/Requirements/Plan/Validations before requesting review —
    batch it in now rather than triggering a second review cycle later.
-8. Commit the draft (see
+8. If a phase-level decision was made while drafting this phase that
+   future work needs to know about, this is yours to document — check
+   `.ai/decisions/decisions.md` first; a related decision may already
+   exist. If not, write the ADR from
+   [.ai/workflow/templates/adr-template.md](.ai/workflow/templates/adr-template.md)
+   into `.ai/decisions/adr{NN}-{name}.md`, add its index row in the same
+   step, and reference it from this phase file's own Context section.
+9. Commit the draft: stage `.ai/phases/p{NN}-{name}.md`, any new ADR +
+   `.ai/decisions/decisions.md` row from step 8, and any
+   `.ai/constitution/roadmap.md`/`.ai/info.md` changes from this step;
+   the message should say what phase was drafted and why (see
    [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)). Stop for
    phase plan review (`phase-review` gate) — see `.ai/info.md` (read
    fresh, not from memory). Stop your turn here. Do not continue into
@@ -134,4 +145,5 @@ stopping for anything. Only step 8 is gated.
 Exactly one file: `.ai/phases/p{NN}-{name}.md` — inside `.ai/`, never
 at the project root — plus Status updates in `.ai/info.md` and
 `.ai/constitution/roadmap.md` (including Depends-on adjustments to
-other phase rows, if this phase precedes any of them).
+other phase rows, if this phase precedes any of them). A new ADR and
+`.ai/decisions/decisions.md` row if a phase-level decision was made.

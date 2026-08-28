@@ -5,8 +5,9 @@ description: Medium-profile skill to run task validation after implementation, b
 
 # Skill: validate-work-medium
 
-Operation for the **Validation Agent**. Contract:
-[.ai/workflow/workflow-medium.md §10](.ai/workflow/workflow-medium.md#10-agent-contracts).
+This skill performs the **validation** operation. Its Can/Must/Cannot
+contract:
+[.ai/workflow/workflow-medium.md §10](.ai/workflow/workflow-medium.md#10-operation-contracts).
 
 Read [.ai/workflow/workflow-medium.md](.ai/workflow/workflow-medium.md)
 in full, same as every other medium-profile skill — do not skip it for

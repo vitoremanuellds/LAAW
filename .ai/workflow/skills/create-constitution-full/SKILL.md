@@ -5,8 +5,9 @@ description: Full-profile skill to create or update a project's constitution (mi
 
 # Skill: create-constitution-full
 
-Operation for the **Constitution Agent**. Contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts).
+This skill performs the **constitution** operation. Its Can/Must/Cannot
+contract:
+[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts).
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for constitution work.
@@ -31,8 +32,8 @@ Creating or updating `.ai/constitution/mission.md`, `techstack.md`, or
 ## Procedure
 
 All paths below are `.ai/`-prefixed and relative to the project root —
-not relative to this skill file. Steps 1–7 require no prior approval —
-draft everything before stopping for anything. Only step 8 is gated.
+not relative to this skill file. Steps 1–8 require no prior approval —
+draft everything before stopping for anything. Only step 9 is gated.
 
 1. Read existing constitution files if present — do not overwrite blind.
 2. **First run only:** if `.ai/info.md` doesn't exist, copy
@@ -86,11 +87,21 @@ draft everything before stopping for anything. Only step 8 is gated.
    (mission, techstack, or roadmap) before requesting review — batch
    it in now rather than triggering a second review cycle later for
    something that could have been included in this one.
-8. Commit the draft (see
-   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)) —
-   include `.ai/info.md`/`.ai/context/context.md`/
-   `.ai/decisions/decisions.md` in this same commit if you just
-   created them. Stop. Constitution review is a gate — see
+8. If a project-level decision was made while drafting mission/
+   techstack/roadmap that future work needs to know about, this is
+   yours to document — check `.ai/decisions/decisions.md` first; a
+   related decision may already exist. If not, write the ADR from
+   [.ai/workflow/templates/adr-template.md](.ai/workflow/templates/adr-template.md)
+   into `.ai/decisions/adr{NN}-{name}.md` and add its index row in the
+   same step.
+9. Commit the draft: stage `.ai/constitution/mission.md`,
+   `.ai/constitution/techstack.md`, and `.ai/constitution/roadmap.md`,
+   plus `.ai/info.md`/`.ai/context/context.md`/
+   `.ai/decisions/decisions.md` if you just created them or added an
+   ADR row in step 8; the message should say what was drafted or
+   updated, and whether this was a first-run bootstrap (see
+   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
+   Stop. Constitution review is a gate — see
    `.ai/info.md` (read fresh, not from memory) for who approves it.
    Do not proceed to phase planning yourself unless authorized. **When
    approval comes back, that's a separate turn:** in `manual`/
@@ -104,4 +115,5 @@ draft everything before stopping for anything. Only step 8 is gated.
 `.ai/constitution/mission.md`, `.ai/constitution/techstack.md`,
 `.ai/constitution/roadmap.md` — always. `.ai/info.md`,
 `.ai/context/context.md`, `.ai/decisions/decisions.md` — first run
-only.
+only. A new ADR and `.ai/decisions/decisions.md` row if a
+project-level decision was made.

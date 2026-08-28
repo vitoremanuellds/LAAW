@@ -5,8 +5,9 @@ description: Full-profile skill to propagate reusable knowledge into context fil
 
 # Skill: propagate-context
 
-Operation for the **Context Agent**. Contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts). Three
+This skill performs the **context** operation. Its Can/Must/Cannot
+contract:
+[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts). Three
 sub-operations — use whichever matches the trigger.
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
@@ -45,7 +46,12 @@ passed yet; don't mark complete regardless of how the task looks.
    Tasks table — this is the actual "task complete" marker. Clear it
    as the active task in `.ai/info.md`'s Status section (leave `Active
    phase` alone if the phase itself isn't done).
-5. Ask whether the phase needs more tasks — does the phase file's Plan
+5. Commit: stage the phase file's updated Tasks table (Status →
+   `complete`, plus any Context section update from step 3) and
+   `.ai/info.md`'s cleared Active task pointer; the message should say
+   which task completed (see
+   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
+6. Ask whether the phase needs more tasks — does the phase file's Plan
    still look sufficient, or is there something to add before this
    unit of work is really closed? A plain question, not a gate — it
    sets no Status on its own. If the answer is yes, that's a normal
@@ -76,7 +82,10 @@ above.
    marker. Clear `.ai/info.md`'s Status section entirely (both `Active
    phase` and `Active task` go back to `—`) unless a next phase is
    already starting in the same breath.
-5. Commit (see
+5. Commit: stage `.ai/constitution/roadmap.md`'s updated Status, the
+   `.ai/context/` file(s) touched in step 3 plus `context.md`'s table
+   row, and `.ai/info.md`'s cleared pointers; the message should say
+   which phase completed (see
    [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
 6. Ask whether the project needs another phase, or is done for now — a
    plain question, not a gate. If the answer is yes, the normal next

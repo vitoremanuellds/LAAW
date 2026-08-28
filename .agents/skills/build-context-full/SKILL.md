@@ -5,7 +5,8 @@ description: Full-profile skill to populate .ai/context/ for a project that's un
 
 # Skill: build-context-full
 
-Operation for the **Context Agent** ([.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-agent-contracts))
+This skill performs the **context** operation
+([.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts))
 — a second operation alongside `propagate-context`: this one builds
 context by surveying an existing codebase, not by propagating what a
 completed task/phase learned.
@@ -48,7 +49,8 @@ check," stop; that belongs in `.iterate`, not here.
    - **Open questions** — anything genuinely unclear from structure
      alone, its own `[QUESTION]` line. Don't fold a question into an
      assumption just because they're related.
-3. Commit (`docs: assumption pass for context.temp.md`, see
+3. Commit: stage `.ai/context/context.temp.md`; the message should say
+   this is the assumption pass (see
    [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
    Stop — tell the human `context.temp.md` is ready for review: they
    may add `[HUMAN]` lines confirming, correcting, or commenting on
@@ -79,7 +81,10 @@ first — don't skip ahead.
    there first if it doesn't exist yet): the ordered file list, one
    row each, Status `queued`; the batch size; a link back to
    `context.temp.md`.
-5. Commit. Report the plan and the first batch, ready for `.iterate`.
+5. Commit: stage `.ai/context/build-plan.md`; the message should say
+   the iteration plan was drafted (see
+   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
+   Report the plan and the first batch, ready for `.iterate`.
 
 ## build-context.iterate — read a batch, build context/, repeat
 
@@ -92,13 +97,17 @@ first — don't skip ahead.
 3. For each file: reconcile it against `context.temp.md`'s
    assumptions — confirm, correct, or flag a discrepancy — and write
    or update the relevant `.ai/context/*.md` file(s). Group by
-   module/domain, not one file per source file — same organizing
-   principle as
-   [.ai/context/workflow-doc-conventions.md](.ai/context/workflow-doc-conventions.md)
-   already uses. Update `context/context.md`'s table for every file
-   touched, in the same step.
+   module/domain, not one file per source file — a `context/` file
+   should read as "everything about this architectural layer or
+   feature-level concept," not as a per-source-file mirror. Update
+   `context/context.md`'s table for every file touched, in the same
+   step.
 4. Set each processed file's row to `read` in `build-plan.md`.
-5. Commit.
+5. Commit: stage the updated `.ai/context/*.md` file(s),
+   `context.md`'s table, and `build-plan.md`'s Status column changes
+   from this batch; the message should say which files were processed
+   (see
+   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
 6. If `build-plan.md` still has `queued` rows: stop and report
    progress (X read, Y queued) — ready for the next `.iterate` call,
    not continued automatically in the same turn; batch size is the
