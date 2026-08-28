@@ -265,26 +265,16 @@ Write one when a decision is deliberate and future work needs to know
 it. Not every deviation produces one; not every ADR comes from one.
 
 **Ownership — whoever's scope produced the decision writes it:** the
-constitution operation (project) · the phase-planning operation
-(phase) · the implementation operation (during implementation). No
-other operation writes one — review flags a missing ADR back to the
-owning scope.
-
-[HUMAN] ADRs maybe must be written only at the phase context propagation process.
-
-Check `../decisions/decisions.md` first. Copy
-[`templates/adr-template.md`](templates/adr-template.md) to
-`../decisions/adr{NN}-{name}.md`, fill it in, add its index row (ID,
-Name, Description, Status `valid`, Relations) in the same step.
-Template fields: Decision, Context (link the deviation if any),
-Alternatives Considered, Consequences.
-
-[HUMAN] This is a "how to" rule, place it inside a relatable skill
+constitution operation (`create-constitution-full`, project-level) ·
+the phase-planning operation (`define-phase`, phase-level) · the
+implementation operation (`implement-task-full`, during
+implementation). No other operation writes one — review flags a
+missing ADR back to the owning scope. Write it and reference it from
+the owning phase/task file the moment the decision is made — never deferred to phase completion; only propagating its relevance into
+`context/` follows §9's timing.
 
 A superseding ADR updates both rows' Relations rather than deleting
 the old one — Git keeps history; the table shows the current chain.
-
-[HUMAN] Rule on how to, move to skill.
 
 ---
 
@@ -321,7 +311,7 @@ progress reports, anything recorded elsewhere.
 
 No lateral shared-context files exist (§4) — a fact belongs in the
 specific phase/task file, or gets promoted to `context/`. See
-`skills/propagate-context/SKILL.md` for the exact procedure.
+`skills/propagate-context/SKILL.md` for the exact procedure. An ADR's relevance to `context/` propagates on this same phase-completion cadence — writing the ADR itself never waits for it.
 
 ---
 
