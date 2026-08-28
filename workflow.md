@@ -1,20 +1,10 @@
 # Agent Workflow
 
-Source of truth for how work is organized, performed, and by whom.
-Procedural how-to lives in `skills/`. Gate *authority* (who) lives in
-[`../info.md`](../info.md), not here. Do not duplicate this file's
-rules elsewhere — reference it.
-
-[HUMAN] This is not a README, only place valiable information for the agent. The only relevant information here is the warning to not duplicate the rules. The Procedural part there is no need, as well have a table later in this document. Same with the gate thing.
-
-This file holds only what every operation needs to know. Detailed
-rationale, lookup tables, and historical context that's genuinely
-occasional-need lives in `reference/`, one file per concept, linked
-from the specific place below that needs it — you don't need to read
-`reference/` to follow the rules here, only to understand *why* a
-specific rule exists or to look something up you're unsure of.
-
-[HUMAN] Maybe the only information needed here is about the references.
+Source of truth for how work is organized, performed, and by whom. Do not
+duplicate this file's rules elsewhere — reference it. Detailed rationale,
+lookup tables, and historical context that's genuinely occasional-need
+lives in `reference/`, one file per concept, linked from the specific place
+below that needs it.
 
 ---
 
@@ -22,11 +12,8 @@ specific rule exists or to look something up you're unsure of.
 
 1. Agents do not reconstruct information that can be persisted cheaply.
 2. Persist knowledge, not reasoning.
-3. Read only what the current task needs. Never load the whole `.ai/`
-   tree speculatively.
-4. Use terminal tools (`tree`, `find`, `ls`, `grep`) to discover the
-   actual project structure — no separate structure map to maintain or
-   trust over the real filesystem. [HUMAN] No need to specify this anymore, let the agent work his way.
+3. Read only what the current task needs. Never load the whole `.ai/` tree
+   speculatively.
 
 ---
 
@@ -94,8 +81,7 @@ never bare or dot-relative,** and every skill's cross-references (to
 `workflow.md`, sibling skills, templates) are `.ai/workflow/`-anchored,
 not dot-relative. See
 [reference/directory-and-links.md](reference/directory-and-links.md)
-for why both rules exist — each is the fix for a bug that actually
-happened, not a stylistic preference. [HUMAN] No need to explain that this is a fix.
+for why both rules exist.
 
 **Naming:** phases `p{NN}-{kebab-name}.md`; tasks
 `p{NN}-t{NN}-{kebab-name}.md` (flat); decisions `adr{NN}-{kebab-name}.md`.
@@ -136,7 +122,7 @@ phase's Plan section read like a task list (the phase-planning
 contract in §10 already forbids assigning task IDs there for the same
 reason).
 
-[HUMAN] Maybe we can create a list of definitions, something like `phase: description; task: description`.
+**Quick reference:** `phase` — a feature/capability-sized slice of work with its own Context and Plan; `task` — one mechanical, close-to-implementable unit of work within a phase's Plan.
 
 ---
 
@@ -327,21 +313,14 @@ everything worth considering; a mid-phase task that thinks its finding
 is that significant still routes through the phase file's Context
 section first, same as any other task-level fact.
 
-[HUMAN] How to, move to skill.
-
 **Propagate:** architecture facts, invariants, responsibilities,
 dependencies, constraints, domain knowledge.
 **Never:** task history, temporary details, internal reasoning,
 progress reports, anything recorded elsewhere.
 
-[HUMAN] More how to, move it as well.
-
 No lateral shared-context files exist (§4) — a fact belongs in the
-specific phase/task file, or gets promoted to `context/`. Touching
-`context/` means updating its row in `context/context.md`'s table in
-the same step.
-
-[HUMAN] This section should only explain this step and why it exists, how to do it should live inside skill.
+specific phase/task file, or gets promoted to `context/`. See
+`skills/propagate-context/SKILL.md` for the exact procedure.
 
 ---
 
