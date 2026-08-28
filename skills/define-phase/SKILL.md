@@ -114,7 +114,9 @@ stopping for anything. Only step 8 is gated.
 7. Ask the user whether there's anything else to add to this phase's
    Context/Requirements/Plan/Validations before requesting review —
    batch it in now rather than triggering a second review cycle later.
-8. Commit the draft (see
+8. Commit the draft: stage `.ai/phases/p{NN}-{name}.md` and any
+   `.ai/constitution/roadmap.md`/`.ai/info.md` changes from this step;
+   the message should say what phase was drafted and why (see
    [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)). Stop for
    phase plan review (`phase-review` gate) — see `.ai/info.md` (read
    fresh, not from memory). Stop your turn here. Do not continue into

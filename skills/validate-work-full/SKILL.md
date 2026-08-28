@@ -55,6 +55,10 @@ still current.
    [.ai/workflow/workflow.md §5](.ai/workflow/workflow.md#5-lifecycle--gates)).
 5. Record any accepted exceptions explicitly rather than silently
    ignoring a failure.
+6. Commit: stage the owning phase file's updated Tasks table (the
+   Status change from step 1, or the revert from step 4 on failure);
+   the message should say pass or fail and for which task (see
+   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
 
 ## Procedure — phase validation
 
@@ -74,6 +78,10 @@ still current.
    Manual, not merged into one overall verdict.** On failure, set
    Status back to `in-progress` in both places rather than leaving it
    at `validating`.
+5. Commit: stage `.ai/constitution/roadmap.md`'s updated Status (the
+   change from step 1, or the revert from step 4 on failure); the
+   message should say pass or fail and for which phase (see
+   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
 
 ## Output
 

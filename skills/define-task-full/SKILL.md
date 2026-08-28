@@ -191,9 +191,12 @@ invocation:**
    invocation, or scope missing from the ones just drafted — before
    requesting review; batch it in now rather than triggering a second
    review cycle later.
-9. Commit everything together — the new stubs from step 1, the
-   fully-drafted task files, the phase file's updated table,
-   `.ai/info.md`, all of it (see
+9. Commit everything together: stage every drafted
+   `.ai/tasks/p{NN}-t{NN}-{name}.md`, the owning
+   `.ai/phases/p{NN}-{name}.md`'s updated Tasks table (stub rows and
+   all), `.ai/info.md`, and `.ai/constitution/roadmap.md` if this was
+   the phase's first task planned; the message should say which tasks
+   were drafted (see
    [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
    Stop for task plan review (`task-review` gate) — see `.ai/info.md`
    (read fresh) — covering only the tasks actually drafted this

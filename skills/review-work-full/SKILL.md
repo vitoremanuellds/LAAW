@@ -68,8 +68,11 @@ naming note). Don't confuse the two just because both are called
 8. Report findings — approve, or changes requested. Do not silently
    fix issues yourself unless your entry in `.ai/info.md` explicitly
    grants implementation authority.
-9. Commit if you made any changes to context/ADR files as part of
-   flagging (see
+9. Commit: stage the Status change to `reviewing` from step 1 (the
+   phase file's Tasks table for a task-level review, or
+   `.ai/constitution/roadmap.md` for a phase-level review), plus any
+   context/ADR files you touched while flagging; the message should
+   say what was reviewed and the verdict (see
    [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
    Stop for `task-completion-review` (task-level) or
    `phase-completion-review` (phase-level) — see `.ai/info.md`.

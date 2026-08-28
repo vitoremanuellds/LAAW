@@ -203,7 +203,7 @@ P06-T14, or a separate phase) if the human wants it done.
 | P06-T06 | Add explicit active-pointer-lifecycle statement to §11 | Documentation clarity only — no behavior change | — | complete |
 | P06-T07 | Keep the one-line ID-order-≠-execution-order rule in §11 | Keep the operating rule in workflow.md; reasoning/examples stay only in reference/status-and-info.md | — | complete |
 | P06-T08 | Fold §12's single-active-item constraint into §11; delete the rest of §12 (no renumbering — leaves a gap) | Preserve the one real constraint, drop the multi-agent advisory content | — | complete |
-| P06-T09 | Migrate commit-step detail into each of the 8 full-profile skills; trim the commit-discipline section to one line | Drop the Conventional-Commits mandate from workflow.md; keep "commit each draft immediately" as the one cross-cutting rule | — | plan-approved |
+| P06-T09 | Migrate commit-step detail into each of the 8 full-profile skills; trim the commit-discipline section to one line | Drop the Conventional-Commits mandate from workflow.md; keep "commit each draft immediately" as the one cross-cutting rule | — | validating |
 | P06-T10 | Define an inline in-task-file deviation convention; update §6 | Replace the separate deviation-file mechanism, precedented by lite/minimal's inline field | P06-T01 | not-planned |
 | P06-T11 | Add an explicit context-resolution search-order rule | New rule: follow the task/phase file's own links first, don't search the codebase for context docs | — | plan-approved |
 | P06-T12 | Apply remaining confirmed-safe trims (opening/§1, §3, §4 glossary, §9) | Low-risk cleanup already confirmed safe against reference/ and propagate-context's existing content | — | plan-approved |

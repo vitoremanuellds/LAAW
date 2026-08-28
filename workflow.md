@@ -450,26 +450,10 @@ guess if still ambiguous.
 
 ## 13. Commit discipline
 
-Commit a draft the moment it's written, before requesting review — the
-review happens via `git diff`. Use Conventional Commits
-(`<type>(<ID>): <description>`) — pick the type that matches what
-actually changed, don't default to one:
-
-- `docs` — phase/task plans, constitution, roadmap, context, ADR
-  writes (no project code touched).
-- `feat` / `fix` / `refactor` / `test` / `chore` — implementation
-  commits; whichever actually describes the change.
-- `chore` — status-only commits (marking complete, clearing pointers)
-  with no accompanying content change.
-
-Examples: `docs(P01): draft phase plan`, `docs(P01-T01): draft task
-plan`, `feat(P01-T01): implement scoring engine`, `chore(P01): mark
-phase complete`. Commit again whenever `info.md`, `roadmap.md`, or a
-phase file's task table changes.
-
-[HUMAN] We must maintain the discipline of committing what was done, but maybe move it to the skills as a step. We can drop the conventional commits thing, let the own user set it on its AGENTS.md as a rule.
-
-[HUMAN]
+Commit each draft immediately, before requesting review — the review
+happens via `git diff`. Message format and type selection are your
+project's own convention (see your `AGENTS.md`); each skill's own
+commit step says what to stage.
 
 # General comments
 
