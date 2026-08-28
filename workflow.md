@@ -234,11 +234,11 @@ assumption breaks:
 Expected / Discovered / Why it fails / Proposed fix / Replan? (task/phase/project)
 ```
 
-File: `tasks/p01-t03-{name}-deviation.md`, next to the task it
-concerns. Lifecycle: `OPEN → ADDRESSED → INCORPORATED`, then delete —
-the fact must already live in the plan, implementation, or an ADR.
-
-[HUMAN] Maybe we can simplify it, leave it inside the task markdown file.
+Recorded inline, as a `## Deviations` subsection appended to the task
+file itself — never a separate file. Lifecycle: `OPEN → ADDRESSED →
+INCORPORATED`, then delete the entry — the fact must already live in
+the plan, implementation, or an ADR. See `define-task-full`'s
+task-file conventions for the exact subsection format.
 
 A task file's optional pseudocode is guidance, not a contract —
 implementing it differently isn't a deviation by itself; only the
