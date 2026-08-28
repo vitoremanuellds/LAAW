@@ -207,4 +207,4 @@ P06-T14, or a separate phase) if the human wants it done.
 | P06-T10 | Define an inline in-task-file deviation convention; update §6 | Replace the separate deviation-file mechanism, precedented by lite/minimal's inline field | P06-T01 | complete |
 | P06-T11 | Add an explicit context-resolution search-order rule | New rule: follow the task/phase file's own links first, don't search the codebase for context docs | — | complete |
 | P06-T12 | Apply remaining confirmed-safe trims (opening/§1, §3, §4 glossary, §9) | Low-risk cleanup already confirmed safe against reference/ and propagate-context's existing content | — | complete |
-| P06-T13 | Sync mirrors: run sync-skills.sh and refresh .ai/workflow/'s copy | Keep .agents/skills/ and .ai/workflow/ byte-identical to the canonical root copies | P06-T01…T12 | not-planned |
+| P06-T13 | Sync mirrors: run sync-skills.sh and refresh .ai/workflow/'s copy | Keep .agents/skills/ and .ai/workflow/ byte-identical to the canonical root copies | P06-T01…T12 | awaiting-plan-review |
