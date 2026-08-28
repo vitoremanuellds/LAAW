@@ -5,9 +5,17 @@ description: Full-profile skill to review a task or phase's implementation and v
 
 # Skill: review-work-full
 
-This skill performs the **review** operation. Its Can/Must/Cannot
-contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts).
+This skill performs the **review** operation — the second of the
+completion-review gate's two internal checks (judgment, after
+validation's mechanical check; see
+[.ai/workflow/workflow.md §8](.ai/workflow/workflow.md#8-validation-vs-review)).
+
+- **Can:** inspect everything, flag scope/requirement/complexity/
+  architecture/validation/context issues and undocumented decisions,
+  set Status `reviewing`; refresh `info.md`'s pointer.
+- **Must:** read `info.md` fresh before trusting a gate's authority;
+  stop after reporting, even clean findings.
+- **Should not:** silently fix issues; write a missing ADR itself.
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for review.
@@ -63,7 +71,8 @@ naming note). Don't confuse the two just because both are called
    skill to fix.
 7. Check for undocumented decisions — an architectural choice with no
    corresponding ADR. Flag it back to whichever operation produced it
-   (see [.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts)) —
+   (ownership rule: see
+   [.ai/workflow/workflow.md §7](.ai/workflow/workflow.md#7-decisions-adrs)) —
    do not write the ADR yourself.
 8. Report findings — approve, or changes requested. Do not silently
    fix issues yourself unless your entry in `.ai/info.md` explicitly
@@ -73,7 +82,7 @@ naming note). Don't confuse the two just because both are called
    `.ai/constitution/roadmap.md` for a phase-level review), plus any
    context/ADR files you touched while flagging; the message should
    say what was reviewed and the verdict (see
-   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
    Stop for `task-completion-review` (task-level) or
    `phase-completion-review` (phase-level) — see `.ai/info.md`.
    **Clean findings are not themselves approval** — even if you found

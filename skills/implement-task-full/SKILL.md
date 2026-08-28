@@ -5,9 +5,16 @@ description: Full-profile skill to write, modify, or delete project code for a t
 
 # Skill: implement-task-full
 
-This skill performs the **implementation** operation. Its
-Can/Must/Cannot contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts).
+This skill performs the **implementation** operation
+([.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts)
+covers what "operation" means and where authority comes from).
+
+- **Can:** read the task file + context; modify project files; run
+  tools.
+- **Must:** update the phase file's task table + `info.md`'s pointer
+  as it progresses; write an ADR for decisions made along the way;
+  treat pseudocode as guidance.
+- **Cannot:** silently change approved requirements/plan.
 
 This is the most frequently invoked skill in the workflow — it runs
 once per task, potentially many times per phase.
@@ -103,7 +110,7 @@ is not worth an agent inventing rules. Then read:
    file's updated Tasks table row, and any new ADR +
    `.ai/decisions/decisions.md` row you wrote; the message should say
    what was implemented (see
-   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
    Stop for `task-validation` — see `.ai/info.md` (read fresh) for
    whether that's yours to run (→
    [validate-work-full](.ai/workflow/skills/validate-work-full/SKILL.md)) or a human's.

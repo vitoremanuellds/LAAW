@@ -5,9 +5,16 @@ description: Full-profile skill to break a phase file's Plan section into indivi
 
 # Skill: define-task-full
 
-This skill performs the **task-planning** operation. Its
-Can/Must/Cannot contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts).
+This skill performs the **task-planning** operation
+([.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts)
+covers what "operation" means and where authority comes from).
+
+- **Can:** read the phase file + `context/`; create the task file
+  with implementation-ready detail.
+- **Must:** update the phase file's task table on every status
+  change; refresh `info.md`'s Active task pointer.
+- **Cannot:** implement code; write an ADR — escalate as a
+  phase-level deviation.
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for task planning.
@@ -197,7 +204,7 @@ invocation:**
    all), `.ai/info.md`, and `.ai/constitution/roadmap.md` if this was
    the phase's first task planned; the message should say which tasks
    were drafted (see
-   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
    Stop for task plan review (`task-review` gate) — see `.ai/info.md`
    (read fresh) — covering only the tasks actually drafted this
    invocation, not the stubs (nothing to review in a title-only row).

@@ -5,9 +5,16 @@ description: Full-profile skill to define a new phase (phases/p{NN}-{name}.md �
 
 # Skill: define-phase
 
-This skill performs the **phase-planning** operation. Its
-Can/Must/Cannot contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts).
+This skill performs the **phase-planning** operation
+([.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts)
+covers what "operation" means and where authority comes from).
+
+- **Can:** read constitution + `context/`; create the phase file
+  (Context+Requirements+Plan+Validations+empty task table).
+- **Must:** ADR for phase-level decisions; update `roadmap.md`'s
+  Status/Depends-on; refresh `info.md`'s Active phase pointer.
+- **Cannot:** implement code; assign task IDs or fill the task table
+  beyond stub titles.
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for phase planning.
@@ -125,7 +132,7 @@ stopping for anything. Only step 9 is gated.
    `.ai/decisions/decisions.md` row from step 8, and any
    `.ai/constitution/roadmap.md`/`.ai/info.md` changes from this step;
    the message should say what phase was drafted and why (see
-   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)). Stop for
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)). Stop for
    phase plan review (`phase-review` gate) — see `.ai/info.md` (read
    fresh, not from memory). Stop your turn here. Do not continue into
    task breakdown or task IDs — that's a separate operation

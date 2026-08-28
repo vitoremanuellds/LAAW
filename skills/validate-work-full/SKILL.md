@@ -5,9 +5,16 @@ description: Full-profile skill to run task- or phase-level validation after imp
 
 # Skill: validate-work-full
 
-This skill performs the **validation** operation. Its Can/Must/Cannot
-contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts).
+This skill performs the **validation** operation — the first of the
+completion-review gate's two internal checks (mechanical, before
+review's judgment call; see
+[.ai/workflow/workflow.md §8](.ai/workflow/workflow.md#8-validation-vs-review)).
+
+- **Can:** run validation, report failures, set Status `validating`;
+  refresh `info.md`'s pointer.
+- **Must:** read `info.md` fresh before trusting a gate's authority —
+  never a cached read.
+- **Should not:** edit implementation to force a pass.
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for validation.
@@ -58,7 +65,7 @@ still current.
 6. Commit: stage the owning phase file's updated Tasks table (the
    Status change from step 1, or the revert from step 4 on failure);
    the message should say pass or fail and for which task (see
-   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
 
 ## Procedure — phase validation
 
@@ -81,7 +88,7 @@ still current.
 5. Commit: stage `.ai/constitution/roadmap.md`'s updated Status (the
    change from step 1, or the revert from step 4 on failure); the
    message should say pass or fail and for which phase (see
-   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
 
 ## Output
 

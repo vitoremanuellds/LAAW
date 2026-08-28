@@ -5,9 +5,15 @@ description: Full-profile skill to create or update a project's constitution (mi
 
 # Skill: create-constitution-full
 
-This skill performs the **constitution** operation. Its Can/Must/Cannot
-contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts).
+This skill performs the **constitution** operation
+([.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts)
+covers what "operation" means and where authority comes from).
+
+- **Can:** constitution artifacts, ask clarification.
+- **Must:** ADR for project decisions; first run, bootstrap
+  `info.md`/`context.md`/`decisions.md` unedited, never overwrite
+  existing.
+- **Cannot:** touch code; invent unsupported requirements.
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for constitution work.
@@ -100,7 +106,7 @@ draft everything before stopping for anything. Only step 9 is gated.
    `.ai/decisions/decisions.md` if you just created them or added an
    ADR row in step 8; the message should say what was drafted or
    updated, and whether this was a first-run bootstrap (see
-   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
    Stop. Constitution review is a gate — see
    `.ai/info.md` (read fresh, not from memory) for who approves it.
    Do not proceed to phase planning yourself unless authorized. **When

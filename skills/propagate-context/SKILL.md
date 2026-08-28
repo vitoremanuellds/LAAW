@@ -5,10 +5,19 @@ description: Full-profile skill to propagate reusable knowledge into context fil
 
 # Skill: propagate-context
 
-This skill performs the **context** operation. Its Can/Must/Cannot
-contract:
-[.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts). Three
-sub-operations — use whichever matches the trigger.
+This skill performs the **context** operation, propagation half — see
+also `build-context-full` for the survey half
+([.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts)
+covers what "operation" means and where authority comes from). Three
+sub-operations below — use whichever matches the trigger.
+
+- **Can:** propagate reusable knowledge to a phase file's Context or
+  `context/`; mark rows complete in the phase file + `roadmap.md`;
+  clear `info.md`'s pointer.
+- **Must:** verify the completion-review gate was actually approved
+  before marking complete — finalizes, doesn't substitute.
+- **Should not:** copy task history; duplicate info; record
+  reasoning.
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for context propagation.
@@ -50,7 +59,7 @@ passed yet; don't mark complete regardless of how the task looks.
    `complete`, plus any Context section update from step 3) and
    `.ai/info.md`'s cleared Active task pointer; the message should say
    which task completed (see
-   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
 6. Ask whether the phase needs more tasks — does the phase file's Plan
    still look sufficient, or is there something to add before this
    unit of work is really closed? A plain question, not a gate — it
@@ -86,7 +95,7 @@ above.
    `.ai/context/` file(s) touched in step 3 plus `context.md`'s table
    row, and `.ai/info.md`'s cleared pointers; the message should say
    which phase completed (see
-   [.ai/workflow/workflow.md §13](.ai/workflow/workflow.md#13-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
 6. Ask whether the project needs another phase, or is done for now — a
    plain question, not a gate. If the answer is yes, the normal next
    step is appending a new bare title row via `create-constitution-full`
