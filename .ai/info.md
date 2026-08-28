@@ -11,7 +11,7 @@ Full gate list and explanations live in `.ai/workflow/workflow.md §5`
 short.
 
 ```yaml
-mode: autonomous   # manual | assisted | delegated | autonomous
+mode: assisted   # manual | assisted | delegated | autonomous
 
 overrides:
   - phase-completion-review
@@ -33,6 +33,6 @@ phase's own file's task table (task). See
 
 ```
 Active phase: P06
-Active task: —
+Active task: P06-T11
 Blocked: none
 ```

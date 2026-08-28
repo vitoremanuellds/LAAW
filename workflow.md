@@ -119,7 +119,11 @@ belongs in `context/` instead.
 
 Read: `info.md` → the artifact defining current work → direct
 references → further links only if genuinely needed. A link is a
-pointer, not a preload.
+pointer, not a preload. Resolve context by following the task or phase
+file's own links first — don't search the rest of the codebase for context
+documents it doesn't already point to; if the context you need isn't
+linked from where you're working, that's a gap in the task/phase file,
+not a cue to go looking elsewhere.
 
 **What a phase is:** a group of high-level steps that are not tasks
 themselves — work large enough and semantically-linked enough to read
