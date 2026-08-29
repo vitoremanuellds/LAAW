@@ -2,7 +2,7 @@
 
 Written by `build-context-full`'s `build-context.assess` sub-operation
 from file/directory listings only — nothing here has been confirmed by
-reading file contents yet. Copy target: `.ai/context/context.temp.md`.
+reading file contents yet. Copy target: `.ai/workbench/context.temp.md`.
 
 **To the human reviewing this:** you may add `[HUMAN]` lines
 confirming, correcting, or commenting on any assumption or question

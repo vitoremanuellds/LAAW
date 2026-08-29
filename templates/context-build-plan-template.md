@@ -2,7 +2,7 @@
 
 Written by `build-context-full`'s `build-context.plan` sub-operation,
 from [`context.temp.md`](context.temp.md). Copy target:
-`.ai/context/build-plan.md`. Tracks which files still need reading
+`.ai/workbench/build-plan.md`. Tracks which files still need reading
 (`queued`) vs. already incorporated into `.ai/context/*.md`
 (`read`) — updated by `build-context.iterate` every call.
 
