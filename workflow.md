@@ -48,12 +48,16 @@ linked where needed below.
 .ai/decisions/      decisions.md + adr{NN}-{name}.md
 .ai/phases/         p{NN}-{name}.md, own Context + task table
 .ai/tasks/          p{NN}-t{NN}-{name}.md, flat
+.ai/workbench/      freeform scratch — planning notes, Q&A, prompt drafts; disposable, not part of the permanent record
 ```
 
 Flat by design; paths always `.ai/`-prefixed off the project root,
 never bare/dot-relative (why:
 [reference/directory-and-links.md](reference/directory-and-links.md)).
-IDs sequential, never reused.
+IDs sequential, never reused. `.ai/workbench/` is the one exception to
+"part of the permanent record" above — nothing in it is schema- or
+Status-tracked, and no skill reads it as an input dependency (why:
+[reference/directory-and-links.md](reference/directory-and-links.md)).
 
 ---
 
