@@ -120,10 +120,14 @@ first — don't skip ahead.
    progress (X read, Y queued) — ready for the next `.iterate` call,
    not continued automatically in the same turn; batch size is the
    human's pacing control, not a suggestion to auto-continue. If the
-   queue is now empty: report completion, and ask whether
-   `context.temp.md` should be archived or deleted now that its
-   assumptions have been reconciled into real `context/` content —
-   never delete it unilaterally.
+   queue is now empty: delete `.ai/workbench/context.temp.md` and
+   `.ai/workbench/build-plan.md` — their assumptions are now
+   reconciled into real `context/` content, and nothing under
+   `.ai/workbench/` is part of the permanent record, so no human
+   confirmation gate applies to this deletion. Commit that deletion
+   (see
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline))
+   and report completion.
 
 ## Output
 
@@ -131,4 +135,5 @@ first — don't skip ahead.
 - `build-context.plan` — `.ai/workbench/build-plan.md`.
 - `build-context.iterate` — updated `.ai/context/*.md` files and
   `context.md`'s table, plus `build-plan.md`'s Status column, every
-  call.
+  call; on the final call (queue empty), also deletes
+  `.ai/workbench/context.temp.md` and `.ai/workbench/build-plan.md`.
