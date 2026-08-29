@@ -47,7 +47,7 @@ check," stop; that belongs in `.iterate`, not here.
    directory inferable from its name alone (`node_modules/`, `dist/`,
    `.venv/`, and similar) — inferred, never opened to confirm.
 2. From names, extensions, and structure alone, write
-   `.ai/context/context.temp.md` (copy
+   `.ai/workbench/context.temp.md` (copy
    [`.ai/workflow/templates/context-temp-template.md`](.ai/workflow/templates/context-temp-template.md)
    there first if it doesn't exist yet) with:
    - **Purpose/mission** — inferred, each distinct claim its own
@@ -57,7 +57,7 @@ check," stop; that belongs in `.iterate`, not here.
    - **Open questions** — anything genuinely unclear from structure
      alone, its own `[QUESTION]` line. Don't fold a question into an
      assumption just because they're related.
-3. Commit: stage `.ai/context/context.temp.md`; the message should say
+3. Commit: stage `.ai/workbench/context.temp.md`; the message should say
    this is the assumption pass (see
    [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
    Stop — tell the human `context.temp.md` is ready for review: they
@@ -71,11 +71,11 @@ check," stop; that belongs in `.iterate`, not here.
 
 ## build-context.plan — iteration plan from assumptions
 
-**Precondition:** `.ai/context/context.temp.md` exists (from
+**Precondition:** `.ai/workbench/context.temp.md` exists (from
 `.assess`, possibly human-annotated). If it doesn't, run `.assess`
 first — don't skip ahead.
 
-1. Read `.ai/context/context.temp.md` in full, including any
+1. Read `.ai/workbench/context.temp.md` in full, including any
    `[HUMAN]` annotations.
 2. Ask the human for the batch size (how many files to read per
    `.iterate` call) if not already stated.
@@ -84,19 +84,19 @@ first — don't skip ahead.
    these correct or confirm the most assumptions per file read — then
    the rest, grouped by the module breakdown `context.temp.md`
    inferred.
-4. Write `.ai/context/build-plan.md` (copy
+4. Write `.ai/workbench/build-plan.md` (copy
    [`.ai/workflow/templates/context-build-plan-template.md`](.ai/workflow/templates/context-build-plan-template.md)
    there first if it doesn't exist yet): the ordered file list, one
    row each, Status `queued`; the batch size; a link back to
    `context.temp.md`.
-5. Commit: stage `.ai/context/build-plan.md`; the message should say
+5. Commit: stage `.ai/workbench/build-plan.md`; the message should say
    the iteration plan was drafted (see
    [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
    Report the plan and the first batch, ready for `.iterate`.
 
 ## build-context.iterate — read a batch, build context/, repeat
 
-**Precondition:** `.ai/context/build-plan.md` exists with at least one
+**Precondition:** `.ai/workbench/build-plan.md` exists with at least one
 `queued` row.
 
 1. Take the next batch-size count of `queued` files from
@@ -127,8 +127,8 @@ first — don't skip ahead.
 
 ## Output
 
-- `build-context.assess` — `.ai/context/context.temp.md`.
-- `build-context.plan` — `.ai/context/build-plan.md`.
+- `build-context.assess` — `.ai/workbench/context.temp.md`.
+- `build-context.plan` — `.ai/workbench/build-plan.md`.
 - `build-context.iterate` — updated `.ai/context/*.md` files and
   `context.md`'s table, plus `build-plan.md`'s Status column, every
   call.
