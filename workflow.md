@@ -18,10 +18,9 @@ linked where needed below.
 ## 2. Starting point for any agent
 
 1. **Read `../info.md` fresh, every gate check.** Policy = gate
-   authority; nothing else lives here (see §11 for where status
-   actually lives). Missing → unbootstrapped: gates are human-owned;
-   run `create-constitution` first — it always scaffolds `info.md` as
-   its first action, whether or not you also want its mission/techstack
+   authority; status lives elsewhere (§11). Missing → unbootstrapped:
+   gates are human-owned; run `create-constitution` first — it always
+   scaffolds `info.md`, even if you don't want its mission/techstack
    content.
 2. **Read the matching skill file before acting, every time.** See
    [reference/reread-skill-discipline.md](reference/reread-skill-discipline.md).
@@ -55,21 +54,19 @@ linked where needed below.
 .ai/workbench/      freeform scratch — planning notes, Q&A, prompt drafts; disposable, not part of the permanent record — optional
 ```
 
-Presence is inferred from existence — nothing declares which layers a
-project uses; a directory that doesn't exist means that layer is off
-for this project. `.ai/tasks/` is the only layer every project has.
-See [reference/scaffold-on-first-use.md](reference/scaffold-on-first-use.md)
-for exactly how a layer comes into existence the first time it's
-needed, and the `bootstrap` skill for choosing several layers up front
-instead of one at a time.
+Presence is inferred from existence — no directory means that layer is
+off for this project; `.ai/tasks/` is the only one every project has.
+How a layer comes into existence on first use: see
+[reference/scaffold-on-first-use.md](reference/scaffold-on-first-use.md)
+(or run `bootstrap` to set up several at once).
 
 `.ai/tasks/` holds two task-file shapes, distinguished by filename
-alone, each with its own independent ID sequence: `p{NN}-t{NN}-{name}.md`
-(linked to a phase) and `t{NN}-{name}.md` (orphan — no phase, whether
-because this project has no `phases/` at all, or because this
-particular task just doesn't need one). A phase-linked task is indexed
-solely in its own phase file's task table; an orphan task is indexed in
-`.ai/tasks/tasks.md` — never both, never neither.
+alone, each its own ID sequence: `p{NN}-t{NN}-{name}.md` (linked to a
+phase) and `t{NN}-{name}.md` (orphan — no phase, whether this project
+has no `phases/` at all or this task just doesn't need one). A
+phase-linked task is indexed only in its phase file's task table; an
+orphan task is indexed in `.ai/tasks/tasks.md` — never both, never
+neither.
 
 Flat by design; paths always `.ai/`-prefixed off the project root,
 never bare/dot-relative (why:
@@ -90,12 +87,9 @@ Constitution → Context → Decisions → Phases (own Context) → Tasks (own C
 Each level links only to the one above it — no lateral shared-context
 files; that belongs in `context/` (§1.3).
 
-Every level except Tasks is optional (§3) — a project with no
-`phases/` goes straight from Context/Decisions to Tasks; a task can
-skip its phase link entirely (an orphan task) independently of whether
-the project uses phases elsewhere. See
-[reference/scaffold-on-first-use.md](reference/scaffold-on-first-use.md)
-for how each layer comes into being.
+Every level except Tasks is optional (§3); a task can skip its phase
+link (an orphan task) independently of whether the project uses phases
+elsewhere.
 
 **Phase** = feature-sized slice of work (*what*). **Task** = one
 mechanical unit within a phase's Plan (*how*), drafted by
@@ -240,9 +234,8 @@ after its frontmatter, in its own SKILL.md — read there, not here.
 Every status value lives in exactly one place — never `info.md`, which
 holds Policy only (§2, §10): `phases.md`'s Status column (phase-level),
 a phase file's own task table (phase-linked task), or `tasks.md`'s
-Status column (orphan task). There is no separate pointer to keep in
-sync — "what's active" is answered by reading the relevant table
-directly, the same table that already is that item's permanent record.
+Status column (orphan task). "What's active" is answered by reading
+the relevant table directly — no separate pointer to keep in sync.
 
 ```
 not-planned → awaiting-plan-review → plan-approved → in-progress
@@ -263,10 +256,8 @@ ambiguous.
 ## 12. Commit discipline
 
 Commit each draft immediately, before requesting review — the review
-happens via `git diff`. This applies only to files that aren't
-gitignored: locality (whether a given layer is tracked at all) is a
-per-layer, per-project choice, and a layer a project has chosen to
-gitignore has nothing to commit — that's outside this discipline's
-scope, not a violation of it. Message format and type selection are
-your project's own convention (see your `AGENTS.md`); each skill's own
-commit step says what to stage.
+happens via `git diff`. Applies only to non-gitignored files: locality
+is a per-layer, per-project choice (§3), and a gitignored layer simply
+has nothing to commit — not a violation of this discipline. Message
+format and type selection are your project's own convention (see your
+`AGENTS.md`); each skill's own commit step says what to stage.
