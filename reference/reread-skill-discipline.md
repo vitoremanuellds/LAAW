@@ -18,7 +18,7 @@ the same as the file being unchanged, and the failure mode this guards
 against produces no error — just a gate quietly skipped or a scope
 quietly overstepped, discovered later if at all.
 
-This is the same discipline `implement-task-full` documents for
+This is the same discipline `implement-task` documents for
 `workflow.md` itself (see its "What to read" section) — a skill's own
 partial summary of a rule, however careful, is not a substitute for
 reading the rule's actual current text.

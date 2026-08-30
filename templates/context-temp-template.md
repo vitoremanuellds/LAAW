@@ -1,6 +1,6 @@
 # Context (temporary — assumptions, not verified fact)
 
-Written by `build-context-full`'s `build-context.assess` sub-operation
+Written by `build-context`'s `build-context.assess` sub-operation
 from file/directory listings only — nothing here has been confirmed by
 reading file contents yet. Copy target: `.ai/workbench/context.temp.md`.
 

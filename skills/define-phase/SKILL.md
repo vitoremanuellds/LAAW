@@ -24,11 +24,23 @@ as every other skill — do not skip it for phase planning.
 
 Defining a new phase; replanning one after a phase-level deviation
 (see [.ai/workflow/workflow.md §6](.ai/workflow/workflow.md#6-deviations));
-or appending new Plan items to an already-approved phase where nothing
-went wrong — an addition, not a deviation, same section. Phases are an
-optional layer (`.ai/workflow/workflow.md §3`) — a project's first-ever
-phase is exactly what brings `.ai/phases/` into existence; nothing
-needs to have run first to "enable" it.
+appending new Plan items to an already-approved phase where nothing
+went wrong — an addition, not a deviation, same section; or **stubbing**
+a bare title-only row for a future phase without drafting its detail
+yet (see [reference/starting-without-a-plan.md](reference/starting-without-a-plan.md)) —
+this skill owns that too, now that `create-constitution` no longer
+touches `phases.md`. Phases are an optional layer
+(`.ai/workflow/workflow.md §3`) — a project's first-ever phase is
+exactly what brings `.ai/phases/` into existence; nothing needs to
+have run first to "enable" it.
+
+**Stubbing only:** if the request is just to register a future phase's
+title, not draft its detail yet — scaffold `.ai/phases/` +
+`phases.md` per step 1 below if needed, add a row (Title, Depends-on
+if already known) with Status `not-planned`, commit, and stop there.
+Don't draft the phase file itself (steps 2 onward) until actually
+asked to plan it — that's a separate, later invocation of this same
+skill.
 
 ## Inputs
 

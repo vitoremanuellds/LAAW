@@ -78,14 +78,15 @@ one):
 
    ```markdown
    ## Agent Workflow
-   This project uses a structured agent workflow — one process, no
-   profile choice:
+   This project uses a structured, modular agent workflow — one
+   process, with optional layers rather than a profile choice:
    - `.ai/info.md` exists → open and read in full — not "recall it
      exists," actually read it —
      [.ai/workflow/workflow.md](.ai/workflow/workflow.md).
    - `.ai/info.md` doesn't exist → unbootstrapped. Run
-     `.ai/workflow/skills/create-constitution-full/SKILL.md` to
-     bootstrap it before doing anything else.
+     `.ai/workflow/skills/create-constitution/SKILL.md` (or
+     `.ai/workflow/skills/bootstrap/SKILL.md` to set up several
+     layers at once) to bootstrap it before doing anything else.
 
    Do this before acting, every session — not just once, and not from
    memory of a previous read. Gate-skip and scope-overstep bugs have
@@ -101,17 +102,24 @@ one):
    Practices below). `.ai/info.md` needs rereading even more
    aggressively, since unlike `workflow.md` it can change mid-session.
 
-2. **Bootstrap the constitution.** Point an agent (or yourself) at
-   `.ai/workflow/skills/create-constitution-full/SKILL.md`. It writes
-   `.ai/constitution/mission.md`, `techstack.md`, `roadmap.md`, and
-   bootstraps `.ai/info.md`, `.ai/context/context.md`,
-   `.ai/decisions/decisions.md`.
+2. **Bootstrap `info.md`, and whichever layers you want now.** Point
+   an agent (or yourself) at
+   `.ai/workflow/skills/create-constitution/SKILL.md` (mission +
+   techstack content, plus `info.md`'s unconditional first-run
+   bootstrap) or `.ai/workflow/skills/bootstrap/SKILL.md` (asks which
+   of constitution/context/decisions/phases/workbench to set up now,
+   each an empty scaffold except constitution, which gets the same
+   interview either way).
 
-   Until this runs, none of those files genuinely exist yet — that's
-   expected, not a sign anything's broken. This is the only step that
-   can't be skipped — everything downstream assumes `.ai/info.md`
+   Until one of these runs, `.ai/info.md` doesn't genuinely exist yet —
+   that's expected, not a sign anything's broken. This is the only step
+   that can't be skipped — everything downstream assumes `.ai/info.md`
    exists. Defaults are safe/conservative (`mode: assisted`); edit the
    policy block afterward once you're ready to delegate any gates.
+   Every other layer is optional and comes into existence the first
+   time its own owning skill is actually used — see
+   [`workflow.md §3`](workflow.md#3-directory-structure) and
+   [`reference/scaffold-on-first-use.md`](reference/scaffold-on-first-use.md).
 
 3. **Optional: sync skills to `.agents/skills/`.** If your harness
    auto-discovers skills from `.agents/skills/` rather than following
@@ -130,27 +138,29 @@ one):
    whether your harness needs this, you probably don't — `workflow.md
    §2`'s own lookup table works without it.
 
-Below, "the fast pointer" refers to `.ai/info.md`'s Status section —
-IDs only, no status values, updated by every skill as its first and
-last action. The permanent record — every actual status value, not
-just what's active — lives in `.ai/constitution/roadmap.md`
-(phase-level) and each phase file's own task table. See
-[`workflow.md §11`](workflow.md#11-status-the-fast-pointer-and-the-permanent-record)
-for how the two stay in sync.
+Every status value lives in exactly one place, never `.ai/info.md`
+(which holds Policy only): `.ai/phases/phases.md`'s Status column
+(phase-level), a phase file's own task table (a phase-linked task), or
+`.ai/tasks/tasks.md`'s Status column (an orphan task — one with no
+phase parent). See
+[`workflow.md §11`](workflow.md#11-status-the-permanent-record).
 
 From there the normal loop is: plan a phase → get it reviewed → break
 it into tasks → implement → validate → review → let context propagate
-→ repeat ([`workflow.md §5`](workflow.md#5-lifecycle--gates)).
+→ repeat ([`workflow.md §5`](workflow.md#5-lifecycle--gates)) — or, for
+a task with no phase, skip straight to drafting it and implementing it
+([`workflow.md §3`](workflow.md#3-directory-structure)/§4).
 
-A phase enters `roadmap.md` as a title-only row (via
-`create-constitution-full`) before it has any detail — its actual
+A phase enters `phases.md` as a title-only row (via `define-phase`'s
+own "stubbing only" mode) before it has any detail — its actual
 Context, In/Out of scope, Requirements, Plan, and Automatic/Manual
-validations get drafted separately, by `define-phase`, sometimes in a
-later session entirely. If you already know what that phase should
-cover, say so when the row is added rather than waiting for the
-planning step — a session that ends in between can lose anything that
-was only ever stated in conversation, not yet captured in a file.
-Planning one phase at a time like this, rather than the whole project
+validations get drafted separately, by a later `define-phase`
+invocation, sometimes in a later session entirely. If you already know
+what that phase should cover, say so when the row is added rather than
+waiting for the planning step — a session that ends in between can
+lose anything that was only ever stated in conversation, not yet
+captured in a file. Planning one phase at a time like this, rather
+than the whole project
 up front, is itself an intentional supported mode, not a workaround —
 see
 [`workflow.md §5`, "Starting without a plan"](workflow.md#5-lifecycle--gates).
@@ -196,10 +206,11 @@ never inside the submodule to begin with.
 | `workflow.md` | `AGENTS.md` (has the snippet pasted in) |
 | `reference/*` — occasional-need detail behind `workflow.md`'s core, one file per concept | |
 | `templates/info-template.md`, `templates/context-template.md`, `templates/decisions-template.md`, `templates/adr-template.md` | `info.md` — bootstrapped from template, then yours |
-| `skills/*` — named `<verb>-<noun>` | `constitution/*`, `context/*` |
-| `sync-skills.sh` | `phases/*` — one flat file per phase, own Context section embedded |
-| | `tasks/*` — one flat file per task, own Context section embedded |
-| | `decisions/*` — `decisions.md` bootstrapped from template, `adrNN-*.md` follow `templates/adr-template.md` |
+| `skills/*` — mostly named `<verb>-<noun>` | `constitution/*` — mission.md, techstack.md; optional |
+| `sync-skills.sh` | `context/*` — optional |
+| | `phases/*` — `phases.md` index + one flat file per phase, own Context section embedded; optional |
+| | `tasks/*` — one flat file per task (phase-linked or orphan), own Context section embedded; `tasks.md` indexes orphan tasks only; the one mandatory layer |
+| | `decisions/*` — `decisions.md` bootstrapped from template, `adrNN-*.md` follow `templates/adr-template.md`; optional |
 
 A third category, technically outside both sides: `.agents/skills/`, if
 you use `sync-skills.sh` — it's a generated copy of `skills/`, not
@@ -219,40 +230,50 @@ workflow.md                    ← the whole workflow, self-contained
 sync-skills.sh                   ← optional: mirrors skills/ to .agents/skills/
 reference/                       ← occasional-need detail, one file per
 │                                    concept, linked from workflow.md
-├── directory-and-links.md          ← §3 detail: path/link-rule incident history
+├── directory-and-links.md          ← §3 detail: path/link-rule incident history, optional-layer list
+├── scaffold-on-first-use.md        ← §3 detail: how an optional layer comes into existence, who owns it
 └── status-and-info.md              ← §11 detail: set-by table, ID-order reasoning
 templates/
 ├── info-template.md              ← copied to .ai/info.md on first run
-├── context-template.md            ← copied to .ai/context/context.md on first run
-├── decisions-template.md           ← copied to .ai/decisions/decisions.md on first run
+├── context-template.md            ← copied to .ai/context/context.md on first use
+├── decisions-template.md           ← copied to .ai/decisions/decisions.md on first use
+├── workbench-readme-template.md     ← copied to .ai/workbench/README.md on first use
+├── context-temp-template.md          ← build-context.assess's temp output
+├── context-build-plan-template.md     ← build-context.plan's temp output
 └── adr-template.md                  ← ADR format, copied into decisions/ per decision
 skills/
-├── create-constitution-full/
+├── bootstrap/
+├── create-constitution/
 ├── define-phase/
-├── define-task-full/
-├── implement-task-full/
-├── validate-work-full/
-├── review-work-full/
+├── define-task/
+├── implement-task/
+├── validate-work/
+├── review-work/
 ├── propagate-context/
-└── build-context-full/
+└── build-context/
 ```
 
 Once mounted at `.ai/workflow/` in a project, alongside it (in the
-*project's* own repo, not this one) you'll have:
+*project's* own repo, not this one) you'll have, once each optional
+layer actually comes into use (see
+[`workflow.md §3`](workflow.md#3-directory-structure)):
 
 ```
 .ai/
 ├── workflow/              ← this repo, as a submodule
-├── info.md                  ← policy + status, merged: who's authorized, what's active
-├── constitution/
-├── context/
+├── info.md                  ← policy only: who's authorized for each gate
+├── constitution/             ← optional: mission.md, techstack.md
+├── context/                  ← optional
 │   ├── context.md              ← entry point, table of everything else here
 │   └── (however many files fit this project's actual architecture)
-├── phases/
+├── phases/                   ← optional
+│   ├── phases.md                ← index: ID, Title, Depends on, Status
 │   └── p01-name.md              ← one flat file per phase: own Context + In/Out of scope + Requirements + Plan + Automatic/Manual validations + task table
-├── tasks/
-│   └── p01-t01-name.md            ← one flat file per task: own Context + Implementation, no per-phase subfolder
-└── decisions/
+├── tasks/                     ← the one mandatory layer
+│   ├── tasks.md                  ← index for orphan tasks only: ID, Title, Purpose, Depends on, Status
+│   ├── p01-t01-name.md            ← phase-linked task: own Context + Implementation
+│   └── t01-name.md                ← orphan task (no phase parent): own Context + Implementation
+└── decisions/                 ← optional
     ├── decisions.md                ← index: ID, Name, Description, Status, Relations
     └── adr01-name.md
 ```
@@ -275,13 +296,13 @@ harness lets you set a thinking/reasoning level per call (e.g. Ollama's
 OpenAI-compatible endpoint), don't leave it at the same setting for
 every skill:
 
-- **High/medium** — `create-constitution-full`, `define-phase`,
-  `define-task-full` (it now writes fairly detailed task files — files
+- **High/medium** — `create-constitution`, `define-phase`,
+  `define-task` (it now writes fairly detailed task files — files
   to touch, ordered steps, sometimes pseudocode — and that detail is
   only useful if it's actually correct), and any deviation or ADR
   decision. These are exactly the places ambiguity is real and a wrong
   call cascades into everything built on top.
-- **Low** — `implement-task-full` and `validate-work-full`. The
+- **Low** — `implement-task` and `validate-work`. The
   hard thinking already happened at planning time; execution should be
   close to mechanical (follow the steps, adjust minor mismatches,
   escalate real deviations rather than reasoning your way around them).
@@ -299,7 +320,7 @@ split — it varies by model.
 **Call the skill explicitly, don't rely on it self-navigating.** Even
 though `workflow.md §2` names the skill-lookup table and instructs
 opening the file, it's cheaper and more reliable to just say "use
-define-task-full to plan this" than to phrase a request generically and
+define-task to plan this" than to phrase a request generically and
 hope it finds the right skill on its own. This has been the single
 most common failure point in testing (see below) — a five-word prompt
 addition avoids it entirely.
@@ -339,15 +360,12 @@ prematurely, just previews — but if you see an agent *acting* on a
 skill before its prerequisites are met, that's worth tightening the
 skill descriptions to be more mutually exclusive.
 
-**`info.md`'s Status section is a fast pointer, not the full
-picture — and it can only track one active item.** It answers "what's
-happening right now" in one read, which is the point, but by design it
-holds no status values (those live in `roadmap.md`/the phase file) and
-doesn't (yet) support more than one active phase/task at a time. If
-you're running genuinely parallel work across multiple agents, watch
-for it getting overwritten by whichever agent finishes its update last
-— that's a real limitation of the current single-pointer format, not a
-bug to route around by ignoring the file.
+**`info.md` never holds a status value — every status lives directly
+in the table that owns it.** `.ai/phases/phases.md` (phase-level), a
+phase file's own task table (a phase-linked task), or
+`.ai/tasks/tasks.md` (an orphan task) — never `info.md`, which holds
+Policy only. "What's happening right now" is answered by reading the
+relevant table directly, not a separate pointer file.
 
 **Keep the submodule boundary clean.** Never let an agent write inside
 `.ai/workflow/` — if a skill ever seems to want to (e.g. "fixing" a typo
@@ -390,7 +408,7 @@ an earlier read — if you see a gate's behavior not match what you just
 changed in `info.md`, this is the first thing to check.
 
 **"Compiled into this skill" is a claim that needs to actually be
-true, not just asserted.** `implement-task-full` used to skip
+true, not just asserted.** `implement-task` used to skip
 rereading `workflow.md`, on the assumption that its rules were fully
 summarized locally. They weren't — the skill only mentioned the status
 values *it* transitions through, never stated the enum was closed, and

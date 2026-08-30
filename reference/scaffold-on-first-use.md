@@ -15,9 +15,9 @@ whether that layer's directory already exists.
 - **If it exists:** proceed normally — never re-scaffold, never
   overwrite an existing index file's content.
 - **If it doesn't exist:** create the directory, plus that layer's
-  starter index file (a table, same shape `roadmap.md` used to have:
-  `| ID | ... | Status |`, columns adapted per layer — see each
-  layer's own skill for its exact columns), then proceed.
+  starter index file (a table shaped `| ID | ... | Status |`, columns
+  adapted per layer — see each layer's own skill for its exact
+  columns), then proceed.
 
 This is the only mechanism that brings a layer into existence — there
 is no separate "enable this layer" step required first. A project can

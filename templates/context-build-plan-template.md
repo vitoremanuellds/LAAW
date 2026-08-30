@@ -1,6 +1,6 @@
 # Context build plan
 
-Written by `build-context-full`'s `build-context.plan` sub-operation,
+Written by `build-context`'s `build-context.plan` sub-operation,
 from [`context.temp.md`](context.temp.md). Copy target:
 `.ai/workbench/build-plan.md`. Tracks which files still need reading
 (`queued`) vs. already incorporated into `.ai/context/*.md`
