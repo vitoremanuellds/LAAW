@@ -17,9 +17,12 @@ linked where needed below.
 
 ## 2. Starting point for any agent
 
-1. **Read `../info.md` fresh, every gate check.** Status = active
-   phase/task, Policy = gate authority. Missing → unbootstrapped: gates
-   are human-owned; run `create-constitution-full` first.
+1. **Read `../info.md` fresh, every gate check.** Policy = gate
+   authority; nothing else lives here (see §11 for where status
+   actually lives). Missing → unbootstrapped: gates are human-owned;
+   run `create-constitution` first — it always scaffolds `info.md` as
+   its first action, whether or not you also want its mission/techstack
+   content.
 2. **Read the matching skill file before acting, every time.** See
    [reference/reread-skill-discipline.md](reference/reread-skill-discipline.md).
 3. Never bypass an unauthorized gate without confirming with the human
@@ -27,14 +30,15 @@ linked where needed below.
 
 | Operation | Skill |
 |---|---|
-| Constitution | `create-constitution-full` |
+| Bootstrap several layers at once | `bootstrap` |
+| Constitution | `create-constitution` |
 | Phase planning | `define-phase` |
-| Task planning | `define-task-full` |
-| Implementation | `implement-task-full` |
-| Validation | `validate-work-full` |
-| Review | `review-work-full` |
+| Task planning | `define-task` |
+| Implementation | `implement-task` |
+| Validation | `validate-work` |
+| Review | `review-work` |
 | Context — propagate/finalize | `propagate-context` |
-| Context — survey codebase | `build-context-full` |
+| Context — survey codebase | `build-context` |
 
 ---
 
@@ -42,14 +46,30 @@ linked where needed below.
 
 ```
 .ai/workflow/       submodule, never written to — workflow.md, reference/, templates/, skills/
-.ai/info.md         Policy + Status, merged
-.ai/constitution/   mission, techstack, roadmap
-.ai/context/        context.md + whatever fits
-.ai/decisions/      decisions.md + adr{NN}-{name}.md
-.ai/phases/         p{NN}-{name}.md, own Context + task table
-.ai/tasks/          p{NN}-t{NN}-{name}.md, flat
-.ai/workbench/      freeform scratch — planning notes, Q&A, prompt drafts; disposable, not part of the permanent record
+.ai/info.md         Policy only — gate authority; always present, not an optional layer
+.ai/constitution/   mission.md, techstack.md — optional
+.ai/context/        context.md + whatever fits — optional
+.ai/decisions/      decisions.md + adr{NN}-{name}.md — optional
+.ai/phases/         phases.md (index) + p{NN}-{name}.md, own Context + task table — optional
+.ai/tasks/          tasks.md (orphan index) + p{NN}-t{NN}-{name}.md (phase-linked) + t{NN}-{name}.md (orphan) — the one mandatory layer
+.ai/workbench/      freeform scratch — planning notes, Q&A, prompt drafts; disposable, not part of the permanent record — optional
 ```
+
+Presence is inferred from existence — nothing declares which layers a
+project uses; a directory that doesn't exist means that layer is off
+for this project. `.ai/tasks/` is the only layer every project has.
+See [reference/scaffold-on-first-use.md](reference/scaffold-on-first-use.md)
+for exactly how a layer comes into existence the first time it's
+needed, and the `bootstrap` skill for choosing several layers up front
+instead of one at a time.
+
+`.ai/tasks/` holds two task-file shapes, distinguished by filename
+alone, each with its own independent ID sequence: `p{NN}-t{NN}-{name}.md`
+(linked to a phase) and `t{NN}-{name}.md` (orphan — no phase, whether
+because this project has no `phases/` at all, or because this
+particular task just doesn't need one). A phase-linked task is indexed
+solely in its own phase file's task table; an orphan task is indexed in
+`.ai/tasks/tasks.md` — never both, never neither.
 
 Flat by design; paths always `.ai/`-prefixed off the project root,
 never bare/dot-relative (why:
@@ -70,9 +90,16 @@ Constitution → Context → Decisions → Phases (own Context) → Tasks (own C
 Each level links only to the one above it — no lateral shared-context
 files; that belongs in `context/` (§1.3).
 
+Every level except Tasks is optional (§3) — a project with no
+`phases/` goes straight from Context/Decisions to Tasks; a task can
+skip its phase link entirely (an orphan task) independently of whether
+the project uses phases elsewhere. See
+[reference/scaffold-on-first-use.md](reference/scaffold-on-first-use.md)
+for how each layer comes into being.
+
 **Phase** = feature-sized slice of work (*what*). **Task** = one
 mechanical unit within a phase's Plan (*how*), drafted by
-`define-task-full`. One or two steps is a task, not a phase.
+`define-task`. One or two steps is a task, not a phase.
 
 ---
 
@@ -120,11 +147,11 @@ the next step; `delegated`/`autonomous` chains through.
 - all tasks complete + `phase-completion-review` (both checks)
 - context reconciled
 - required ADRs exist
-- `roadmap.md` row complete
+- `phases.md` row complete
 
-Both clear `info.md` when done.
+Both leave `info.md` untouched — it holds no status to clear (§11).
 
-Starting without a full roadmap up front is normal:
+Starting without every phase already planned is normal:
 [reference/starting-without-a-plan.md](reference/starting-without-a-plan.md).
 
 ---
@@ -136,14 +163,14 @@ against a plan detail marked flexible isn't one, everything else is.
 Recorded inline as a `## Deviations` subsection in the task file —
 never separate; lifecycle `OPEN → ADDRESSED → INCORPORATED`, deleted
 once the fact lives in the plan, implementation, or an ADR. Field
-format: `define-task-full`'s task-file conventions. Pseudocode is
+format: `define-task`'s task-file conventions. Pseudocode is
 guidance, not contract — deviating from it isn't itself a deviation;
 only the underlying *approach* being wrong is.
 
 - **Task-level** → back to the implementation loop.
 - **Phase-level** → replanned via `define-phase` (completed tasks
   carry over; ADR if architecturally significant).
-- **Project-level** → replanned via `create-constitution-full`,
+- **Project-level** → replanned via `create-constitution`,
   always an ADR.
 
 New, working-as-planned scope on approved work isn't a deviation — it
@@ -157,9 +184,9 @@ Write one when a decision is deliberate and future work needs to know
 it — not every deviation produces one, not every ADR comes from one.
 
 **Owner writes it, at the moment of the decision:**
-- `create-constitution-full` — project-level
+- `create-constitution` — project-level
 - `define-phase` — phase-level
-- `implement-task-full` — during implementation
+- `implement-task` — during implementation
 
 No other operation writes one — review flags a missing one back to
 the owning scope. Promotion into `context/` follows §9; writing the
@@ -208,15 +235,14 @@ after its frontmatter, in its own SKILL.md — read there, not here.
 
 ---
 
-## 11. Status: the fast pointer and the permanent record
+## 11. Status: the permanent record
 
-`info.md`'s Status section: IDs only (`Active phase`, `Active task`),
-no status words — just which two files to open. Set by
-`define-phase`/`define-task-full`, cleared by `propagate-context`;
-tracks one active item.
-
-Permanent record — every status value: `roadmap.md`'s Status column,
-each phase file's task table.
+Every status value lives in exactly one place — never `info.md`, which
+holds Policy only (§2, §10): `phases.md`'s Status column (phase-level),
+a phase file's own task table (phase-linked task), or `tasks.md`'s
+Status column (orphan task). There is no separate pointer to keep in
+sync — "what's active" is answered by reading the relevant table
+directly, the same table that already is that item's permanent record.
 
 ```
 not-planned → awaiting-plan-review → plan-approved → in-progress
@@ -237,6 +263,10 @@ ambiguous.
 ## 12. Commit discipline
 
 Commit each draft immediately, before requesting review — the review
-happens via `git diff`. Message format and type selection are your
-project's own convention (see your `AGENTS.md`); each skill's own
+happens via `git diff`. This applies only to files that aren't
+gitignored: locality (whether a given layer is tracked at all) is a
+per-layer, per-project choice, and a layer a project has chosen to
+gitignore has nothing to commit — that's outside this discipline's
+scope, not a violation of it. Message format and type selection are
+your project's own convention (see your `AGENTS.md`); each skill's own
 commit step says what to stage.
