@@ -1,9 +1,9 @@
 ---
-name: implement-task-full
-description: Full-profile skill to write, modify, or delete project code for a task with an already-approved task file. Requires task planning first — use define-task-full if the task file doesn't exist. Not for planning what a task should do.
+name: implement-task
+description: Write, modify, or delete project code for a task with an already-approved task file — phase-linked or orphan. Requires task planning first — use define-task if the task file doesn't exist. Not for planning what a task should do.
 ---
 
-# Skill: implement-task-full
+# Skill: implement-task
 
 This skill performs the **implementation** operation
 ([.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts)
@@ -11,8 +11,10 @@ covers what "operation" means and where authority comes from).
 
 - **Can:** read the task file + context; modify project files; run
   tools.
-- **Must:** update the phase file's task table + `info.md`'s pointer
-  as it progresses; write an ADR for decisions made along the way;
+- **Must:** update the task's Status as it progresses (its owning
+  phase file's Tasks table if phase-linked, `.ai/tasks/tasks.md` if
+  orphan); write an ADR for decisions made along the way, scaffolding
+  `.ai/decisions/` first if this is the project's first-ever one;
   treat pseudocode as guidance.
 - **Cannot:** silently change approved requirements/plan.
 
@@ -37,11 +39,12 @@ partial summary of it wasn't enough to stop that. A shorter read here
 is not worth an agent inventing rules. Then read:
 
 1. `.ai/info.md` — read fresh, not from earlier in the session;
-   confirms this is genuinely the active task and tells you whether
-   `task-validation`/`task-review` are yours to self-certify.
-2. The task's file (`.ai/tasks/p{NN}-t{NN}-{name}.md`, Context +
-   Implementation sections — including its Files to modify/create,
-   Steps, and any Pseudocode).
+   confirms whether `task-validation`/`task-review` are yours to
+   self-certify.
+2. The task's file (`.ai/tasks/p{NN}-t{NN}-{name}.md` if phase-linked,
+   `.ai/tasks/t{NN}-{name}.md` if orphan — Context + Implementation
+   sections, including its Files to modify/create, Steps, and any
+   Pseudocode).
 3. Only the files the task's Context section lists as relevant, plus
    whatever those reference and you actually end up touching. Don't
    pull in unrelated modules "for context."
@@ -55,24 +58,21 @@ is not worth an agent inventing rules. Then read:
    files to modify, files to create, ordered steps, pseudocode if
    present, dependencies, expected result, validation instructions.
 2. Read the Context section and only the referenced files it names.
-3. Check the task's current Status in its owning phase file's Tasks
-   table (`.ai/phases/p{NN}-{name}.md` — the task file itself never
-   tracks its own status; that table is the only place it lives). It
-   should be `plan-approved` — if it's still `awaiting-plan-review`,
-   task-review hasn't actually passed yet; stop and check before
-   proceeding rather than assuming being asked to implement implies
-   approval happened. Once confirmed, set Status to `in-progress`
-   there. `.ai/info.md`'s Active task pointer already names this task
-   from task planning — leave it as the ID only; the status word
-   `in-progress` belongs in the phase file's table, never in `info.md`
-   (§11).
+3. Check the task's current Status — in its owning phase file's Tasks
+   table if phase-linked (`.ai/phases/p{NN}-{name}.md`), or in
+   `.ai/tasks/tasks.md` if orphan; the task file itself never tracks
+   its own status, that table is the only place it lives. It should be
+   `plan-approved` — if it's still `awaiting-plan-review`, task-review
+   hasn't actually passed yet; stop and check before proceeding rather
+   than assuming being asked to implement implies approval happened.
+   Once confirmed, set Status to `in-progress` there.
    **The Status enum is exactly these eight values, nothing else:**
    `not-planned` · `awaiting-plan-review` · `plan-approved` ·
    `in-progress` · `validating` · `reviewing` · `complete` ·
    `blocked`. If you find yourself wanting a status this list doesn't
    have, that's a signal you've misunderstood the situation, not a
    reason to invent one — stop and re-read
-   [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-fast-pointer-and-the-permanent-record)
+   [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-permanent-record)
    rather than write something new into the table.
 4. Follow the task's Files-to-modify/Files-to-create and Steps in
    order. If Pseudocode is present, treat it as guidance for the
@@ -94,33 +94,33 @@ is not worth an agent inventing rules. Then read:
    dependency, a new pattern) that future work needs to know about,
    this is yours to document — you don't escalate it. Check
    `.ai/decisions/decisions.md` first; a related decision may already
-   exist. If not, write the ADR from
+   exist. If `.ai/decisions/` doesn't exist yet, scaffold it per
+   [reference/scaffold-on-first-use.md](reference/scaffold-on-first-use.md)
+   first. Then write the ADR from
    [.ai/workflow/templates/adr-template.md](.ai/workflow/templates/adr-template.md)
    into `.ai/decisions/adr{NN}-{name}.md` and add its row to the index
    in the same step.
 
 ## 3. Finishing
 
-1. Set the task's Status to `validating` (or `blocked` if stuck) in
-   its owning phase file's Tasks table. `.ai/info.md`'s Active task
-   pointer already names this task — leave it as the ID only; the
-   status word belongs only in the phase file's table, never in
-   `info.md` (§11).
-2. Commit: stage the modified/created project files, the owning phase
-   file's updated Tasks table row, and any new ADR +
+1. Set the task's Status to `validating` (or `blocked` if stuck) — in
+   its owning phase file's Tasks table if phase-linked, or
+   `.ai/tasks/tasks.md` if orphan.
+2. Commit: stage the modified/created project files, the updated
+   Status row (phase file or `tasks.md`), and any new ADR +
    `.ai/decisions/decisions.md` row you wrote; the message should say
    what was implemented (see
    [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
    Stop for `task-validation` — see `.ai/info.md` (read fresh) for
    whether that's yours to run (→
-   [validate-work-full](.ai/workflow/skills/validate-work-full/SKILL.md)) or a human's.
+   [validate-work](.ai/workflow/skills/validate-work/SKILL.md)) or a human's.
 3. Do not mark the task complete yourself — completion requires
    validation and review to pass first (see
    [.ai/workflow/workflow.md §5](.ai/workflow/workflow.md#5-lifecycle--gates)).
 
 ## Output
 
-Modified project files; an updated row in the owning phase file's
-Tasks table (`.ai/info.md`'s pointer is unaffected — see §11); a new ADR and
-`.ai/decisions/decisions.md` row if an architectural decision was
-made; the task ready for validation.
+Modified project files; an updated Status row (owning phase file's
+Tasks table if phase-linked, `.ai/tasks/tasks.md` if orphan); a new ADR
+and `.ai/decisions/decisions.md` row (scaffolded first if needed) if an
+architectural decision was made; the task ready for validation.

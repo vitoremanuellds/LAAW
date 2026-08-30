@@ -1,9 +1,9 @@
 ---
-name: build-context-full
-description: Full-profile skill to populate .ai/context/ for a project that's unbootstrapped or has little context yet — a listing-only assumption pass, human-annotated review, then a batch-sized, status-tracked iteration that reads real files and builds context/ until the queue is empty. Not for propagating knowledge after a task/phase completes — see propagate-context. Requires .ai/info.md and .ai/context/context.md to already exist.
+name: build-context
+description: Populate .ai/context/ for a project that has little context yet — a listing-only assumption pass, human-annotated review, then a batch-sized, status-tracked iteration that reads real files and builds context/ until the queue is empty. Not for propagating knowledge after a task/phase completes — see propagate-context. Requires .ai/info.md to already exist; scaffolds .ai/context/context.md and .ai/workbench/ on first use if they don't exist yet.
 ---
 
-# Skill: build-context-full
+# Skill: build-context
 
 This skill performs the **context** operation, survey half — see also
 `propagate-context` for the propagation half
@@ -12,7 +12,9 @@ covers what "operation" means and where authority comes from). This
 one builds context by surveying an existing codebase, not by
 propagating what a completed task/phase learned.
 
-- **Can:** survey the codebase; write `.ai/context/*.md`.
+- **Can:** survey the codebase; write `.ai/context/*.md`; scaffold
+  `.ai/context/` and `.ai/workbench/` on first use, per
+  [reference/scaffold-on-first-use.md](reference/scaffold-on-first-use.md).
 - **Must:** get human review of `context.temp.md`'s assumptions
   before `.iterate` reconciles them into real context files; never
   delete an `[ASSUMPTION]`/`[QUESTION]` line unilaterally.
@@ -24,16 +26,20 @@ as every other skill — do not skip it for context building.
 
 ## When to use
 
-A project is bootstrapped (`.ai/info.md`/`.ai/context/context.md`
-already exist) but `.ai/context/` is thin relative to the actual
-codebase — freshly bootstrapped onto an existing project, or a project
-that's grown without `context/` keeping up. Not a required step of
-bootstrap; invoked when the human wants context built up deliberately
-rather than only accumulating through `propagate-context`'s
-task/phase-completion path.
+`.ai/context/` is thin relative to the actual codebase, or doesn't
+exist yet — context is an optional layer
+(`.ai/workflow/workflow.md §3`), and this skill is one of the two ways
+it comes into existence (the other is `propagate-context`, from a
+completed task/phase). Not a required step of bootstrap; invoked when
+the human wants context built up deliberately rather than only
+accumulating through `propagate-context`'s task/phase-completion path.
 
 Three sub-operations, in order — `.assess` once, `.plan` once (after
 human review of `.assess`'s output), `.iterate` repeatedly until done.
+`.assess`/`.plan` only ever write into `.ai/workbench/`, scaffolded on
+first use if it doesn't exist yet — neither needs `.ai/context/` to
+already exist. `.iterate` is what actually writes into `.ai/context/`,
+and scaffolds it first if needed.
 
 ## build-context.assess — listing-only assumption pass
 
@@ -46,7 +52,11 @@ check," stop; that belongs in `.iterate`, not here.
    `.git/`, `.ai/workflow/` (the submodule), and any build/dependency
    directory inferable from its name alone (`node_modules/`, `dist/`,
    `.venv/`, and similar) — inferred, never opened to confirm.
-2. From names, extensions, and structure alone, write
+2. If `.ai/workbench/` doesn't exist yet, scaffold it now per
+   [reference/scaffold-on-first-use.md](reference/scaffold-on-first-use.md)
+   (copy [`.ai/workflow/templates/workbench-readme-template.md`](.ai/workflow/templates/workbench-readme-template.md)
+   to `.ai/workbench/README.md` unedited).
+3. From names, extensions, and structure alone, write
    `.ai/workbench/context.temp.md` (copy
    [`.ai/workflow/templates/context-temp-template.md`](.ai/workflow/templates/context-temp-template.md)
    there first if it doesn't exist yet) with:
@@ -57,8 +67,9 @@ check," stop; that belongs in `.iterate`, not here.
    - **Open questions** — anything genuinely unclear from structure
      alone, its own `[QUESTION]` line. Don't fold a question into an
      assumption just because they're related.
-3. Commit: stage `.ai/workbench/context.temp.md`; the message should say
-   this is the assumption pass (see
+4. Commit: stage `.ai/workbench/context.temp.md` (and `.ai/workbench/README.md`
+   if just created); the message should say this is the assumption
+   pass (see
    [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
    Stop — tell the human `context.temp.md` is ready for review: they
    may add `[HUMAN]` lines confirming, correcting, or commenting on
@@ -99,10 +110,15 @@ first — don't skip ahead.
 **Precondition:** `.ai/workbench/build-plan.md` exists with at least one
 `queued` row.
 
-1. Take the next batch-size count of `queued` files from
+1. If `.ai/context/` doesn't exist yet, scaffold it now per
+   [reference/scaffold-on-first-use.md](reference/scaffold-on-first-use.md)
+   (copy [`.ai/workflow/templates/context-template.md`](.ai/workflow/templates/context-template.md)
+   to `.ai/context/context.md` unedited) — this is the project's
+   first-ever context content.
+2. Take the next batch-size count of `queued` files from
    `build-plan.md`, in order.
-2. Read each file in the batch in full.
-3. For each file: reconcile it against `context.temp.md`'s
+3. Read each file in the batch in full.
+4. For each file: reconcile it against `context.temp.md`'s
    assumptions — confirm, correct, or flag a discrepancy — and write
    or update the relevant `.ai/context/*.md` file(s). Group by
    module/domain, not one file per source file — a `context/` file
@@ -110,13 +126,13 @@ first — don't skip ahead.
    feature-level concept," not as a per-source-file mirror. Update
    `context/context.md`'s table for every file touched, in the same
    step.
-4. Set each processed file's row to `read` in `build-plan.md`.
-5. Commit: stage the updated `.ai/context/*.md` file(s),
-   `context.md`'s table, and `build-plan.md`'s Status column changes
-   from this batch; the message should say which files were processed
-   (see
+5. Set each processed file's row to `read` in `build-plan.md`.
+6. Commit: stage the updated `.ai/context/*.md` file(s) (and
+   `context.md` itself if just scaffolded), `context.md`'s table, and
+   `build-plan.md`'s Status column changes from this batch; the
+   message should say which files were processed (see
    [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
-6. If `build-plan.md` still has `queued` rows: stop and report
+7. If `build-plan.md` still has `queued` rows: stop and report
    progress (X read, Y queued) — ready for the next `.iterate` call,
    not continued automatically in the same turn; batch size is the
    human's pacing control, not a suggestion to auto-continue. If the
@@ -131,9 +147,11 @@ first — don't skip ahead.
 
 ## Output
 
-- `build-context.assess` — `.ai/workbench/context.temp.md`.
+- `build-context.assess` — `.ai/workbench/context.temp.md`
+  (`.ai/workbench/README.md` too, first use only).
 - `build-context.plan` — `.ai/workbench/build-plan.md`.
-- `build-context.iterate` — updated `.ai/context/*.md` files and
-  `context.md`'s table, plus `build-plan.md`'s Status column, every
-  call; on the final call (queue empty), also deletes
-  `.ai/workbench/context.temp.md` and `.ai/workbench/build-plan.md`.
+- `build-context.iterate` — `.ai/context/context.md` (first use only),
+  updated `.ai/context/*.md` files and `context.md`'s table, plus
+  `build-plan.md`'s Status column, every call; on the final call
+  (queue empty), also deletes `.ai/workbench/context.temp.md` and
+  `.ai/workbench/build-plan.md`.

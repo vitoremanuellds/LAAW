@@ -1,17 +1,16 @@
 ---
-name: validate-work-full
-description: Full-profile skill to run task- or phase-level validation after implementation, before review — check requirements, report pass/fail. Not for fixing failing code (return to implementation) or code-quality/architectural review (see review-work-full).
+name: validate-work
+description: Run task- or phase-level validation after implementation, before review — check requirements, report pass/fail. Not for fixing failing code (return to implementation) or code-quality/architectural review (see review-work).
 ---
 
-# Skill: validate-work-full
+# Skill: validate-work
 
 This skill performs the **validation** operation — the first of the
 completion-review gate's two internal checks (mechanical, before
 review's judgment call; see
 [.ai/workflow/workflow.md §8](.ai/workflow/workflow.md#8-validation-vs-review)).
 
-- **Can:** run validation, report failures, set Status `validating`;
-  refresh `info.md`'s pointer.
+- **Can:** run validation, report failures, set Status `validating`.
 - **Must:** read `info.md` fresh before trusting a gate's authority —
   never a cached read.
 - **Should not:** edit implementation to force a pass.
@@ -23,13 +22,14 @@ as every other skill — do not skip it for validation.
 not to this skill file — write the full `.ai/...` path.** Status
 values you set here (`validating`, `in-progress`) are two of exactly
 eight in a closed enum — see
-[.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-fast-pointer-and-the-permanent-record)
+[.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-permanent-record)
 for the full list; never invent one not on it.
 
 ## When to use
 
 After implementation, before review — at task level (`task-validation`
-gate) or phase level (`phase-validation` gate).
+gate) or phase level (`phase-validation` gate; only applicable to a
+project that uses phases at all).
 
 ## Before anything else: check authority, freshly
 
@@ -48,32 +48,28 @@ still current.
 
 ## Procedure — task validation
 
-1. Set the task's Status to `validating` in its owning
-   `.ai/phases/p{NN}-{name}.md` Tasks table if not already set.
-   `.ai/info.md`'s Active task pointer should already name this task —
-   leave it as the ID only; the status word belongs in the phase
-   file's table, never in `info.md` (§11).
+1. Set the task's Status to `validating` if not already set — in its
+   owning `.ai/phases/p{NN}-{name}.md` Tasks table if phase-linked, or
+   `.ai/tasks/tasks.md` if orphan.
 2. Read the task file's Implementation section (requirements + plan).
 3. Execute the validation instructions (automated tests, integration
    checks).
 4. Report pass/fail. On failure, do **not** edit implementation to
-   force a pass — set Status back to `in-progress` in both places and
-   return the task to the implementation loop (see
+   force a pass — set Status back to `in-progress` there and return
+   the task to the implementation loop (see
    [.ai/workflow/workflow.md §5](.ai/workflow/workflow.md#5-lifecycle--gates)).
 5. Record any accepted exceptions explicitly rather than silently
    ignoring a failure.
-6. Commit: stage the owning phase file's updated Tasks table (the
-   Status change from step 1, or the revert from step 4 on failure);
-   the message should say pass or fail and for which task (see
+6. Commit: stage the updated Status row (phase file's Tasks table or
+   `.ai/tasks/tasks.md` — the change from step 1, or the revert from
+   step 4 on failure); the message should say pass or fail and for
+   which task (see
    [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
 
 ## Procedure — phase validation
 
-1. Set the phase's Status to `validating` in
-   `.ai/constitution/roadmap.md` if not already set. `.ai/info.md`'s
-   Active phase pointer should already name this phase — leave it as
-   the ID only; the status word belongs in `roadmap.md`, never in
-   `info.md` (§11).
+1. Set the phase's Status to `validating` in `.ai/phases/phases.md` if
+   not already set.
 2. Read the phase file's Automatic validations and Manual validations
    sections (separately — never treat them as one merged list) and its
    Tasks table (every task's result in the phase).
@@ -83,18 +79,15 @@ still current.
    behavior and phase acceptance criteria belong in this Manual pass.
 4. Report pass/fail per validation item, **grouped by Automatic vs.
    Manual, not merged into one overall verdict.** On failure, set
-   Status back to `in-progress` in both places rather than leaving it
-   at `validating`.
-5. Commit: stage `.ai/constitution/roadmap.md`'s updated Status (the
-   change from step 1, or the revert from step 4 on failure); the
-   message should say pass or fail and for which phase (see
+   Status back to `in-progress` rather than leaving it at `validating`.
+5. Commit: stage `.ai/phases/phases.md`'s updated Status (the change
+   from step 1, or the revert from step 4 on failure); the message
+   should say pass or fail and for which phase (see
    [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
 
 ## Output
 
 Pass/fail result recorded against the task (in its owning phase file's
-Tasks table) or phase (in `.ai/constitution/roadmap.md` and the phase
-file itself) — not a separate permanent log file. `.ai/info.md`'s
-Active task/phase pointer is unaffected — it already names this item;
-the status word lives only in the phase file's table or `roadmap.md`
-(§11).
+Tasks table, or `.ai/tasks/tasks.md` if orphan) or phase (in
+`.ai/phases/phases.md` and the phase file itself) — not a separate
+permanent log file.

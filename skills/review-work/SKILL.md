@@ -1,9 +1,9 @@
 ---
-name: review-work-full
-description: Full-profile skill to review a task or phase's implementation and validation results for scope, complexity, architecture, missing validation, or context issues — at task-completion-review/phase-completion-review, after validation passes. Distinct from task-review/phase-review (plan approval) and from validate-work-full (correctness). Never silently fix issues — report and stop for the gate.
+name: review-work
+description: Review a task or phase's implementation and validation results for scope, complexity, architecture, missing validation, or context issues — at task-completion-review/phase-completion-review, after validation passes. Distinct from task-review/phase-review (plan approval) and from validate-work (correctness). Never silently fix issues — report and stop for the gate.
 ---
 
-# Skill: review-work-full
+# Skill: review-work
 
 This skill performs the **review** operation — the second of the
 completion-review gate's two internal checks (judgment, after
@@ -12,7 +12,7 @@ validation's mechanical check; see
 
 - **Can:** inspect everything, flag scope/requirement/complexity/
   architecture/validation/context issues and undocumented decisions,
-  set Status `reviewing`; refresh `info.md`'s pointer.
+  set Status `reviewing`.
 - **Must:** read `info.md` fresh before trusting a gate's authority;
   stop after reporting, even clean findings.
 - **Should not:** silently fix issues; write a missing ADR itself.
@@ -24,7 +24,7 @@ as every other skill — do not skip it for review.
 not to this skill file — write the full `.ai/...` path.** Status
 values you set here (`reviewing`, `complete`) are two of exactly eight
 in a closed enum — see
-[.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-fast-pointer-and-the-permanent-record)
+[.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-permanent-record)
 for the full list; never invent one not on it.
 
 ## When to use
@@ -34,7 +34,7 @@ this is the "Review" step in the lifecycle
 (`Implement → Validate → Review → Context Evaluation → Complete`), a
 different moment from the `task-review`/`phase-review` gates (which
 approve the *plan*, before any implementation happens — see
-[.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-fast-pointer-and-the-permanent-record)'s
+[.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-permanent-record)'s
 naming note). Don't confuse the two just because both are called
 "review." Distinct from validation too: see
 [.ai/workflow/workflow.md §8](.ai/workflow/workflow.md#8-validation-vs-review).
@@ -43,7 +43,8 @@ naming note). Don't confuse the two just because both are called
 
 - The task file or phase file, and the actual changes made.
 - Tests and validation results (the task's Status in its owning phase
-  file's Tasks table; the phase file's Validations section).
+  file's Tasks table, or `.ai/tasks/tasks.md` if orphan; the phase
+  file's Validations section).
 - Relevant `.ai/context/` files and ADRs.
 
 ## Procedure
@@ -51,12 +52,9 @@ naming note). Don't confuse the two just because both are called
 1. Read `.ai/info.md` fresh — confirms `task-completion-review`/
    `phase-completion-review` authority; don't rely on a read from
    earlier in the session. Set Status to `reviewing` — in the task's
-   row in its owning phase file's Tasks table for a task-level review,
-   or the phase's row in `.ai/constitution/roadmap.md` for a
-   phase-level review. `.ai/info.md`'s Active task/phase pointer
-   should already name this item — leave it as the ID only; the status
-   word belongs in the phase file's table or `roadmap.md`, never in
-   `info.md` (§11).
+   row in its owning phase file's Tasks table (phase-linked) or
+   `.ai/tasks/tasks.md` (orphan) for a task-level review, or the
+   phase's row in `.ai/phases/phases.md` for a phase-level review.
 2. Confirm the change matches its stated scope — flag anything done
    that wasn't in the plan (scope violation) or required but missing
    (requirement mismatch).
@@ -78,10 +76,10 @@ naming note). Don't confuse the two just because both are called
    fix issues yourself unless your entry in `.ai/info.md` explicitly
    grants implementation authority.
 9. Commit: stage the Status change to `reviewing` from step 1 (the
-   phase file's Tasks table for a task-level review, or
-   `.ai/constitution/roadmap.md` for a phase-level review), plus any
-   context/ADR files you touched while flagging; the message should
-   say what was reviewed and the verdict (see
+   phase file's Tasks table or `.ai/tasks/tasks.md` for a task-level
+   review, or `.ai/phases/phases.md` for a phase-level review), plus
+   any context/ADR files you touched while flagging; the message
+   should say what was reviewed and the verdict (see
    [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
    Stop for `task-completion-review` (task-level) or
    `phase-completion-review` (phase-level) — see `.ai/info.md`.
@@ -101,6 +99,5 @@ naming note). Don't confuse the two just because both are called
 
 A review verdict (approve / changes requested) with findings listed
 against the checks above. If approved: the task/phase left at Status
-`reviewing` in the relevant table (`.ai/info.md`'s pointer is
-unaffected — see §11), ready for `propagate-context` to mark it
-`complete` — review itself never sets Status to `complete`.
+`reviewing` in the relevant table, ready for `propagate-context` to
+mark it `complete` — review itself never sets Status to `complete`.
