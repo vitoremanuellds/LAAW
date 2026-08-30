@@ -1,4 +1,4 @@
-# Local Model Agent Workflow
+# LAAW
 
 A file-based workflow for developing software with AI coding agents.
 Built around the hardest constraints — small context windows, weaker
