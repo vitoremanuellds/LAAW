@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Installs or re-syncs this repo's workflow content (workflow.md,
-# skills/, templates/, reference/, README.md) into a target project's
-# .ai/workflow/ — the copy-based replacement for `git submodule add`/
+# skills/, templates/, reference/, README.md, sync-skills.sh) into a
+# target project's .ai/workflow/ — the copy-based replacement for
+# `git submodule add`/
 # `git submodule update --remote` (see adr01-plain-copy-bootstrap.md in
 # the LAAW-Workspace repo).
 #
@@ -51,7 +52,7 @@ if [ -d "$DEST" ]; then
 fi
 
 mkdir -p "$DEST"
-cp -r "$SOURCE_DIR/workflow.md" "$SOURCE_DIR/skills" "$SOURCE_DIR/templates" "$SOURCE_DIR/reference" "$SOURCE_DIR/README.md" "$DEST/"
+cp -r "$SOURCE_DIR/workflow.md" "$SOURCE_DIR/skills" "$SOURCE_DIR/templates" "$SOURCE_DIR/reference" "$SOURCE_DIR/README.md" "$SOURCE_DIR/sync-skills.sh" "$DEST/"
 
 if SHA="$(git -C "$SOURCE_DIR" rev-parse HEAD 2>/dev/null)"; then
   :
