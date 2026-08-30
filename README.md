@@ -39,35 +39,54 @@ defaults to — lives inside `workflow.md`, self-contained. See
 
 This repo contains **only** workflow content that never changes
 per-project: `workflow.md`, `templates/`, `skills/`. It gets installed
-as a git submodule mounted at `.ai/workflow/` inside your project — one
-level *inside* your project's `.ai/` folder, not the whole thing.
+into `.ai/workflow/` inside your project (via `sync-workflow.sh`, see
+**Bootstrapping into a project** below) — one level *inside* your
+project's `.ai/` folder, not the whole thing.
 
 That's deliberate, not incidental. `constitution/`, `context/`,
 `phases/`, `tasks/`, `decisions/`, and `info.md` all get written to
-constantly by agents — if the whole `.ai/` folder were the submodule,
-every one of those writes would leave the submodule dirty. You'd
-either be unable to commit that work at all, or committing your
-project's actual constitution/phases/decisions into the shared
-template's own history — neither is right. And `git submodule update
---remote` against a dirty submodule ranges from "refuses to run" to
-"silently discards your uncommitted work," depending on your git
-config. Scoping the submodule to just `.ai/workflow/` means nothing
-ever writes inside it — updates stay clean *with respect to
-agent-generated content*.
+constantly by agents — if a re-sync's scope covered the whole `.ai/`
+folder instead of just `.ai/workflow/`, there'd be no way to
+distinguish "content that came from this repo and should be replaced
+on update" from "content your own agents wrote and must never be
+touched." Scoping installs to just `.ai/workflow/` means nothing an
+agent writes ever lives where a re-sync could overwrite it — updates
+stay clean *with respect to agent-generated content*, regardless of
+which mechanism performs the install.
 
-That doesn't make updates risk-free in general, though: this repo's
-own internal structure can still change between versions (it has, more
-than once) — files moving, renaming, or being merged. Floating on the
-default branch means every one of those changes lands on you
-immediately, and a structural change can leave an already-checked-out
-submodule referencing paths that no longer exist. See **Updating the
-workflow** below before you pull.
+This repo's own internal structure can still change between versions
+(it has, more than once) — files moving, renaming, or being merged.
+`sync-workflow.sh`'s re-sync wholesale-replaces `.ai/workflow/`'s
+content rather than patching it in place, so a structural change never
+leaves an old, now-orphaned file sitting alongside the new layout —
+but it also means there's no automatic "you're now on the latest
+version" happening in the background; you only get a newer version by
+explicitly re-running the script against a freshly pulled source. See
+**Updating the workflow** below.
 
 ## Bootstrapping into a project
 
+Clone this repo somewhere on disk, then run its `sync-workflow.sh`
+against your project — this copies `workflow.md`, `skills/`,
+`templates/`, `reference/`, and `README.md` into `.ai/workflow/`. No
+`git submodule` command is involved.
+
 ```bash
+git clone <this-repo-url> /path/to/LAAW
 cd your-project
-git submodule add <this-repo-url> .ai/workflow
+/path/to/LAAW/sync-workflow.sh
+```
+
+`sync-workflow.sh` takes two independent, optional positional
+arguments — `[source-dir] [target-root]` — each defaulting sensibly:
+source to the script's own checkout location, target to the current
+directory. Running it with no arguments from inside your project, as
+above, is the normal case. If you're not `cd`-ed into your project
+first, pass both explicitly instead (there's no way to give just the
+target and skip the source positionally):
+
+```bash
+/path/to/LAAW/sync-workflow.sh /path/to/LAAW /path/to/your-project
 ```
 
 Then, as regular files tracked by *your project's own repo* (not this
@@ -135,8 +154,8 @@ one):
    `chmod +x .ai/workflow/sync-skills.sh` once — file permissions
    sometimes don't survive a download or the first checkout). This
    copies (not links) the skills there — re-run it after every
-   `git submodule update`, or the mirrored copy silently drifts out of
-   sync with the real one in `.ai/workflow/`. If you don't know
+   `sync-workflow.sh` re-sync, or the mirrored copy silently drifts out
+   of sync with the real one in `.ai/workflow/`. If you don't know
    whether your harness needs this, you probably don't — `workflow.md
    §2`'s own lookup table works without it.
 
@@ -169,66 +188,73 @@ see
 
 ## Updating the workflow
 
-**Pin to a commit or tag, don't float on the branch head:**
+Re-running the same `sync-workflow.sh` invocation against your project
+re-syncs `.ai/workflow/` to the source checkout's current `HEAD` —
+wholesale-replacing its content, since nothing in there is ever
+supposed to be hand-edited (see **This repo is only the fixed half**
+above):
 
 ```bash
-cd .ai/workflow
-git log --oneline -5        # find a commit you've actually reviewed
-cd ../..
-git -C .ai/workflow checkout <sha-or-tag>
-git add .ai/workflow
-git commit -m "Pin workflow to <sha-or-tag>"
+cd /path/to/LAAW && git pull
+cd your-project
+/path/to/LAAW/sync-workflow.sh
 ```
 
-Review what changed before moving the pin — `git -C .ai/workflow log
-<old-sha>..<new-sha>` — the same way you'd review any dependency
-upgrade. This repo doesn't yet publish tagged releases; until it does,
-treat every commit as a potential breaking change and pin explicitly
-rather than trusting `--remote` to only ever pull safe updates.
-
-**If a submodule update leaves things broken** (paths that used to
-resolve don't anymore, `git status` shows the submodule in a strange
-state): don't try to patch it in place.
+**Review what changed before adopting it, don't blindly re-sync to
+whatever `HEAD` currently is:** this repo doesn't yet publish tagged
+releases, so treat every commit as a potential breaking change, the
+same way you'd review any dependency upgrade.
 
 ```bash
-git submodule deinit -f .ai/workflow
-rm -rf .git/modules/.ai/workflow
-git submodule add <this-repo-url> .ai/workflow
+git -C /path/to/LAAW log --oneline -5   # find a commit you've actually reviewed
+git -C /path/to/LAAW checkout <sha>     # pin your own separate clone there
 ```
 
-This re-adds it clean at whatever commit you point it to. Your
-project's own content (`info.md`, `constitution/`, `context/`,
-`phases/`, `tasks/`, `decisions/`) is untouched either way — it was
-never inside the submodule to begin with.
+Then point `sync-workflow.sh` at that pinned clone as its source
+argument, instead of one floating on the default branch:
+
+```bash
+/path/to/LAAW/sync-workflow.sh /path/to/LAAW /path/to/your-project
+```
+
+Your project's own content (`info.md`, `constitution/`, `context/`,
+`phases/`, `tasks/`, `decisions/`) is untouched by any of this — the
+script never writes anywhere under `.ai/` besides `.ai/workflow/`
+itself and the `.ai/workflow-version` stamp file it writes beside it.
 
 ## What's in this repo vs. what's in your project
 
-| This repo (`.ai/workflow/`, submodule, never edited per-project) | Your project (`.ai/`, regular files, edit freely) |
+| This repo (`.ai/workflow/`, installed by `sync-workflow.sh`, never edited per-project) | Your project (`.ai/`, regular files, edit freely) |
 |---|---|
 | `workflow.md` | `AGENTS.md` (has the snippet pasted in) |
 | `reference/*` — occasional-need detail behind `workflow.md`'s core, one file per concept | |
 | `templates/info-template.md`, `templates/context-template.md`, `templates/decisions-template.md`, `templates/adr-template.md` | `info.md` — bootstrapped from template, then yours |
 | `skills/*` — mostly named `<verb>-<noun>` | `constitution/*` — mission.md, techstack.md; optional |
 | `sync-skills.sh` | `context/*` — optional |
-| | `phases/*` — `phases.md` index + one flat file per phase, own Context section embedded; optional |
+| `sync-workflow.sh` — the install/re-sync script itself | `phases/*` — `phases.md` index + one flat file per phase, own Context section embedded; optional |
 | | `tasks/*` — one flat file per task (phase-linked or orphan), own Context section embedded; `tasks.md` indexes orphan tasks only; the one mandatory layer |
 | | `decisions/*` — `decisions.md` bootstrapped from template, `adrNN-*.md` follow `templates/adr-template.md`; optional |
 
 A third category, technically outside both sides: `.agents/skills/`, if
 you use `sync-skills.sh` — it's a generated copy of `skills/`, not
 source of truth for either repo. Don't edit it directly and don't treat
-it as authoritative; re-run the script instead.
+it as authoritative; re-run the script instead. Same status for
+`.ai/workflow-version`, written by `sync-workflow.sh` as a sibling of
+`.ai/workflow/` on every install/re-sync — it records which commit of
+this repo is currently installed (source, commit SHA, date); it's
+generated metadata, not something to hand-edit.
 
 If you find yourself editing anything under `.ai/workflow/` per-project,
 that's a signal the workflow itself needs a change — make it in this
-repo instead, so every project using it benefits, and so
-`git submodule update` doesn't just overwrite your edit next time.
+repo instead, so every project using it benefits, and so the next
+`sync-workflow.sh` re-sync doesn't just overwrite your edit.
 
 ## This repo's own structure
 
 ```
 README.md
 workflow.md                    ← the whole workflow, self-contained
+sync-workflow.sh                 ← installs/re-syncs this repo into a target's .ai/workflow/
 sync-skills.sh                   ← optional: mirrors skills/ to .agents/skills/
 reference/                       ← occasional-need detail, one file per
 │                                    concept, linked from workflow.md
@@ -255,14 +281,15 @@ skills/
 └── build-context/
 ```
 
-Once mounted at `.ai/workflow/` in a project, alongside it (in the
+Once installed at `.ai/workflow/` in a project, alongside it (in the
 *project's* own repo, not this one) you'll have, once each optional
 layer actually comes into use (see
 [`workflow.md §3`](workflow.md#3-directory-structure)):
 
 ```
 .ai/
-├── workflow/              ← this repo, as a submodule
+├── workflow/              ← this repo's content, installed/re-synced by sync-workflow.sh
+├── workflow-version         ← generated by sync-workflow.sh: source, commit SHA, date of what's installed
 ├── info.md                  ← policy only: who's authorized for each gate
 ├── constitution/             ← optional: mission.md, techstack.md
 ├── context/                  ← optional
@@ -369,12 +396,12 @@ phase file's own task table (a phase-linked task), or
 Policy only. "What's happening right now" is answered by reading the
 relevant table directly, not a separate pointer file.
 
-**Keep the submodule boundary clean.** Never let an agent write inside
-`.ai/workflow/` — if a skill ever seems to want to (e.g. "fixing" a typo
-in `workflow.md` mid-task), that's a signal to raise it as feedback for
-this repo, not to patch it locally; a local patch will just be
-overwritten by the next `git submodule update` and silently diverge
-from what the rest of your team is running.
+**Keep the `.ai/workflow/` boundary clean.** Never let an agent write
+inside `.ai/workflow/` — if a skill ever seems to want to (e.g.
+"fixing" a typo in `workflow.md` mid-task), that's a signal to raise it
+as feedback for this repo, not to patch it locally; a local patch will
+just be overwritten by the next `sync-workflow.sh` re-sync and silently
+diverge from what the rest of your team is running.
 
 **Smaller/weaker local models may need to be pointed at skill files
 explicitly, every time, especially early in a session.** In testing
