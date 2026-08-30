@@ -1,5 +1,7 @@
 # LAAW
 
+**L**ocal **A**I **A**gents **W**orkflow.
+
 A file-based workflow for developing software with AI coding agents.
 Built around the hardest constraints — small context windows, weaker
 instruction-following — so it holds up on local models (7B–35B,
