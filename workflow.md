@@ -44,7 +44,7 @@ linked where needed below.
 ## 3. Directory structure
 
 ```
-.ai/workflow/       submodule, never written to — workflow.md, reference/, templates/, skills/
+.ai/workflow/       plain copy, managed by sync-workflow.sh (P02), never written to — workflow.md, reference/, templates/, skills/
 .ai/info.md         Policy only — gate authority; always present, not an optional layer
 .ai/constitution/   mission.md, techstack.md — optional
 .ai/context/        context.md + whatever fits — optional

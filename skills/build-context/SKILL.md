@@ -49,7 +49,7 @@ in this sub-operation** — if the temptation is to open a file to "just
 check," stop; that belongs in `.iterate`, not here.
 
 1. Run a recursive directory listing of the project, excluding
-   `.git/`, `.ai/workflow/` (the submodule), and any build/dependency
+   `.git/`, `.ai/workflow/` (the plain copy), and any build/dependency
    directory inferable from its name alone (`node_modules/`, `dist/`,
    `.venv/`, and similar) — inferred, never opened to confirm.
 2. If `.ai/workbench/` doesn't exist yet, scaffold it now per
