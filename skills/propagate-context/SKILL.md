@@ -25,7 +25,7 @@ as every other skill — do not skip it for context propagation.
 
 **All `.ai/`-artifact paths below are relative to the project root,
 not to this skill file — write the full `.ai/...` path.** Status
-values you set here (`complete`) are one of exactly eight in a closed
+values you set here (`complete`) are one of exactly six in a closed
 enum — see
 [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-permanent-record)
 for the full list; never invent one not on it.

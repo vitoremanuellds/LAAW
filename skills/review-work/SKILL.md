@@ -22,7 +22,7 @@ as every other skill — do not skip it for review.
 
 **All `.ai/`-artifact paths below are relative to the project root,
 not to this skill file — write the full `.ai/...` path.** Status
-values you set here (`reviewing`, `complete`) are two of exactly eight
+values you set here (`reviewing`, `complete`) are two of exactly six
 in a closed enum — see
 [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-permanent-record)
 for the full list; never invent one not on it.

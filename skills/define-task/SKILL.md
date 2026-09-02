@@ -89,7 +89,7 @@ batch only happens when the user explicitly asks for "all".
    individually drafted. Skip this step entirely if the table already
    has a row for every plan step.
 2. If the phase's status in `.ai/phases/phases.md` is still
-   `plan-approved`, set it to `in-progress` there — task planning
+   `awaiting-plan-review`, set it to `in-progress` there — task planning
    starting is the actual signal that work has begun. If `phases.md`
    still shows `awaiting-plan-review` for this phase, stop and check
    before proceeding — don't treat being asked to plan tasks as itself
@@ -152,7 +152,7 @@ asked for all:**
    (read fresh) — covering only the tasks actually drafted this
    invocation, not the stubs (nothing to review in a title-only row).
    **When approval comes back, that's a separate turn:** set Status to
-   `plan-approved` in the phase file's table for every task that was
+   `in-progress` in the phase file's table for every task that was
    approved — a partial approval (some tasks approved, others sent
    back) is fine; update each row according to its own outcome. In
    `manual`/`assisted` mode, report the approval and explicitly ask
@@ -204,7 +204,7 @@ path.
    exclude any gitignored files — gitignored layers simply have nothing to
    commit, not a violation of commit discipline.
    Stop for task plan review (`task-review` gate) — see `.ai/info.md`.
-   **When approval comes back:** set Status to `plan-approved` in
+   **When approval comes back:** set Status to `in-progress` in
    `tasks.md`. Same "don't start implementing in the same response"
    rule as the phase-linked path.
 

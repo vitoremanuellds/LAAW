@@ -10,7 +10,7 @@ completion-review gate's two internal checks (mechanical, before
 review's judgment call; see
 [.ai/workflow/workflow.md §8](.ai/workflow/workflow.md#8-validation-vs-review)).
 
-- **Can:** run validation, report failures, set Status `validating`.
+- **Can:** run validation, report failures, set Status `reviewing`.
 - **Must:** read `info.md` fresh before trusting a gate's authority —
   never a cached read.
 - **Should not:** edit implementation to force a pass.
@@ -20,8 +20,8 @@ as every other skill — do not skip it for validation.
 
 **All `.ai/`-artifact paths below are relative to the project root,
 not to this skill file — write the full `.ai/...` path.** Status
-values you set here (`validating`, `in-progress`) are two of exactly
-eight in a closed enum — see
+values you set here (`reviewing`, `in-progress`) are two of
+exactly six in a closed enum — see
 [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-permanent-record)
 for the full list; never invent one not on it.
 
@@ -48,7 +48,7 @@ still current.
 
 ## Procedure — task validation
 
-1. Set the task's Status to `validating` if not already set — in its
+1. Set the task's Status to `reviewing` if not already set — in its
    owning `.ai/phases/p{NN}-{name}.md` Tasks table if phase-linked, or
    `.ai/tasks/tasks.md` if orphan.
 2. Read the task file's Implementation section (requirements + plan).
@@ -70,7 +70,7 @@ still current.
 
 ## Procedure — phase validation
 
-1. Set the phase's Status to `validating` in `.ai/phases/phases.md` if
+1. Set the phase's Status to `reviewing` in `.ai/phases/phases.md` if
    not already set.
 2. Read the phase file's Automatic validations and Manual validations
    sections (separately — never treat them as one merged list) and its
@@ -81,7 +81,7 @@ still current.
    behavior and phase acceptance criteria belong in this Manual pass.
 4. Report pass/fail per validation item, **grouped by Automatic vs.
    Manual, not merged into one overall verdict.** On failure, set
-   Status back to `in-progress` rather than leaving it at `validating`.
+   Status back to `in-progress` rather than leaving it at `reviewing`.
 5. Commit: stage `.ai/phases/phases.md`'s updated Status (the change
    from step 1, or the revert from step 4 on failure); the message
    should say pass or fail and for which phase (see

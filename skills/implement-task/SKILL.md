@@ -62,13 +62,13 @@ is not worth an agent inventing rules. Then read:
    table if phase-linked (`.ai/phases/p{NN}-{name}.md`), or in
    `.ai/tasks/tasks.md` if orphan; the task file itself never tracks
    its own status, that table is the only place it lives. It should be
-   `plan-approved` — if it's still `awaiting-plan-review`, task-review
+   `in-progress` — if it's still `awaiting-plan-review`, task-review
    hasn't actually passed yet; stop and check before proceeding rather
    than assuming being asked to implement implies approval happened.
    Once confirmed, set Status to `in-progress` there.
-   **The Status enum is exactly these eight values, nothing else:**
-   `not-planned` · `awaiting-plan-review` · `plan-approved` ·
-   `in-progress` · `validating` · `reviewing` · `complete` ·
+   **The Status enum is exactly these six values, nothing else:**
+   `not-planned` · `awaiting-plan-review` · `in-progress` ·
+   `reviewing` · `complete` ·
    `blocked`. If you find yourself wanting a status this list doesn't
    have, that's a signal you've misunderstood the situation, not a
    reason to invent one — stop and re-read
@@ -103,7 +103,7 @@ is not worth an agent inventing rules. Then read:
 
 ## 3. Finishing
 
-1. Set the task's Status to `validating` (or `blocked` if stuck) — in
+1. Set the task's Status to `reviewing` (or `blocked` if stuck) — in
    its owning phase file's Tasks table if phase-linked, or
    `.ai/tasks/tasks.md` if orphan.
 2. Commit: stage the modified/created project files, the updated

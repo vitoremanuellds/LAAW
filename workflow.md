@@ -244,9 +244,8 @@ a phase file's own task table (phase-linked task), or `tasks.md`'s
 Status column (orphan task). "What's active" is answered by reading
 the relevant table directly — no separate pointer to keep in sync.
 
-```
-not-planned → awaiting-plan-review → plan-approved → in-progress
-  → validating → reviewing → complete
+``` 
+not-planned → awaiting-plan-review → in-progress → reviewing → complete
 (blocked applies from any active state)
 ```
 

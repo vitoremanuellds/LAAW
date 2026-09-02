@@ -13,10 +13,8 @@ reasoning behind the ID-order caveat, not as a matter of routine.
 |---|---|
 | `not-planned` | `define-phase` (stubbing a bare phase title, or every remaining plan step on a phase's first `define-task` invocation) |
 | `awaiting-plan-review` | `define-phase`/`define-task`, end of drafting |
-| `plan-approved` | Whichever skill's ending receives approval — see `workflow.md §5`'s unlocking-≠-starting rule |
 | `in-progress` | `define-task` (phase, task planning begins) / `implement-task` (task, implementation begins) |
-| `validating` | `validate-work` |
-| `reviewing` | `review-work` — a different check than plan-review, see below |
+| `reviewing` | `validate-work` (sets to `reviewing` — validation is the first part of the review process) / `review-work` (continues `reviewing`) — a different check than plan-review, see below |
 | `complete` | `propagate-context`, only after its completion-review is approved |
 | `blocked` | any agent, from any active state |
 
@@ -41,7 +39,7 @@ Policy only (`workflow.md §2`, §10).
 
 ## Plan-review vs. `reviewing` — same word, different check
 
-Plan-review (`awaiting-plan-review`/`plan-approved`) checks a *plan*
+Plan-review (`awaiting-plan-review`) checks a *plan*
 before work begins; `reviewing` checks the *result* after
 (`workflow.md §8`). Same word "review" surfaces in both — a plan
 that's `awaiting-plan-review` has not had any implementation done
@@ -60,7 +58,7 @@ Resolve "first/next task" against the phase file's Depends-on and
 Status columns (or `tasks.md`'s, for an orphan task); resolve
 "first/next phase" the same way against `phases.md`'s Depends-on and
 Status columns — no unmet dependencies, Status
-`awaiting-plan-review`/`plan-approved` — not the lowest ID.
+`awaiting-plan-review` — not the lowest ID.
 
 This matters in practice: "implement the first task" or "plan the next
 phase" reads as precise but is genuinely ambiguous once any replanning
