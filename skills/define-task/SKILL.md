@@ -37,12 +37,15 @@ one, independently of whether phases exist elsewhere in the project
 vs. `t{NN}-{name}.md`, are distinguished by filename shape alone, each
 with its own independent ID sequence — never mixed.
 
-**Scope is whatever was actually asked** — "plan the first task" means
-exactly one; "plan the tasks for this phase" or "break down the whole
-plan" means all remaining steps in one pass (phase-linked only —
-orphan tasks are drafted one request at a time, there's no plan to
-exhaust). If the request is ambiguous about scope, ask rather than
-defaulting silently to one or to all.
+**Default scope is exactly one task** — "plan the first task" or
+"plan the next task" means exactly one task, drafted and then the user
+is asked whether to continue. "Plan all remaining tasks" or "break
+down the whole plan" means every remaining step in one pass (phase-
+linked only — orphan tasks are drafted one request at a time, there's
+no plan to exhaust). The "draft all" path is NOT the default: it only
+happens when the user explicitly asks for it. If the request is
+ambiguous about scope, ask whether to draft one task or all before
+proceeding — never default silently to one or to all.
 
 ## Inputs
 
@@ -68,11 +71,12 @@ closed enum — see
 [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-permanent-record)
 for the full list; never invent one not on it.
 
-Steps 1–7 require no prior approval — draft everything for this
-invocation before stopping for anything. Only step 8 is gated, and
-it's a single stop for the whole batch, not one per task — don't make
-the human approve four tasks one at a time when they asked for all
-four together.
+Steps 1–7 require no prior approval — stubbing (step 1) and drafting
+the task(s) in scope happen before stopping for anything. Only step 8
+is gated. By default only ONE task is drafted this invocation; step 1
+still stubs every remaining plan step (titles only, cheap) so the full
+phase task list is visible immediately. Drafting the remaining tasks in
+batch only happens when the user explicitly asks for "all".
 
 1. **If this is the first time any task has been planned for this
    phase**, or the phase file's Tasks table doesn't yet have a row for
@@ -93,7 +97,8 @@ four together.
    this check, not from earlier in the session.
 
 **Then, repeat steps 3–6 for each task actually in scope this
-invocation:**
+invocation — by default that's a single task unless the user explicitly
+asked for all:**
 
 3. If this task doesn't already have an ID from step 1's stubbing,
    assign the next sequential one (`P{NN}-T{NN}`) — never reuse or
@@ -128,17 +133,19 @@ invocation:**
    (Example: T01–T02 were in scope this invocation and got fully
    drafted; T03 exists as a stub from step 1 but wasn't asked for yet.)
 
-7. **Once every task in scope for this invocation is drafted**, ask
-   the user whether there's more to add — more tasks to draft this
-   invocation, or scope missing from the ones just drafted — before
-   requesting review; batch it in now rather than triggering a second
-   review cycle later.
+7. **Once the task drafted this invocation is complete**, ask the user
+   whether to draft the next task now, or stop — before requesting
+   review. With the single-task default there's normally just one task,
+   so this is really "draft the next task, or stop?" Batch several in
+   one review cycle only when the user explicitly asked for all.
 8. Commit everything together: stage every drafted
    `.ai/tasks/p{NN}-t{NN}-{name}.md`, the owning
    `.ai/phases/p{NN}-{name}.md`'s updated Tasks table (stub rows and
    all), and `.ai/phases/phases.md` if this was the phase's first task
-   planned; the message should say which tasks were drafted (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline));
+   planned; the message should say which task was drafted (see
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline))
+   — which single task by default, or "all" only when the user explicitly
+   requested every task;
    exclude any gitignored files — gitignored layers simply have nothing to
    commit, not a violation of commit discipline.
    Stop for task plan review (`task-review` gate) — see `.ai/info.md`
@@ -162,6 +169,12 @@ invocation:**
 Same path/prefix rules as above. Steps 1–4 require no prior approval;
 step 5 is gated.
 
+Orphan tasks are drafted one at a time by default — there's no phase
+Plan to exhaust, so there's never a "draft all" batch here. Step 6's
+"more to add?" question therefore means "draft the next orphan task now,
+or stop?", which is the same single-task default as the phase-linked
+path.
+
 1. **If `.ai/tasks/tasks.md` doesn't exist yet**, scaffold it now per
    [reference/scaffold-on-first-use.md](reference/scaffold-on-first-use.md)
    (an empty `| ID | Title | Purpose | Depends on | Status |` table) —
@@ -183,7 +196,7 @@ step 5 is gated.
    phase-linked path's step 5.
 5. Add or update this task's row in `.ai/tasks/tasks.md` — Status
    `awaiting-plan-review` now that its file exists.
-6. Ask the user whether there's more to add before requesting review.
+6. Ask the user whether to draft the next orphan task now, or stop, before requesting review.
 7. Commit: stage the task file and `.ai/tasks/tasks.md` (scaffolded
    first if needed); the message should say which orphan task was
    drafted (see
@@ -288,7 +301,9 @@ if it's genuinely project-level in scope, escalated via
 ## Output
 
 One task file per task actually drafted this invocation — never at the
-project root — not one for every stub row. Phase-linked: the owning
+project root — not one for every stub row. By default that's a single
+task file (the stub rows from step 1 are table rows only, not files).
+Produce more than one only when the user explicitly asked for all. Phase-linked: the owning
 `.ai/phases/p{NN}-{name}.md`'s Tasks table, updated with a row for
 *every* remaining plan step (most at `not-planned` if this was the
 first invocation for the phase); `.ai/phases/phases.md` updated to
