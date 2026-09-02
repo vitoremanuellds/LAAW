@@ -153,7 +153,9 @@ stopping for anything. Only step 8 is gated.
 8. Commit the draft: stage `.ai/phases/p{NN}-{name}.md`, `.ai/phases/phases.md`,
    and any new ADR + `.ai/decisions/decisions.md` row from step 7; the
    message should say what phase was drafted and why (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)). Stop for
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline));
+   exclude any gitignored files — gitignored layers simply have nothing to
+   commit, not a violation of commit discipline. Stop for
    phase plan review (`phase-review` gate) — see `.ai/info.md` (read
    fresh, not from memory). Stop your turn here. Do not continue into
    task breakdown or task IDs — that's a separate operation

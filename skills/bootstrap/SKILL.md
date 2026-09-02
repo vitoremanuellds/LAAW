@@ -86,8 +86,10 @@ not relative to this skill file.
      [`.ai/workflow/templates/workbench-readme-template.md`](.ai/workflow/templates/workbench-readme-template.md)
      to `.ai/workbench/README.md` unedited.
 4. Commit: stage everything scaffolded this run (excluding whatever
-   constitution's own procedure already committed itself in step 3);
-   the message should say which layers were set up (see
+   constitution's own procedure already committed itself in step 3, and
+   excluding any gitignored files — gitignored layers simply have nothing
+   to commit, not a violation of commit discipline); the message should
+   say which layers were set up (see
    [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
    No gate of its own for the non-constitution layers — an empty
    scaffold carries no decision to review; if constitution was chosen,

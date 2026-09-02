@@ -70,7 +70,9 @@ check," stop; that belongs in `.iterate`, not here.
 4. Commit: stage `.ai/workbench/context.temp.md` (and `.ai/workbench/README.md`
    if just created); the message should say this is the assumption
    pass (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline));
+   exclude any gitignored files — gitignored layers simply have nothing to
+   commit, not a violation of commit discipline.
    Stop — tell the human `context.temp.md` is ready for review: they
    may add `[HUMAN]` lines confirming, correcting, or commenting on
    anything, but must **never delete an `[ASSUMPTION]` or
@@ -102,7 +104,9 @@ first — don't skip ahead.
    `context.temp.md`.
 5. Commit: stage `.ai/workbench/build-plan.md`; the message should say
    the iteration plan was drafted (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline));
+   exclude any gitignored files — gitignored layers simply have nothing to
+   commit, not a violation of commit discipline.
    Report the plan and the first batch, ready for `.iterate`.
 
 ## build-context.iterate — read a batch, build context/, repeat
@@ -131,7 +135,9 @@ first — don't skip ahead.
    `context.md` itself if just scaffolded), `context.md`'s table, and
    `build-plan.md`'s Status column changes from this batch; the
    message should say which files were processed (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline));
+   exclude any gitignored files — gitignored layers simply have nothing to
+   commit, not a violation of commit discipline.
 7. If `build-plan.md` still has `queued` rows: stop and report
    progress (X read, Y queued) — ready for the next `.iterate` call,
    not continued automatically in the same turn; batch size is the
@@ -142,8 +148,9 @@ first — don't skip ahead.
    `.ai/workbench/` is part of the permanent record, so no human
    confirmation gate applies to this deletion. Commit that deletion
    (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline))
-   and report completion.
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline));
+   exclude any gitignored files — gitignored layers simply have nothing to
+   commit, not a violation of commit discipline — and report completion.
 
 ## Output
 

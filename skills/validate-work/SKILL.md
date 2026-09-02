@@ -64,7 +64,9 @@ still current.
    `.ai/tasks/tasks.md` — the change from step 1, or the revert from
    step 4 on failure); the message should say pass or fail and for
    which task (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline));
+   exclude any gitignored files — gitignored layers simply have nothing to
+   commit, not a violation of commit discipline.
 
 ## Procedure — phase validation
 
@@ -83,7 +85,9 @@ still current.
 5. Commit: stage `.ai/phases/phases.md`'s updated Status (the change
    from step 1, or the revert from step 4 on failure); the message
    should say pass or fail and for which phase (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline));
+   exclude any gitignored files — gitignored layers simply have nothing to
+   commit, not a violation of commit discipline.
 
 ## Output
 

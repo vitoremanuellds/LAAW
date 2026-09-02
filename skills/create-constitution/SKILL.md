@@ -88,7 +88,9 @@ draft everything before stopping for anything. Only step 8 is gated.
    created it, and `.ai/decisions/` if you just scaffolded or added to
    it in step 7; the message should say what was drafted or updated,
    and whether this was a first-run bootstrap (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline));
+   exclude any gitignored files — gitignored layers simply have nothing to
+   commit, not a violation of commit discipline.
    Stop. Constitution review is a gate — see
    `.ai/info.md` (read fresh, not from memory) for who approves it.
    Do not proceed to phase planning yourself unless authorized. **When

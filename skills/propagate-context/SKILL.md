@@ -69,7 +69,9 @@ passed yet; don't mark complete regardless of how the task looks.
    `tasks.md`), plus any Context update from step 2 (phase file's
    Context section, or `.ai/context/` files + `context.md`'s table for
    an orphan task); the message should say which task completed (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline));
+   exclude any gitignored files — gitignored layers simply have nothing to
+   commit, not a violation of commit discipline.
 5. **Phase-linked:** ask whether the phase needs more tasks — does the
    phase file's Plan still look sufficient, or is there something to
    add before this unit of work is really closed? A plain question,
@@ -108,7 +110,9 @@ above.
 5. Commit: stage `.ai/phases/phases.md`'s updated Status, and the
    `.ai/context/` file(s) touched in step 3 plus `context.md`'s table
    row; the message should say which phase completed (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline));
+   exclude any gitignored files — gitignored layers simply have nothing to
+   commit, not a violation of commit discipline.
 6. Ask whether the project needs another phase, or is done for now — a
    plain question, not a gate. If the answer is yes, the normal next
    step is running `define-phase` directly for the new phase (see

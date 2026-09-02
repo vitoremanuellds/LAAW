@@ -138,7 +138,9 @@ invocation:**
    `.ai/phases/p{NN}-{name}.md`'s updated Tasks table (stub rows and
    all), and `.ai/phases/phases.md` if this was the phase's first task
    planned; the message should say which tasks were drafted (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline));
+   exclude any gitignored files — gitignored layers simply have nothing to
+   commit, not a violation of commit discipline.
    Stop for task plan review (`task-review` gate) — see `.ai/info.md`
    (read fresh) — covering only the tasks actually drafted this
    invocation, not the stubs (nothing to review in a title-only row).
@@ -185,7 +187,9 @@ step 5 is gated.
 7. Commit: stage the task file and `.ai/tasks/tasks.md` (scaffolded
    first if needed); the message should say which orphan task was
    drafted (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline));
+   exclude any gitignored files — gitignored layers simply have nothing to
+   commit, not a violation of commit discipline.
    Stop for task plan review (`task-review` gate) — see `.ai/info.md`.
    **When approval comes back:** set Status to `plan-approved` in
    `tasks.md`. Same "don't start implementing in the same response"

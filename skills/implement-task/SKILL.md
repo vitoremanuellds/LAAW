@@ -110,7 +110,9 @@ is not worth an agent inventing rules. Then read:
    Status row (phase file or `tasks.md`), and any new ADR +
    `.ai/decisions/decisions.md` row you wrote; the message should say
    what was implemented (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline));
+   exclude any gitignored files — gitignored layers simply have nothing to
+   commit, not a violation of commit discipline.
    Stop for `task-validation` — see `.ai/info.md` (read fresh) for
    whether that's yours to run (→
    [validate-work](.ai/workflow/skills/validate-work/SKILL.md)) or a human's.
