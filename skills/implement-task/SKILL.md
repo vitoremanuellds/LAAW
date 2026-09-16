@@ -13,8 +13,9 @@ covers what "operation" means and where authority comes from).
   tools; fill in the task's Context After section after implementation;
   update subtask statuses in the parent's Subtasks table.
 - **Must:** update the task's Status in `.ai/tasks/tasks.md` as it
-  progresses; record architectural decisions as context rows for
-  `propagate-context` to promote later.
+  progresses (for root tasks); update subtask statuses in the parent's
+  Subtasks table (for subtasks); record architectural decisions as
+  context rows for `propagate-context` to promote later.
 - **Cannot:** silently change approved requirements/plan.
 
 This is the most frequently invoked skill in the workflow — it runs
@@ -60,24 +61,31 @@ read:
    one — stop and re-read
    [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-permanent-record)
    rather than write something new into the table.
-4. **If the task has subtasks**, walk through them in id order. For
-   each subtask:
+4. **If this task is a subtask** (it has no row in `tasks.md` but has
+   a row in a parent task's Subtasks table), check the parent's
+   Subtasks table instead. The subtask's Status should be `in-progress`.
+   If it's `planned`, `task-review` hasn't passed yet — stop and check
+   before proceeding.
+5. **If the task has subtasks**, walk through them in id order before
+   implementing the parent's own Steps. For each subtask:
    - Update its status from `planned` to `in-progress` in the parent's
      Subtasks table.
-   - Implement the subtask's steps (if it has a separate file, read
-     and follow it; if it's just a table row, execute the steps inline).
+   - Read the subtask file (`tasks/t{parent-ID}-{parent-name}/t{sub-ID}-{sub-name}.md`)
+     if it exists; read the parent's Steps if not.
+   - Implement the subtask's work (follow its Steps section, or
+     execute the parent's Steps directly if the subtask has no file).
    - Update its status to `done` in the Subtasks table.
    - If the subtask produced reusable knowledge, note it for
      `propagate-context` (the parent's Context After section captures
      the aggregate).
-5. Follow the task's Steps in order. Adjust freely only where the task
+6. Follow the task's Steps in order. Adjust freely only where the task
    file explicitly marked a detail flexible. Everything else that
-   doesn't match gets raised as a deviation per step 6.
-6. If the plan turns out wrong in a way that changes scope, the
+   doesn't match gets raised as a deviation per step 7.
+7. If the plan turns out wrong in a way that changes scope, the
    library/API doesn't support what was planned, or the strategy
    itself has to change — stop and raise a deviation. Do not silently
    expand scope or improvise past what was approved.
-7. **Decisions are context rows.** If an architectural decision is made
+8. **Decisions are context rows.** If an architectural decision is made
    along the way (a new dependency, a new pattern) that future work
    needs to know about, record it as a note for `propagate-context` to
    promote later, or write it directly as a context row
@@ -96,22 +104,26 @@ read:
 2. Set the task's Status to `done` (the new enum has no `reviewing`
    state; `done` here means implementation complete and ready for
    validation).
-3. Commit: stage the modified/created project files, the updated Status
-   row in `tasks.md`, and the filled-in Context After section; verify
-   no `.gitignore`d files are included (run `git diff --cached` and
-   check the output); the message should say what was implemented (see
+3. **Update the Status row:**
+   - For root tasks: update `.ai/tasks/tasks.md`.
+   - For subtasks: update the parent task file's Subtasks table.
+4. Commit: stage the modified/created project files, the updated Status
+   row, and the filled-in Context After section; verify no
+   `.gitignore`d files are included (run `git diff --cached` and check
+   the output); the message should say what was implemented (see
    [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
    Stop for `task-completion-review` → `validate-work` — see
    `.ai/info.md` (read fresh) for whether that's yours to run
    (→ [validate-work](.ai/workflow/skills/validate-work/SKILL.md))
    or a human's.
-4. Do not mark the task complete yourself — completion requires
+5. Do not mark the task complete yourself — completion requires
    validation and review to pass first (see
    [.ai/workflow/workflow.md §5](.ai/workflow/workflow.md#5-lifecycle--gates)).
 
 ## Output
 
-Modified project files; an updated Status row in `.ai/tasks/tasks.md`;
-the filled-in Context After section; a decision recorded as a context
-row if an architectural decision was made; the task ready for
-validation.
+Modified project files; an updated Status row in `.ai/tasks/tasks.md`
+(for root tasks) or the parent task file's Subtasks table (for
+subtasks); the filled-in Context After section; a decision recorded as
+a context row if an architectural decision was made; the task ready
+for validation.

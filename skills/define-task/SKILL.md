@@ -1,6 +1,6 @@
 ---
 name: define-task
-description: Break a plan into individual tasks (tasks/t{ID}-{name}.md), or draft a standalone task with no parent (tasks/t{ID}-{name}.md, indexed in tasks/tasks.md). Writes enough detail (files, ordered steps, optional pseudocode) that implementation is close to mechanical. On first use, scaffolds .ai/tasks/tasks.md. Supports subtasks: a parent task can contain a Subtasks table; define-task creates the parent file and all subtask entries, and updates each subtask's status to planned in the table. Not for implementing code.
+description: Break a plan into individual tasks (tasks/t{ID}-{name}.md), or draft a standalone task with no parent (tasks/t{ID}-{name}.md, indexed in tasks/tasks.md). Writes enough detail (files, ordered steps, optional pseudocode) that implementation is close to mechanical. On first use, scaffolds .ai/tasks/tasks.md. Supports subtasks: a parent task gets subtask rows in its table during parent planning; subtasks are planned separately, one by one or all, each getting its own file. Not for implementing code.
 ---
 
 # Skill: define-task
@@ -11,8 +11,8 @@ covers what "operation" means and where authority comes from).
 
 - **Can:** read the task's description + `context/`; create the task
   file with implementation-ready detail; scaffold `.ai/tasks/tasks.md`
-  on first use; manage subtasks (create parent + subtask entries,
-  update subtask statuses).
+  on first use; manage subtasks (parent rows during parent planning,
+  full subtask files during separate subtask planning).
 - **Must:** update `.ai/tasks/tasks.md` on every status change for
   root-level tasks — `tasks.md` is the only place status lives for
   them. For subtasks, update the parent task file's Subtasks table.
@@ -40,20 +40,36 @@ one or to all.
 ## Subtasks
 
 A task may contain **subtasks** — smaller, more concrete units of work
-that roll up into the parent task. When a task has subtasks:
+that roll up into the parent task. Subtasks follow the exact same
+planning and implementation flow as root tasks; they are planned and
+implemented separately.
 
-- `define-task` creates the parent task file and adds rows for every
-  subtask in the parent's Subtasks table, each with Status `planned`.
-- `implement-task` walks through subtasks in order, updating each
-  subtask's status (`not-started` → `planned` → `in-progress` → `done`)
-  as it progresses through them. Subtask statuses live exclusively in
-  the parent task's Subtasks table, **not** in `tasks.md`.
-- A subtask is a row in the parent's Subtasks table; it has no
-  separate file unless it's complex enough to warrant its own
-  `t{ID}-{name}.md` file (in which case the Subtasks table row points
-  to it).
-- Subtask rows are id-ascending; new subtasks added later are appended
-  at the end.
+**Planning a parent task with subtasks:**
+- `define-task` creates the parent task file.
+- The parent file includes a Subtasks table with one row per subtask
+  (id, name, description, depends on, status `planned`).
+- **No subtask files are created during parent planning.** Only the
+  rows exist in the table.
+- After the parent task is planned and approved, the user explicitly
+  asks to plan the subtasks.
+
+**Planning subtasks (separate operation):**
+- When the user asks to plan subtasks, `define-task` drafts each
+  subtask file (`tasks/t{ID}-{name}/t{ID}-{name}.md`) one by one
+  (default) or all at once (if the user explicitly asks for "all").
+- Each subtask is a full task file with all sections (Description,
+  Context, In scope, Out of scope, Steps, Validations).
+- Subtasks follow the same planning flow as root tasks: one by one
+  or all, each goes through `task-review`, then `implement-task`.
+- Subtask statuses live exclusively in the parent task's Subtasks
+  table, **not** in `.ai/tasks/tasks.md`.
+
+**Implementation:**
+- `implement-task` walks through subtasks in id order when implementing
+  a parent task, updating each subtask's status (`not-started` →
+  `planned` → `in-progress` → `done`) in the parent's Subtasks table.
+- Subtasks can also be implemented individually by asking to implement
+  them directly.
 
 ## Inputs
 
@@ -83,6 +99,8 @@ still stubs every remaining plan step (titles only, cheap) so the full
 task list is visible immediately. Drafting the remaining tasks in
 batch only happens when the user explicitly asks for "all".
 
+### Planning a parent task (with or without subtasks)
+
 1. **If `.ai/tasks/tasks.md` doesn't exist**, scaffold it now per
    [reference/scaffold-on-first-use.md](reference/scaffold-on-first-use.md)
    (an empty `| id | name | description | depends on | status |` table)
@@ -96,9 +114,10 @@ batch only happens when the user explicitly asks for "all".
    create the single file `tasks/t{ID}-{name}.md`. This is the
    **recursive folder rule** — every task follows the same shape:
    a folder named `t{ID}-{name}/` containing `t{ID}-{name}.md`.
-4. Write the task file body per the **Task file body** section below.
-   If the task has subtasks, add a row for each subtask in the
-   Subtasks table with Status `planned`.
+4. Write the parent task file body per the **Task file body** section
+   below. If the task has subtasks, add a row for each subtask in the
+   Subtasks table with Status `planned` — **do not create subtask
+   files at this point**.
 5. Note dependencies on other tasks explicitly if they exist — this
    determines what can run in parallel. **If this task logically
    precedes tasks that already exist** (e.g. a replan inserts a
@@ -110,12 +129,13 @@ batch only happens when the user explicitly asks for "all".
    happens.
 6. Add or update this task's row in `.ai/tasks/tasks.md` — Status
    `planned`.
-7. **Once the task drafted this invocation is finished**, ask the user
-   whether to draft the next task now, or stop — before requesting
-   review. With the single-task default there's normally just one task,
-   so this is really "draft the next task, or stop?" Batch several in
-   one review cycle only when the user explicitly asked for all.
-8. Commit everything together: stage every drafted task file and
+7. **Once the parent task drafted this invocation is finished**, ask
+   the user whether to draft the next task now, or stop — before
+   requesting review. With the single-task default there's normally
+   just one task, so this is really "draft the next task, or stop?"
+   Batch several in one review cycle only when the user explicitly
+   asked for all.
+8. Commit everything together: stage the parent task file and
    `.ai/tasks/tasks.md`; the message should say which task was drafted
    (see [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline))
    — which single task by default, or "all" only when the user
@@ -133,6 +153,34 @@ batch only happens when the user explicitly asks for "all".
    [.ai/workflow/workflow.md §5](.ai/workflow/workflow.md#5-lifecycle--gates)).
    `implement-task`'s own first step is what finally moves each task's
    Status to `in-progress`, once you actually start it.
+
+### Planning subtasks (after parent is planned)
+
+When the user asks to plan the subtasks of a parent task:
+
+1. For each subtask in the parent's Subtasks table (one by one by
+   default, or all if the user explicitly asks for "all"):
+   - Mint the next ID for the subtask using
+     `tools/generate-id.py --prefix t`.
+   - Create the subtask file per the recursive folder rule:
+     `tasks/t{parent-ID}-{parent-name}/t{subtask-ID}-{subtask-name}.md`.
+   - Write the subtask file body per the **Task file body** section
+     below (full layout: Description, TL;DR, Context, In scope, Out
+     of scope, Steps, Validations — no Subtasks section, since
+     subtasks are leaf tasks).
+   - Update the subtask's row in the parent's Subtasks table — Status
+     `planned`.
+2. Ask the user whether to draft the next subtask now, or stop —
+   before requesting review. Same single-task default as the parent
+   path.
+3. Commit: stage the subtask file(s) and the parent task file's
+   updated Subtasks table; the message should say which subtask was
+   drafted; exclude any gitignored files.
+4. Stop for `task-review` gate — see `.ai/info.md` (read fresh).
+   **When approval comes back, that's a separate turn:** set Status to
+   `in-progress` in the parent's Subtasks table for every subtask that
+   was approved. Same "don't start implementing in the same response"
+   rule as the parent path.
 
 ## Task file body
 
@@ -189,12 +237,14 @@ Write every task file with this layout:
 - **Subtasks table** — optional; only present if the task has
   subtasks. Columns: id, name, description, depends on, status.
   Rows are id-ascending; new subtasks are appended at the end.
-  `define-task` adds rows with Status `planned`; `implement-task`
-  updates each subtask's status as it walks through them.
+  `define-task` adds rows with Status `planned` during parent
+  planning; subtask files are created later during separate subtask
+  planning.
 - **Deviation recording** — same inline `## Deviations` subsection
   pattern as before (added later by whichever operation raises it).
 
 ## Output
 
 One task file per task actually drafted this invocation. Update
-`.ai/tasks/tasks.md` (scaffolded first if needed).
+`.ai/tasks/tasks.md` (scaffolded first if needed) for root tasks;
+update the parent task file's Subtasks table for subtasks.
