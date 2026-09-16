@@ -47,7 +47,7 @@ linked where needed below.
 .ai/workflow/       plain copy, managed by sync-workflow.py (P02), never written to — workflow.md, reference/, templates/, skills/, tools/
 .ai/info.md         Policy only — gate authority; always present, not an optional layer
 .ai/context/        THE one context layer (merged): context.md + c-{ID}-{name}.md + optional index-*.md — effectively mandatory (one small file suffices)
-.ai/tasks/          Mandatory: tasks.md + t{ID}-{name}.md (leaf) + t{ID}-{name}/ (has-subtasks folder, per the recursive rule below)
+.ai/tasks/          Mandatory: tasks.md + t{ID}-{name}/task.md (leaf) + t{ID}-{name}/ (has-subtasks folder, per the recursive rule below)
 .ai/workbench/      freeform scratch — planning notes, Q&A, prompt drafts; disposable, not part of the permanent record — optional
 ```
 
@@ -60,8 +60,8 @@ How a layer comes into existence on first use: see
 (or run `bootstrap` to set up several at once).
 
 `.ai/tasks/` holds two shapes, distinguished by path: a **leaf task**
-(`t{ID}-{name}.md`) and a **task with subtasks** (`t{ID}-{name}/` — a
-folder containing the parent file `t{ID}-{name}.md` and subtask files
+(`t{ID}-{name}/task.md`) and a **task with subtasks** (`t{ID}-{name}/` — a
+folder containing the parent file `task.md` and subtask files
 below it). The same rule applies at every nesting level: if a task has
 subtasks, it is a folder; if it does not, it is a leaf file. IDs are
 sequential and never reused.

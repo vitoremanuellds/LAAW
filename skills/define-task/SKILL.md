@@ -1,6 +1,6 @@
 ---
 name: define-task
-description: Break a plan into individual tasks (tasks/t{ID}-{name}.md), or draft a standalone task with no parent (tasks/t{ID}-{name}.md, indexed in tasks/tasks.md). Writes enough detail (files, ordered steps, optional pseudocode) that implementation is close to mechanical. On first use, scaffolds .ai/tasks/tasks.md. Supports subtasks: a parent task gets subtask rows in its table during parent planning (status not-started); subtasks are planned separately, one by one or all, each getting its own file and status moving to planned. Not for implementing code.
+description: Break a plan into individual tasks (tasks/t{ID}-{name}/task.md), or draft a standalone task with no parent (tasks/t{ID}-{name}/task.md, indexed in tasks/tasks.md). Writes enough detail (files, ordered steps, optional pseudocode) that implementation is close to mechanical. On first use, scaffolds .ai/tasks/tasks.md. Supports subtasks: a parent task gets subtask rows in its table during parent planning (status not-started); subtasks are planned separately, one by one or all, each getting its own file and status moving to planned. Not for implementing code.
 ---
 
 # Skill: define-task
@@ -18,6 +18,11 @@ covers what "operation" means and where authority comes from).
   them. For subtasks, update the parent task file's Subtasks table.
 - **Cannot:** implement code; write an ADR — escalate as a deviation
   instead.
+
+Always use `tools/generate-id.py --prefix t` to generate IDs for any
+project file that requires an ID. Never hardcode, guess, or manually
+construct IDs — the script is the single source of truth for ID
+generation across the entire project.
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for task planning.
@@ -61,8 +66,10 @@ implemented separately.
   Subtasks table, always use `tools/generate-id.py --prefix t` to mint
   the subtask IDs — never hardcode or guess them. Run the script once
   per subtask row and write the generated ID into the table.
+- **Always use `tools/generate-id.py --prefix c` to generate IDs for
+  context files.
 - When the user asks to plan subtasks, `define-task` drafts each
-  subtask file (`tasks/t{ID}-{name}/t{ID}-{name}.md`) one by one
+  subtask file (`tasks/t{ID}-{name}/t{sub-ID}-{sub-name}/task.md`) one by one
   (default) or all at once (if the user explicitly asks for "all").
 - Each subtask is a full task file with all sections (Description,
   Context, In scope, Out of scope, Steps, Validations).
@@ -117,10 +124,10 @@ batch only happens when the user explicitly asks for "all".
    id format.
 3. **Recursive folder rule:** If the task has subtasks, create the
    folder `tasks/t{ID}-{name}/` with the parent file
-   `t{ID}-{name}.md` inside it. If it's a leaf task (no subtasks),
-   create the single file `tasks/t{ID}-{name}.md`. This is the
+   `task.md` inside it. If it's a leaf task (no subtasks),
+   create the single file `tasks/t{ID}-{name}/task.md`. This is the
    **recursive folder rule** — every task follows the same shape:
-   a folder named `t{ID}-{name}/` containing `t{ID}-{name}.md`.
+   a folder named `t{ID}-{name}/` containing `task.md`.
 4. Write the parent task file body per the **Task file body** section
    below. If the task has subtasks, add a row for each subtask in the
    Subtasks table with Status `not-started` — **do not create subtask

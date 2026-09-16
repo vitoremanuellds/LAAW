@@ -15,6 +15,14 @@ review's judgment call; see
   never a cached read.
 - **Should not:** edit implementation to force a pass.
 
+Always use `tools/generate-id.py --prefix t` to generate IDs for any
+project file that requires an ID. Never hardcode, guess, or manually
+construct IDs — the script is the single source of truth for ID
+generation across the entire project.
+
+Always use `tools/generate-id.py --prefix c` to generate IDs for
+context files.
+
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for validation.
 

@@ -18,6 +18,14 @@ covers what "operation" means and where authority comes from).
   context rows for `propagate-context` to promote later.
 - **Cannot:** silently change approved requirements/plan.
 
+Always use `tools/generate-id.py --prefix t` to generate IDs for any
+project file that requires an ID. Never hardcode, guess, or manually
+construct IDs — the script is the single source of truth for ID
+generation across the entire project.
+
+Always use `tools/generate-id.py --prefix c` to generate IDs for
+context files.
+
 This is the most frequently invoked skill in the workflow — it runs
 once per task, potentially many times.
 
@@ -35,8 +43,8 @@ read:
 
 1. `.ai/info.md` — read fresh, not from earlier in the session;
    confirms whether `task-completion-review` is yours to self-certify.
-2. The task file — `tasks/t{ID}-{name}.md` (leaf task) or
-   `tasks/t{ID}-{name}/t{ID}-{name}.md` (parent with subtasks) —
+2. The task file — `tasks/t{ID}-{name}/task.md` (leaf task) or
+   `tasks/t{ID}-{name}/t{sub-ID}-{sub-name}/task.md` (parent with subtasks) —
    Context + Steps sections, including its Validations.
 3. Only the files the task's Context section lists as relevant, plus
    whatever those reference and you actually end up touching. Don't
@@ -70,7 +78,7 @@ read:
    implementing the parent's own Steps. For each subtask:
    - Update its status from `not-started` to `planned`, then to
      `in-progress`, in the parent's Subtasks table.
-   - Read the subtask file (`tasks/t{parent-ID}-{parent-name}/t{sub-ID}-{sub-name}.md`)
+   - Read the subtask file (`tasks/t{parent-ID}-{parent-name}/t{sub-ID}-{sub-name}/task.md`)
      if it exists; read the parent's Steps if not.
    - Implement the subtask's work (follow its Steps section, or
      execute the parent's Steps directly if the subtask has no file).

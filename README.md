@@ -77,7 +77,7 @@ use: see
 │   └── tools/             ← generate-id.py, sync-workflow.py, sync-skills.py, .epoch
 ├── info.md                ← Policy only: gate authority; always present
 ├── context/                  ← optional: context.md + c-{ID}-{name}.md
-├── tasks/                    ← mandatory: tasks.md + t{ID}-{name}.md
+├── tasks/                    ← mandatory: tasks.md + t{ID}-{name}/task.md
 └── workbench/                ← optional: freeform scratch space
 ```
 
@@ -87,9 +87,9 @@ layer comes into existence on first use: see
 [`reference/scaffold-on-first-use.md`](reference/scaffold-on-first-use.md).
 
 `.ai/tasks/` holds two shapes, distinguished by path: a **leaf task**
-(`t{ID}-{name}.md`) and a **task with subtasks**
+(`t{ID}-{name}/task.md`) and a **task with subtasks**
 (`t{ID}-{name}/` — a folder containing the parent file
-`t{ID}-{name}.md` and subtask files below it). The same rule applies at
+`task.md` and subtask files below it). The same rule applies at
 every nesting level: if a task has subtasks, it is a folder; if it does
 not, it is a leaf file. IDs are sequential and never reused.
 
