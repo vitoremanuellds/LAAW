@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Generate compact 8-char IDs per ADR05: 5-char base-36 timestamp + 3-char base-36 random suffix."""
+"""Generate dash-separated IDs: `<prefix>{mmm-dddd-rrrrr}`.
+
+Format: a `t` or `c` prefix, then the 7-digit zero-padded count of
+minutes since the epoch split 3+4 (e.g. `005-4321`), a dash, then 5
+random decimal digits — e.g. `t005-4321-48213`.
+"""
 
 import argparse
 import datetime
@@ -7,107 +12,96 @@ import os
 import random
 import sys
 
-BASE36_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz"
-TIMESTAMP_CHARS = 5
-RANDOM_CHARS = 3
-TOTAL_CHARS = TIMESTAMP_CHARS + RANDOM_CHARS
+MINUTE_CAP = 10_000_000  # 7-digit counter caps just under ~19 years
 
 
-def to_base36(value, width=TIMESTAMP_CHARS):
-    """Convert a non-negative integer to a zero-padded base-36 string."""
-    if value < 0:
-        raise ValueError("Value must be non-negative")
-    if value == 0:
-        return BASE36_CHARS[0] * width
-    digits = []
-    while value > 0:
-        digits.append(BASE36_CHARS[value % 36])
-        value //= 36
-    result = "".join(reversed(digits))
-    return result.zfill(width)
-
-
-def random_base36(n=RANDOM_CHARS):
-    """Generate n random base-36 characters."""
-    return "".join(random.choices(BASE36_CHARS, k=n))
-
-
-def read_epoch():
-    """Read the default epoch from LAAW/tools/.epoch."""
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    epoch_path = os.path.join(script_dir, ".epoch")
-    with open(epoch_path, "r") as f:
-        return f.read().strip()
+def die(message):
+    print(f"generate-id: {message}", file=sys.stderr)
+    sys.exit(1)
 
 
 def parse_epoch(epoch_str):
-    """Parse an epoch string into a timezone-aware datetime."""
-    # Handle format: "YYYY-MM-DD HH:MM:SS ±HHMM"
+    """Parse an epoch string into a timezone-aware UTC datetime.
+
+    Accepts ISO 8601 with `Z` or an explicit offset, and bare
+    `YYYY-MM-DD[ T]HH:MM:SS` date-times (assumed UTC), with the same
+    tolerance as the previous tool.
+    """
     try:
-        dt = datetime.datetime.strptime(epoch_str, "%Y-%m-%d %H:%M:%S %z")
+        dt = datetime.datetime.fromisoformat(epoch_str.strip().replace("Z", "+00:00"))
     except ValueError:
-        # Try without timezone, assume UTC if not specified
-        try:
-            dt = datetime.datetime.strptime(epoch_str, "%Y-%m-%d %H:%M:%S")
-            dt = dt.replace(tzinfo=datetime.timezone.utc)
-        except ValueError:
-            raise ValueError(
-                f"Cannot parse epoch string: {epoch_str}. "
-                "Expected format: 'YYYY-MM-DD HH:MM:SS ±HHMM'"
-            )
-    return dt
+        die(
+            f"cannot parse epoch: {epoch_str!r} — expected ISO 8601 with `Z` "
+            "or an explicit offset, or a bare 'YYYY-MM-DD HH:MM:SS' (UTC)"
+        )
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=datetime.timezone.utc)
+    return dt.astimezone(datetime.timezone.utc)
 
 
-def generate_id(epoch_dt, count=1):
-    """Generate one or more 8-char IDs within the same minute bucket."""
-    now = datetime.datetime.now(datetime.timezone.utc)
-    # Calculate total minutes since epoch
-    delta = now - epoch_dt
-    total_minutes = int(delta.total_seconds() / 60)
-    timestamp_part = to_base36(total_minutes)
+def read_epoch():
+    """Read the default epoch from tools/.epoch next to this script."""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(script_dir, ".epoch"), "r") as f:
+        return f.read().strip()
 
-    if count == 1:
-        random_part = random_base36()
-        return [timestamp_part + random_part]
 
-    # For multiple IDs, generate all within the same minute bucket
-    ids = []
-    for _ in range(count):
-        random_part = random_base36()
-        ids.append(timestamp_part + random_part)
+def minutes_since(epoch_dt, now=None):
+    """Floor the minute count between now (UTC) and the epoch."""
+    if now is None:
+        now = datetime.datetime.now(datetime.timezone.utc)
+    return (now - epoch_dt) // datetime.timedelta(minutes=1)
 
-    # Sort numerically (by base-36 value, which is lexicographic for same-length strings)
-    ids.sort(key=lambda x: int(x, 36))
-    return ids
+
+def used_in_dir(dir_path, candidate):
+    """True if dir_path holds an entry whose name starts with `{candidate}-`."""
+    return any(name.startswith(candidate + "-") for name in os.listdir(dir_path))
+
+
+def mint_ids(prefix, minutes_part, count, dir_path=None):
+    """Mint `count` unique ids sharing one minute part, sorted ascending."""
+    prefix = prefix + minutes_part + "-"
+    if dir_path is not None and not os.path.isdir(dir_path):
+        die(f"--dir path does not exist: {dir_path}")
+    batch = set()
+    while len(batch) < count:
+        candidate = prefix + f"{random.randint(0, 99999):05d}"
+        if candidate in batch:
+            continue
+        if dir_path is not None and used_in_dir(dir_path, candidate):
+            continue
+        batch.add(candidate)
+    return sorted(batch)
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate compact 8-char IDs (5-char base-36 timestamp + 3-char base-36 random)."
+        description="Generate dash-separated ids: <prefix>{mmm-dddd-rrrrr} "
+        "(7-digit minutes since epoch, split 3+4, plus 5 random digits)."
     )
-    parser.add_argument(
-        "--count",
-        type=int,
-        default=1,
-        help="Number of IDs to generate (default: 1)",
-    )
-    parser.add_argument(
-        "--epoch",
-        type=str,
-        default=None,
-        help='Override the default epoch (format: "YYYY-MM-DD HH:MM:SS ±HHMM")',
-    )
-
+    parser.add_argument("--count", type=int, default=1, help="number of ids (default: 1)")
+    parser.add_argument("--epoch", type=str, default=None, help="override the epoch (default: tools/.epoch next to the script)")
+    parser.add_argument("--prefix", choices=("t", "c"), default="t", help="id prefix (default: t)")
+    parser.add_argument("--dir", type=str, default=None, help="check minted ids against this existing directory of {id}-{name} files")
     args = parser.parse_args()
 
-    if args.epoch:
-        epoch_dt = parse_epoch(args.epoch)
-    else:
-        epoch_str = read_epoch()
-        epoch_dt = parse_epoch(epoch_str)
+    if args.count < 1:
+        die("--count must be >= 1")
 
-    ids = generate_id(epoch_dt, args.count)
-    for id_str in ids:
+    epoch_str = args.epoch if args.epoch is not None else read_epoch()
+    epoch_dt = parse_epoch(epoch_str)
+
+    minutes = minutes_since(epoch_dt)
+    if minutes < 0:
+        die(f"epoch is in the future ({epoch_str}); minutes-since-epoch is negative")
+    if minutes >= MINUTE_CAP:
+        die(
+            f"minute counter overflow: {minutes} >= {MINUTE_CAP} — the 7-digit "
+            "id space is exhausted; choose a later epoch"
+        )
+
+    minutes_part = f"{minutes:07d}"[:3] + "-" + f"{minutes:07d}"[3:]
+    for id_str in mint_ids(args.prefix, minutes_part, args.count, args.dir):
         print(id_str)
 
 
