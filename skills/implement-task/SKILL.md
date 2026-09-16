@@ -68,8 +68,8 @@ read:
    before proceeding.
 5. **If the task has subtasks**, walk through them in id order before
    implementing the parent's own Steps. For each subtask:
-   - Update its status from `planned` to `in-progress` in the parent's
-     Subtasks table.
+   - Update its status from `not-started` to `planned`, then to
+     `in-progress`, in the parent's Subtasks table.
    - Read the subtask file (`tasks/t{parent-ID}-{parent-name}/t{sub-ID}-{sub-name}.md`)
      if it exists; read the parent's Steps if not.
    - Implement the subtask's work (follow its Steps section, or

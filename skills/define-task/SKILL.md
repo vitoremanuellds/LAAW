@@ -1,6 +1,6 @@
 ---
 name: define-task
-description: Break a plan into individual tasks (tasks/t{ID}-{name}.md), or draft a standalone task with no parent (tasks/t{ID}-{name}.md, indexed in tasks/tasks.md). Writes enough detail (files, ordered steps, optional pseudocode) that implementation is close to mechanical. On first use, scaffolds .ai/tasks/tasks.md. Supports subtasks: a parent task gets subtask rows in its table during parent planning; subtasks are planned separately, one by one or all, each getting its own file. Not for implementing code.
+description: Break a plan into individual tasks (tasks/t{ID}-{name}.md), or draft a standalone task with no parent (tasks/t{ID}-{name}.md, indexed in tasks/tasks.md). Writes enough detail (files, ordered steps, optional pseudocode) that implementation is close to mechanical. On first use, scaffolds .ai/tasks/tasks.md. Supports subtasks: a parent task gets subtask rows in its table during parent planning (status not-started); subtasks are planned separately, one by one or all, each getting its own file and status moving to planned. Not for implementing code.
 ---
 
 # Skill: define-task
@@ -47,7 +47,7 @@ implemented separately.
 **Planning a parent task with subtasks:**
 - `define-task` creates the parent task file.
 - The parent file includes a Subtasks table with one row per subtask
-  (id, name, description, depends on, status `planned`).
+  (id, name, description, depends on, status `not-started`).
 - **No subtask files are created during parent planning.** Only the
   rows exist in the table.
 - After the parent task is planned and approved, the user explicitly
@@ -116,7 +116,7 @@ batch only happens when the user explicitly asks for "all".
    a folder named `t{ID}-{name}/` containing `t{ID}-{name}.md`.
 4. Write the parent task file body per the **Task file body** section
    below. If the task has subtasks, add a row for each subtask in the
-   Subtasks table with Status `planned` — **do not create subtask
+   Subtasks table with Status `not-started` — **do not create subtask
    files at this point**.
 5. Note dependencies on other tasks explicitly if they exist — this
    determines what can run in parallel. **If this task logically
@@ -237,9 +237,9 @@ Write every task file with this layout:
 - **Subtasks table** — optional; only present if the task has
   subtasks. Columns: id, name, description, depends on, status.
   Rows are id-ascending; new subtasks are appended at the end.
-  `define-task` adds rows with Status `planned` during parent
-  planning; subtask files are created later during separate subtask
-  planning.
+  `define-task` adds rows with Status `not-started` during parent
+  planning (no files yet); subtasks move to `planned` when their
+  files are created during separate subtask planning.
 - **Deviation recording** — same inline `## Deviations` subsection
   pattern as before (added later by whichever operation raises it).
 
