@@ -57,6 +57,10 @@ implemented separately.
 - **Subtask location rule:** All subtask files must be created inside the
   parent task folder, never alongside it. The subtask folder and file sit
   directly under the parent's `t{ID}-{name}/` directory.
+- **Subtask ID generation:** When adding subtask rows to the parent's
+  Subtasks table, always use `tools/generate-id.py --prefix t` to mint
+  the subtask IDs — never hardcode or guess them. Run the script once
+  per subtask row and write the generated ID into the table.
 - When the user asks to plan subtasks, `define-task` drafts each
   subtask file (`tasks/t{ID}-{name}/t{ID}-{name}.md`) one by one
   (default) or all at once (if the user explicitly asks for "all").
