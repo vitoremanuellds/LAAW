@@ -54,6 +54,9 @@ implemented separately.
   asks to plan the subtasks.
 
 **Planning subtasks (separate operation):**
+- **Subtask location rule:** All subtask files must be created inside the
+  parent task folder, never alongside it. The subtask folder and file sit
+  directly under the parent's `t{ID}-{name}/` directory.
 - When the user asks to plan subtasks, `define-task` drafts each
   subtask file (`tasks/t{ID}-{name}/t{ID}-{name}.md`) one by one
   (default) or all at once (if the user explicitly asks for "all").
