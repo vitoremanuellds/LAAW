@@ -1,6 +1,6 @@
 ---
 name: review-work
-description: Review a task or phase's implementation and validation results for scope, complexity, architecture, missing validation, or context issues — at task-completion-review/phase-completion-review, after validation passes. Distinct from task-review/phase-review (plan approval) and from validate-work (correctness). Never silently fix issues — report and stop for the gate.
+description: Review a task's implementation and validation results for scope, complexity, architecture, missing validation, or context issues — at task-completion-review, after validation passes. Distinct from task-review (plan approval) and from validate-work (correctness). Never silently fix issues — report and stop for the gate.
 ---
 
 # Skill: review-work
@@ -12,79 +12,70 @@ validation's mechanical check; see
 
 - **Can:** inspect everything, flag scope/requirement/complexity/
   architecture/validation/context issues and undocumented decisions,
-  set Status `reviewing`.
+  set Status `done`.
 - **Must:** read `info.md` fresh before trusting a gate's authority;
   stop after reporting, even clean findings.
-- **Should not:** silently fix issues; write a missing ADR itself.
+- **Should not:** silently fix issues.
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for review.
 
 **All `.ai/`-artifact paths below are relative to the project root,
 not to this skill file — write the full `.ai/...` path.** Status
-values you set here (`reviewing`, `complete`) are two of exactly six
-in a closed enum — see
+values you set here (`done`) are one of exactly four in a closed enum
+— see
 [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-permanent-record)
 for the full list; never invent one not on it.
 
 ## When to use
 
-After validation passes, before a task or phase is marked complete —
-this is the "Review" step in the lifecycle
-(`Implement → Validate → Review → Context Evaluation → Complete`), a
-different moment from the `task-review`/`phase-review` gates (which
-approve the *plan*, before any implementation happens — see
-[.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-permanent-record)'s
+After validation passes, before a task is marked `done` — this is the
+"Review" step in the lifecycle (`Implement → Validate → Review →
+Context Evaluation → Done`), a different moment from the `task-review`
+gate (which approves the *plan*, before any implementation happens —
+see [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-permanent-record)'s
 naming note). Don't confuse the two just because both are called
 "review." Distinct from validation too: see
 [.ai/workflow/workflow.md §8](.ai/workflow/workflow.md#8-validation-vs-review).
 
 ## Inputs
 
-- The task file or phase file, and the actual changes made.
-- Tests and validation results (the task's Status in its owning phase
-  file's Tasks table, or `.ai/tasks/tasks.md` if orphan; the phase
-  file's Validations section).
-- Relevant `.ai/context/` files and ADRs.
+- The task file, and the actual changes made.
+- Tests and validation results (the task's Status in `.ai/tasks/tasks.md`).
+- Relevant `.ai/context/` files (context rows).
 
 ## Procedure
 
-1. Read `.ai/info.md` fresh — confirms `task-completion-review`/
-   `phase-completion-review` authority; don't rely on a read from
-   earlier in the session. Set Status to `reviewing` — in the task's
-   row in its owning phase file's Tasks table (phase-linked) or
-   `.ai/tasks/tasks.md` (orphan) for a task-level review, or the
-   phase's row in `.ai/phases/phases.md` for a phase-level review.
+1. Read `.ai/info.md` fresh — confirms `task-completion-review`
+   authority; don't rely on a read from earlier in the session. Set
+   Status to `done` — in `.ai/tasks/tasks.md`. (`done` replaces the
+   old `reviewing` status; review is part of the `done` transition.)
 2. Confirm the change matches its stated scope — flag anything done
    that wasn't in the plan (scope violation) or required but missing
    (requirement mismatch).
 3. Check for unnecessary complexity relative to the stated objective.
-4. Check consistency with existing architecture and any relevant ADRs
-   in `.ai/decisions/`.
+4. Check consistency with existing architecture and relevant
+   context rows from `context/`.
 5. Check that validation coverage actually matches what the
    requirements call for — flag missing validation.
 6. Check that context files (`.ai/context/context.md` and its listed
-   files, the phase file's own Context section) still accurately
-   describe the result — flag context inconsistencies for the context
-   skill to fix.
+   files) still accurately describe the result — flag context
+   inconsistencies for the context skill to fix.
 7. Check for undocumented decisions — an architectural choice with no
-   corresponding ADR. Flag it back to whichever operation produced it
-   (ownership rule: see
-   [.ai/workflow/workflow.md §7](.ai/workflow/workflow.md#7-decisions-adrs)) —
-   do not write the ADR yourself.
+   corresponding context row. Flag it back to whichever operation
+   produced it (ownership rule: see
+   [.ai/workflow/workflow.md §7](.ai/workflow/workflow.md#7-decisions-adrs))
+   — do not write the decision row yourself.
 8. Report findings — approve, or changes requested. Do not silently
    fix issues yourself unless your entry in `.ai/info.md` explicitly
    grants implementation authority.
-9. Commit: stage the Status change to `reviewing` from step 1 (the
-   phase file's Tasks table or `.ai/tasks/tasks.md` for a task-level
-   review, or `.ai/phases/phases.md` for a phase-level review), plus
-   any context/ADR files you touched while flagging; the message
-   should say what was reviewed and the verdict (see
+9. Commit: stage the Status change in `tasks.md` from step 1, plus
+   any context files you touched while flagging; the message should
+   say what was reviewed and the verdict (see
    [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline));
-   exclude any gitignored files — gitignored layers simply have nothing to
-   commit, not a violation of commit discipline.
-   Stop for `task-completion-review` (task-level) or
-   `phase-completion-review` (phase-level) — see `.ai/info.md`.
+   exclude any gitignored files — gitignored layers simply have nothing
+   to commit, not a violation of commit discipline.
+   Stop for `task-completion-review` — see `.ai/info.md`.
    **Clean findings are not themselves approval** — even if you found
    nothing wrong, stop and wait for an explicit yes before anything
    gets marked complete; don't treat "I approve of what I found" as
@@ -100,6 +91,6 @@ naming note). Don't confuse the two just because both are called
 ## Output
 
 A review verdict (approve / changes requested) with findings listed
-against the checks above. If approved: the task/phase left at Status
-`reviewing` in the relevant table, ready for `propagate-context` to
-mark it `complete` — review itself never sets Status to `complete`.
+against the checks above. If approved: the task left at Status `done`
+in `tasks.md`, ready for `propagate-context` to mark it complete —
+review itself never sets Status to `complete`.

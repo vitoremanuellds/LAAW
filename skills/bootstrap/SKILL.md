@@ -80,7 +80,7 @@ not relative to this skill file.
      to `.ai/decisions/decisions.md` unedited.
    - **Phases** — create `.ai/phases/` and `.ai/phases/phases.md` (an
      empty `| ID | Title | Depends on | Status |` table) — no phase
-     content, that's `define-phase`'s own job once there's an actual
+     content, that's `define-task`'s own job once there's an actual
      phase to plan.
    - **Workbench** — create `.ai/workbench/` and copy
      [`.ai/workflow/templates/workbench-readme-template.md`](.ai/workflow/templates/workbench-readme-template.md)

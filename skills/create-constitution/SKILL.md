@@ -1,6 +1,6 @@
 ---
 name: create-constitution
-description: Create or update a project's constitution (mission.md, techstack.md) under .ai/constitution/ — an optional layer. Always bootstraps .ai/info.md on first run, regardless of whether constitution content is wanted, since info.md is gate-authority plumbing, not an optional layer. Not for phase or task planning — see define-phase/define-task. Not for scaffolding any other layer (context/decisions/phases/tasks/workbench) — each owns its own scaffold-on-first-use step, see reference/scaffold-on-first-use.md.
+description: Create or update a project's constitution (mission.md, techstack.md) under .ai/constitution/ — an optional layer. Always bootstraps .ai/info.md on first run, regardless of whether constitution content is wanted, since info.md is gate-authority plumbing, not an optional layer. Not for phase or task planning — see define-task. Not for scaffolding any other layer (context/decisions/phases/tasks/workbench) — each owns its own scaffold-on-first-use step, see reference/scaffold-on-first-use.md.
 ---
 
 # Skill: create-constitution

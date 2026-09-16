@@ -115,7 +115,7 @@ above.
    commit, not a violation of commit discipline.
 6. Ask whether the project needs another phase, or is done for now — a
    plain question, not a gate. If the answer is yes, the normal next
-   step is running `define-phase` directly for the new phase (see
+   step is running `define-task` directly for the new phase's tasks (see
    [.ai/workflow/workflow.md §5](.ai/workflow/workflow.md#5-lifecycle--gates),
    "Starting without a plan"), not re-deriving the whole mechanism
    here.
