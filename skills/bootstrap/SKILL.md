@@ -1,6 +1,6 @@
 ---
 name: bootstrap
-description: Ask which optional layers (constitution/context/workbench) a project wants set up now, then trigger each chosen layer's own scaffold-on-first-use step. Always ensures .ai/info.md exists first, regardless of which optional layers are chosen. Safe to re-run later to add a layer not chosen initially. Does not author real mission/techstack/task content itself beyond what create-constitution's own interview does when constitution is chosen.
+description: Ask which optional layers (context/workbench) a project wants set up now, then trigger each chosen layer's own scaffold-on-first-use step. Always ensures .ai/info.md exists first, regardless of which optional layers are chosen. Safe to re-run later to add a layer not chosen initially. Does not author real mission/techstack/task content itself beyond what create-constitution's own interview does when context is chosen.
 ---
 
 # Skill: bootstrap
@@ -56,20 +56,12 @@ not relative to this skill file.
    [`.ai/workflow/templates/info-template.md`](.ai/workflow/templates/info-template.md)
    to `.ai/info.md` unedited) — this happens regardless of which
    optional layers get chosen below; `info.md` isn't one of them.
-2. Check which optional layers already exist (constitution, context,
-   workbench — each per
+2. Check which optional layers already exist (context, workbench — each per
    [reference/scaffold-on-first-use.md](reference/scaffold-on-first-use.md)'s
    directory column). Ask the user only about the ones that don't
    exist yet — never re-offer a layer already present, and never
    overwrite one.
 3. For each layer the user chooses:
-   - **Constitution** — run `create-constitution`'s full procedure
-     now (the mission/techstack interview happens as part of this
-     choice, not deferred) — including its own commit and
-     `task-review` gate at the end. This is the one layer where
-     "chosen during bootstrap" means real content gets authored, not
-     just an empty scaffold, since mission/techstack only exist as
-     interviewed content.
    - **Context** — create `.ai/context/` and copy
      [`.ai/workflow/templates/context-template.md`](.ai/workflow/templates/context-template.md)
      to `.ai/context/context.md` unedited. An empty, ready-to-use
@@ -78,13 +70,11 @@ not relative to this skill file.
    - **Workbench** — create `.ai/workbench/` and copy
      [`.ai/workflow/templates/workbench-readme-template.md`](.ai/workflow/templates/workbench-readme-template.md)
      to `.ai/workbench/README.md` unedited.
-4. Commit — stage everything scaffolded this run (excluding whatever
-   constitution's own procedure already committed itself in step 3);
-   the message should say which layers were set up (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit00hk1f4discipline)).
-   No gate of its own for the non-constitution layers — an empty
-   scaffold carries no decision to review; if constitution was chosen,
-   its own `task-review` gate already applied in step 3.
+4. Commit — stage everything scaffolded this run; the message should
+   say which layers were set up (see
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
+   No gate of its own for the optional layers — an empty
+   scaffold carries no decision to review.
 
 ## Output
 

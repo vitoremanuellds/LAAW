@@ -15,9 +15,8 @@ whether that layer's directory already exists.
 - **If it exists:** proceed normally — never re-scaffold, never
   overwrite an existing index file's content.
 - **If it doesn't exist:** create the directory, plus that layer's
-  starter index file (a table shaped `| ID | ... | Status |`, columns
-  adapted per layer — see each layer's own skill for its exact
-  columns), then proceed.
+  starter index file (a table shaped per the layer's needs — see each
+  layer's own skill for its exact columns), then proceed.
 
 This is the only mechanism that brings a layer into existence — there
 is no separate "enable this layer" step required first. A project can
@@ -33,14 +32,12 @@ step early.
 
 | Layer | Directory | Starter file | Owning skill |
 |---|---|---|---|
-| Constitution | `.ai/constitution/` | `mission.md` + `techstack.md` (interviewed, not templated) | [`create-constitution`](../skills/create-constitution/SKILL.md) |
-| Gate authority (not an optional layer — always scaffolded first, regardless of which layers a project uses) | `.ai/info.md` | copied from `templates/info-template.md` | [`create-constitution`](../skills/create-constitution/SKILL.md) |
-| Phases | `.ai/phases/` | `phases.md` (empty table) | [`define-phase`](../skills/define-phase/SKILL.md) |
-| Tasks (orphan only — phase-linked tasks need no scaffold beyond `.ai/tasks/` itself, which the first task of either kind creates) | `.ai/tasks/` | `tasks.md` (empty table, orphan tasks only) | [`define-task`](../skills/define-task/SKILL.md) |
-| Context | `.ai/context/` | `context.md`, copied from `templates/context-template.md` | [`build-context`](../skills/build-context/SKILL.md) or [`propagate-context`](../skills/propagate-context/SKILL.md), whichever writes to it first |
-| Decisions | `.ai/decisions/` | `decisions.md`, copied from `templates/decisions-template.md` | whichever skill writes the first-ever ADR — [`create-constitution`](../skills/create-constitution/SKILL.md), [`define-phase`](../skills/define-phase/SKILL.md), or [`implement-task`](../skills/implement-task/SKILL.md), per [`workflow.md §7`](../workflow.md#7-decisions-adrs)'s ownership rule |
-| Workbench | `.ai/workbench/` | `README.md`, copied from `templates/workbench-readme-template.md` | whichever skill first writes into it — today, [`build-context`](../skills/build-context/SKILL.md)'s temp files |
+| Gate authority | `.ai/info.md` | `templates/info-template.md` | [`create-constitution`](../skills/create-constitution/SKILL.md) |
+| Context | `.ai/context/` | `templates/context-template.md` | [`build-context`](../skills/build-context/SKILL.md) / [`propagate-context`](../skills/propagate-context/SKILL.md) |
+| Workbench | `.ai/workbench/` | `templates/workbench-readme-template.md` | first skill writing into it |
 
-Tasks are the one layer that's never optional — `.ai/tasks/` always
-comes into existence with the project's first task, phase-linked or
-orphan, via whichever of `define-task`'s two paths applies.
+Gate authority is not an optional layer — it's always scaffolded first,
+regardless of which optional layers a project uses.
+
+Tasks always come into existence with the first task via
+`define-task` (no scaffold needed beyond the `tasks/` directory itself).

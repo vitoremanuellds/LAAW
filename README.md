@@ -33,10 +33,11 @@ and follows links only as far as it needs to — it never reads the whole
 
 ### 2. Separate *what* from *who decides*
 
-`workflow.md` defines the process (constitution → phases → tasks →
-validation → review) and **never changes per-project**. `info.md` holds
-who's authorized for each gate and what mode is active — it changes as
-you trust the agents more, without touching the process itself.
+`workflow.md` defines the process (tasks → task-review → implementation
+→ task-completion-review) and **never changes per-project**. `info.md`
+holds who's authorized for each gate and what mode is active — it
+changes as you trust the agents more, without touching the process
+itself.
 
 Everything else — skills, agent contracts, deviation rules, context
 propagation, the full gate list — lives inside `workflow.md`,
@@ -44,21 +45,14 @@ self-contained. See [`workflow.md`](workflow.md) for all of it.
 
 ---
 
-## One workflow, three axes
+## One workflow, no profiles
 
-LAAW used to ship `medium`/`lite`/`minimal` profiles alongside `full`,
-then dropped to `full`-only. Maintaining several variants meant every
-workflow change had to be ported across all of them. ADR03 replaced that
-with a **single modular workflow** built on three independent axes:
-
-| Axis | What it controls | How it works |
-|---|---|---|
-| **Presence** | Which layers are active | Every layer but `tasks/` is optional — inferred from what exists on disk. No config file needed. |
-| **Granularity** | Task vs. phase structure | A task opts into a phase parent or not, independently of whether the project uses phases at all. |
-| **Locality** | Where files live | One `.ai/` tree, always in-repo. A consuming project gitignores whatever layers it doesn't want committed. |
-
-`full` and `Light` collapse into presets of this one design rather than
-separately-versioned document sets.
+LAAW ships a single workflow — no `medium`/`lite`/`minimal` profiles.
+Optional layers are inferred from what exists on disk; no config file
+declares which layers a project uses. `.ai/tasks/` is mandatory;
+everything else is optional. How a layer comes into existence on first
+use: see
+[`reference/scaffold-on-first-use.md`](reference/scaffold-on-first-use.md).
 
 ---
 
@@ -66,17 +60,24 @@ separately-versioned document sets.
 
 ```
 .ai/
-├── workflow/              ← this repo's content, installed by sync-workflow.sh
+├── workflow/              ← this repo's content, installed by sync-workflow.py
 │   ├── workflow.md        ← the whole workflow, self-contained
 │   ├── skills/            ← one SKILL.md per operation
+│   │   ├── route/         ← router: plain-language → correct skill
+│   │   ├── bootstrap/
+│   │   ├── create-constitution/
+│   │   ├── define-task/
+│   │   ├── implement-task/
+│   │   ├── validate-work/
+│   │   ├── review-work/
+│   │   ├── build-context/
+│   │   └── propagate-context/
 │   ├── reference/         ← occasional-need detail, one file per concept
-│   └── templates/         ← templates for first-run scaffolding
+│   ├── templates/         ← templates for first-run scaffolding
+│   └── tools/             ← generate-id.py, sync-workflow.py, sync-skills.py, .epoch
 ├── info.md                ← Policy only: gate authority; always present
-├── constitution/             ← optional: mission.md, techstack.md
-├── context/                  ← optional: context.md + architecture files
-├── decisions/                ← optional: decisions.md + adr{NN}-{name}.md
-├── phases/                   ← optional: phases.md + p{NN}-{name}.md
-├── tasks/                    ← mandatory: tasks.md + p{NN}-t{NN}-*.md + t{NN}-*.md
+├── context/                  ← optional: context.md + c-{ID}-{name}.md
+├── tasks/                    ← mandatory: tasks.md + t{ID}-{name}.md
 └── workbench/                ← optional: freeform scratch space
 ```
 
@@ -85,93 +86,75 @@ layer is off. `.ai/tasks/` is the only one every project has. How a
 layer comes into existence on first use: see
 [`reference/scaffold-on-first-use.md`](reference/scaffold-on-first-use.md).
 
-`.ai/tasks/` holds two task-file shapes, distinguished by filename:
-`p{NN}-t{NN}-{name}.md` (phase-linked) and
-`t{NN}-{name}.md` (orphan — no phase parent). A phase-linked task is
-indexed only in its phase file's task table; an orphan task is indexed
-in `.ai/tasks/tasks.md` — never both, never neither.
+`.ai/tasks/` holds two shapes, distinguished by path: a **leaf task**
+(`t{ID}-{name}.md`) and a **task with subtasks**
+(`t{ID}-{name}/` — a folder containing the parent file
+`t{ID}-{name}.md` and subtask files below it). The same rule applies at
+every nesting level: if a task has subtasks, it is a folder; if it does
+not, it is a leaf file. IDs are sequential and never reused.
 
 ---
 
 ## Lifecycle & gates
 
 ```
-Constitution → Constitution Review → Phase → Phase Plan Review
-  → Tasks → Task Plan Review → Implement
+Tasks → Task Plan Review → Implement
   → Task Completion Review (validate, then review)
   → Context Evaluation → Task Complete → (repeat)
-  → Phase Completion Review (validate, then review)
-  → Reconcile Phase/Project Context → Phase Complete
 ```
 
 **Gates for missing layers are skipped.** The lifecycle above shows
 the full set — a project never walks through every gate; it only
-encounters gates for layers that exist. If `constitution/` doesn't
-exist, `constitution-review` doesn't run. If `phases/` doesn't exist,
-`phase-review` and `phase-completion-review` don't run. If `context/`
-doesn't exist, `context-update` and `context-evaluation` don't run.
+encounters gates for layers that exist.
 
 | Gate | Runs after | Unlocks |
 |---|---|---|
-| `constitution-review` | constitution draft | phase planning |
-| `phase-review` | phase plan draft | task planning |
 | `task-review` | task-batch draft | implementation |
-| `task-completion-review` | implementation | task complete |
-| `phase-completion-review` | all tasks done | phase complete |
-| `context-update` | alongside completion | — |
+| `task-completion-review` | implementation (mech., then judgment) | task complete |
 
 Gates block *advancing past* a draft, never *producing* one.
 
 **Modes** (`info.md`: `mode` + `overrides`):
 
-| Mode | Plan-review | Completion: mech. | Completion: judgment | `context-update` |
-|---|---|---|---|---|
-| `manual` | human | human | human | human |
-| `assisted` (default) | human | agent | human | agent |
-| `autonomous` | agent | agent | agent | agent |
-| `delegated` | — | — | — | — |
+| Mode | Plan-review | Compl.: mech. | Compl.: judgment |
+|---|---|---|---|
+| `manual` | human | human | human |
+| `assisted` (default) | human | agent | human |
+| `autonomous` | agent | agent | agent |
 
-`delegated`: no defaults — every gate listed in `overrides`, else
-`human`.
+**Task complete:** implementation + `task-completion-review` (both
+checks) + context evaluated.
+
+Starting without every task already planned is normal:
+[`reference/starting-without-a-plan.md`](reference/starting-without-a-plan.md).
 
 ---
 
-## This repo vs. your project
+## Router skill
 
-| This repo (`.ai/workflow/`, installed by `sync-workflow.sh`) | Your project (`.ai/`, edit freely) |
-|---|---|
-| `workflow.md` | `info.md` — bootstrapped from template, then yours |
-| `skills/*` — one per operation | `constitution/*` — mission.md, techstack.md; optional |
-| `reference/*` — occasional-need detail | `context/*` — optional |
-| `templates/*` — first-run scaffolding | `phases/*` — optional |
-| `sync-workflow.sh` | `tasks/*` — **mandatory layer** |
-| `sync-skills.sh` (optional mirror) | `decisions/*` — optional |
-
-A third category, technically outside both: `.agents/skills/`, if you
-use `sync-skills.sh` — a generated copy, not source of truth. Same
-status for `.ai/workflow-version`, written by `sync-workflow.sh` —
-generated metadata, not hand-edited.
-
-If you find yourself editing anything under `.ai/workflow/` per-project,
-that's a signal the workflow itself needs a change — make it in this
-repo instead.
+Users state what they want in plain terms — "plan a task", "implement
+X", "build context" — and the router (`skills/route/SKILL.md`) points
+the agent at the correct operation skill. You don't need to name skills
+explicitly; the router handles the mapping. The router does no operation
+work itself; it only reads the user's request and points at the right
+skill file.
 
 ---
 
 ## Bootstrap into a project
 
-Clone this repo somewhere on disk, then run `sync-workflow.sh` against
+Clone this repo somewhere on disk, then run `sync-workflow.py` against
 your project. **No `git submodule` command is involved.**
 
 ```bash
 git clone <this-repo-url> /path/to/LAAW
 cd your-project
-/path/to/LAAW/sync-workflow.sh
+/path/to/LAAW/tools/sync-workflow.py
 ```
 
-`sync-workflow.sh` takes two optional positional arguments —
-`[source-dir] [target-root]` — each defaulting sensibly. Running it with
-no arguments from inside your project is the normal case.
+`sync-workflow.py` takes two optional positional arguments —
+`[source_dir] [target_root]` — each defaulting sensibly. Running it
+with no arguments from inside your project is the normal case.
 
 ### 1. Wire up `AGENTS.md`
 
@@ -186,9 +169,8 @@ with optional layers rather than a profile choice:
   exists," actually read it —
   [.ai/workflow/workflow.md](.ai/workflow/workflow.md).
 - `.ai/info.md` doesn't exist → unbootstrapped. Run
-  `.ai/workflow/skills/create-constitution/SKILL.md` (or
-  `.ai/workflow/skills/bootstrap/SKILL.md` to set up several
-  layers at once) to bootstrap it before doing anything else.
+  [.ai/workflow/skills/route/SKILL.md](.ai/workflow/skills/route/SKILL.md)
+  and say "bootstrap" to set up several layers at once.
 
 Do this before acting, every session — not just once, and not from
 memory of a previous read. Gate-skip and scope-overstep bugs have
@@ -201,13 +183,12 @@ Point an agent (or yourself) at:
 
 - **`create-constitution`** — mission + techstack interview, plus
   `info.md`'s unconditional first-run bootstrap
-- **`bootstrap`** — asks which of constitution/context/decisions/phases
-  to set up now (each an empty scaffold; constitution gets the same
-  interview)
+- **`bootstrap`** — asks which optional layers to set up now (each an
+  empty scaffold; constitution gets the same interview)
 
 Until one of these runs, `.ai/info.md` doesn't genuinely exist yet —
-that's expected. Defaults are safe/conservative (`mode: assisted`); edit
-the policy block afterward once you're ready to delegate gates.
+that's expected. Defaults are safe/conservative (`mode: assisted`);
+edit the policy block afterward once you're ready to delegate gates.
 
 ### 3. Optional: sync skills to `.agents/skills/`
 
@@ -215,10 +196,10 @@ If your harness auto-discovers skills from `.agents/skills/` rather
 than following `workflow.md`'s lookup table:
 
 ```bash
-.ai/workflow/sync-skills.sh
+.ai/workflow/tools/sync-skills.py
 ```
 
-Re-run it after every `sync-workflow.sh` re-sync. If you don't know
+Re-run it after every `sync-workflow.py` re-sync. If you don't know
 whether your harness needs this, you probably don't —
 `workflow.md §2`'s own lookup table works without it.
 
@@ -226,13 +207,13 @@ whether your harness needs this, you probably don't —
 
 ## Updating the workflow
 
-Re-running `sync-workflow.sh` re-syncs `.ai/workflow/` to the source
+Re-running `sync-workflow.py` re-syncs `.ai/workflow/` to the source
 checkout's current `HEAD` — wholesale-replacing its content:
 
 ```bash
 cd /path/to/LAAW && git pull
 cd your-project
-/path/to/LAAW/sync-workflow.sh
+/path/to/LAAW/tools/sync-workflow.py
 ```
 
 **Review what changed before adopting it.** This repo doesn't yet publish
@@ -243,9 +224,9 @@ git -C /path/to/LAAW log --oneline -5   # find a reviewed commit
 git -C /path/to/LAAW checkout <sha>     # pin your clone there
 ```
 
-Then point `sync-workflow.sh` at that pinned clone as its source
-argument. Your project's own content (`info.md`, `constitution/`,
-`context/`, `phases/`, `tasks/`, `decisions/`) is untouched.
+Then point `sync-workflow.py` at that pinned clone as its source
+argument. Your project's own content (`info.md`, `context/`, `tasks/`,
+`workbench/`) is untouched.
 
 ---
 
@@ -254,27 +235,28 @@ argument. Your project's own content (`info.md`, `constitution/`,
 **Reasoning effort should match the gate, not stay uniform.** If your
 harness lets you set thinking/reasoning level per call:
 
-- **High/medium** — `create-constitution`, `define-phase`,
-  `define-task`, and any deviation/ADR work. Ambiguity is real here; a
-  wrong call cascades.
+- **High/medium** — `create-constitution`, `define-task`, and any
+  deviation/decision work. Ambiguity is real here; a wrong call
+  cascades.
 - **Low** — `implement-task` and `validate-work`. Hard thinking happened
   at planning time; execution should be close to mechanical.
 
-**Call the skill explicitly.** Say "use `define-task` to plan this"
-rather than phrasing generically. This has been the single most common
-failure point in testing.
+**State what you want in plain terms.** Say "plan a task for X" rather
+than "use `define-task`." The router skill maps your request to the
+correct skill automatically.
 
-**Name the task or phase you mean.** "Implement P02-T03" beats
+**Name the task you mean.** "Implement t{xxx-yyyy-zzzzz}" beats
 "implement the next task," especially after replanning. Task IDs are
 sequential and never reflect reordering.
 
-**One thread per phase/task-batch.** Starting fresh threads for
-subsequent phases keeps each one's context budget close to what it needs,
-rather than accumulating full project history.
+**One thread per task-batch.** Starting fresh threads for subsequent
+tasks keeps each one's context budget close to what it needs, rather
+than accumulating full project history.
 
-**Watch for skills reading one step ahead.** A model may read an adjacent
-skill even when its prerequisites aren't met. Harmless if it just
-previews, but worth tightening descriptions if an agent *acts* prematurely.
+**Watch for skills reading one step ahead.** A model may read an
+adjacent skill even when its prerequisites aren't met. Harmless if it
+just previews, but worth tightening descriptions if an agent *acts*
+prematurely.
 
 **A gate's authority can change mid-session.** Read `info.md` fresh at
 every gate check, not from memory. This caused a real bug: a gate's
@@ -284,7 +266,7 @@ the old value earlier kept acting on stale information.
 **Keep `.ai/workflow/` clean.** If a skill seems to want to edit
 `workflow.md` mid-task, that's feedback for this repo — not a local
 patch to apply. A local patch will be overwritten by the next
-`sync-workflow.sh` and silently diverge.
+`sync-workflow.py` and silently diverge.
 
 ---
 
@@ -293,8 +275,6 @@ patch to apply. A local patch will be overwritten by the next
 ```
 README.md
 workflow.md                    ← the whole workflow, self-contained
-sync-workflow.sh               ← installs/re-syncs into a target's .ai/workflow/
-sync-skills.sh                 ← optional: mirrors skills/ to .agents/skills/
 reference/                       ← occasional-need detail
 ├── directory-and-links.md
 ├── reread-skill-discipline.md
@@ -302,21 +282,28 @@ reference/                       ← occasional-need detail
 ├── starting-without-a-plan.md
 └── status-and-info.md
 templates/
-├── info-template.md
+├── task-template.md
+├── context-item-template.md
 ├── context-template.md
-├── decisions-template.md
-├── adr-template.md
-└── workbench-readme-template.md
+├── info-template.md
+├── workbench-readme-template.md
+├── assumptions-template.md
+└── context-build-plan-template.md
 skills/
+├── route/                     ← router
 ├── bootstrap/
 ├── create-constitution/
-├── define-phase/
 ├── define-task/
 ├── implement-task/
 ├── validate-work/
 ├── review-work/
-├── propagate-context/
-└── build-context/
+├── build-context/
+└── propagate-context/
+tools/
+├── generate-id.py             ← mint t{xxx-yyyy-zzzzz} / c{xxx-yyyy-zzzzz}
+├── sync-workflow.py           ← cross-platform workflow sync
+├── sync-skills.py             ← cross-platform skills mirror
+└── .epoch                     ← default epoch for ID generation
 ```
 
 Once installed at `.ai/workflow/` in a project, alongside it (in the
@@ -328,11 +315,9 @@ use:
 ├── workflow/              ← this repo's content
 ├── workflow-version       ← generated: source, commit SHA, date
 ├── info.md                  ← policy only
-├── constitution/             ← optional
 ├── context/                  ← optional
-├── phases/                   ← optional
 ├── tasks/                    ← mandatory
-└── decisions/                ← optional
+└── workbench/                ← optional
 ```
 
 Every link inside this repo is relative and none hardcode `.ai/`, so it

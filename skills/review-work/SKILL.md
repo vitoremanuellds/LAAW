@@ -48,8 +48,7 @@ naming note). Don't confuse the two just because both are called
 
 1. Read `.ai/info.md` fresh — confirms `task-completion-review`
    authority; don't rely on a read from earlier in the session. Set
-   Status to `done` — in `.ai/tasks/tasks.md`. (`done` replaces the
-   old `reviewing` status; review is part of the `done` transition.)
+   Status to `done` — in `.ai/tasks/tasks.md`.
 2. Confirm the change matches its stated scope — flag anything done
    that wasn't in the plan (scope violation) or required but missing
    (requirement mismatch).

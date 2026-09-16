@@ -4,17 +4,14 @@ Referenced from [`../workflow.md §5`](../workflow.md#5-lifecycle--gates).
 The rule itself is already fully stated there — read this only for the
 worked-example detail, which isn't needed on every operation.
 
-Not every project has a fully-formed phase list up front, and it
-doesn't need one to start. Planning one phase at a time — instead of
-the whole project up front — is a normal, intentional way to work, not
-a workaround: `define-phase` itself appends a single title-only row to
-`phases.md` for whatever's next (its "stubbing only" mode — see its own
-SKILL.md), with no pre-existing Plan detail required, then — in a
-later, separate invocation — drafts that phase's full
-Context/In-scope/Out-of-scope/Requirements/Plan/Validations straight
-from the live conversation, not from anything already written down.
+Not every project has every task already planned up front, and it
+doesn't need to. Planning one task at a time — instead of the whole
+project up front — is a normal, intentional way to work, not a
+workaround: `define-task` drafts one task (or a parent with subtasks),
+it gets approved via `task-review`, implemented, then the next task is
+drafted. This incremental approach is the default, not an exception.
 
-If you already know what a newly-added phase should cover, say so when
-the row is added rather than waiting for the planning step — a session
-that ends in between can lose anything that was only ever stated in
+If you already know what the next task should cover, say so when
+drafting it rather than waiting for the planning step — a session that
+ends in between can lose anything that was only ever stated in
 conversation, not yet captured in a file.

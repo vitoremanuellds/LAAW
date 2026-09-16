@@ -1,6 +1,6 @@
 ---
 name: build-context
-description: Populate .ai/context/ for a project that has little context yet — reads real files and writes c-{ID}.md items directly to context/. Not for propagating knowledge after a task/phase completes — see propagate-context. Requires .ai/info.md to already exist; scaffolds .ai/context/ on first use if it doesn't exist yet.
+description: Populate .ai/context/ for a project that has little context yet — reads real files and writes c-{ID}.md items directly to context/. Not for propagating knowledge after a task completes — see propagate-context. Requires .ai/info.md to already exist; scaffolds .ai/context/ on first use if it doesn't exist yet.
 ---
 
 # Skill: build-context
@@ -10,7 +10,7 @@ This skill performs the **context** operation, survey half — see also
 ([.ai/workflow/workflow.md §10](.ai/workflow/workflow.md#10-operation-contracts)
 covers what "operation" means and where authority comes from). This
 one builds context by surveying an existing codebase, not by
-propagating what a completed task/phase learned.
+propagating what a completed task learned.
 
 - **Can:** read project files; write `c-{ID}-{name}.md` to
   `context/`; update `context.md`'s index table.

@@ -43,8 +43,7 @@ still current.
 ## Procedure — task validation
 
 1. Set the task's Status to `done` if not already set — in
-   `.ai/tasks/tasks.md`. (`done` replaces the old `reviewing` status
-   for "ready for review.")
+   `.ai/tasks/tasks.md`. for "ready for review."
 2. Read the task file's Steps section (requirements + plan).
 3. Execute the validation instructions (automated tests, integration
    checks).

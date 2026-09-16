@@ -1,6 +1,6 @@
 ---
 name: create-constitution
-description: Create or update a project's context (mission.md, techstack.md as inline core in context.md) — an optional layer. Always bootstraps .ai/info.md on first run, regardless of whether constitution content is wanted, since info.md is gate-authority plumbing, not an optional layer. Not for phase or task planning — see define-phase/define-task. Not for scaffolding any layer other than info.md + context/ — that's each other layer's own owning skill, see reference/scaffold-on-first-use.md. Decisions are written as c-{ID}-{name}.md context rows.
+description: Create or update a project's context (mission + techstack as inline core in context.md) — an optional layer. Always bootstraps .ai/info.md on first run, regardless of whether mission/techstack content is wanted, since info.md is gate-authority plumbing, not an optional layer. Not for task planning — see define-task. Not for scaffolding any layer other than info.md + context/ — that's each other layer's own owning skill, see reference/scaffold-on-first-use.md. Decisions are written as c-{ID}-{name}.md context rows.
 ---
 
 # Skill: create-constitution
@@ -40,7 +40,7 @@ constitution at all still needs `info.md`; running this skill
   only read/used if `.ai/info.md` doesn't exist yet.
 - [`.ai/workflow/templates/context-template.md`](.ai/workflow/templates/context-template.md) —
   the single-folder index template (now includes inline mission/techstack
-  core + index table with columns: File, Description, Status, Relations).
+  core + index table with columns: File, Description, Relation, Superseded by).
 
 ## Procedure
 
@@ -54,8 +54,8 @@ draft everything before stopping for anything. Only step 8 is gated.
    there unedited — its defaults (`mode: assisted`) are the safe
    starting point; the human adjusts it later, not you. This is the
    only file this skill scaffolds unconditionally — every other layer
-   (context, phases, tasks, workbench) is scaffolded by its own owning
-   skill on first use, never here (see
+   (context, workbench) is scaffolded by its own owning skill on first
+   use, never here (see
    [reference/scaffold-on-first-use.md](reference/scaffold-on-first-use.md)).
    Never overwrite `info.md` if it already exists — a second
    constitution run (updating an existing project) skips this step
@@ -79,7 +79,7 @@ draft everything before stopping for anything. Only step 8 is gated.
    created), plus any `c-{ID}.md` files; the message should say what
    was drafted or updated, and whether this was a first-run bootstrap
    (see
-   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit00hk1f4discipline)).
+   [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
    Stop for `task-review` gate — see
    `.ai/info.md` (read fresh, not from memory) for who approves it.
    **When approval comes back:** in `manual`/`assisted` mode, report

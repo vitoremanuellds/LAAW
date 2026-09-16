@@ -101,8 +101,7 @@ read:
    section is read by `propagate-context` to determine what to promote
    to `context/`. Omit task history, temporary details, reasoning, or
    anything recorded elsewhere.
-2. Set the task's Status to `done` (the new enum has no `reviewing`
-   state; `done` here means implementation complete and ready for
+2. Set the task's Status to `done` (implementation complete, ready for
    validation).
 3. **Update the Status row:**
    - For root tasks: update `.ai/tasks/tasks.md`.

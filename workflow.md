@@ -114,7 +114,7 @@ exist, `context-evaluation` doesn't run.
 
 Gates block *advancing past* a draft, never *producing* one.
 **Unlocking ≠ starting** — `manual`/`assisted` stops and asks before
-the next step; `delegated`/`autonomous` chains through.
+the next step; `autonomous` chains through.
 
 **Modes** (`info.md`: `mode` + `overrides`):
 

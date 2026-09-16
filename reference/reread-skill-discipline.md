@@ -22,3 +22,11 @@ This is the same discipline `implement-task` documents for
 `workflow.md` itself (see its "What to read" section) — a skill's own
 partial summary of a rule, however careful, is not a substitute for
 reading the rule's actual current text.
+
+## Router awareness
+
+When the user says "plan a task" or "implement X", the agent first
+reads `skills/route/SKILL.md`, which points to the correct operation
+skill; then the agent reads that operation skill file fresh. The router
+itself is also read fresh every time — the same discipline applies to
+routing as to all other operations.

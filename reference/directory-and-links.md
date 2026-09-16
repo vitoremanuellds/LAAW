@@ -10,16 +10,16 @@ This document is a reference for understanding the rules, not a
 literal sequence of write-tool calls. When a **skill** instructs an
 actual write/read, it spells out the full `.ai/`-prefixed path
 explicitly and states this same rule again at the point of use — treat
-any bare mention of `info.md`, `phases.md`, `tasks.md`, `phases/`,
-`tasks/`, `context/`, `decisions/`, or `constitution/` in `workflow.md`
-itself, or in a skill's prose, as shorthand, never as a literal path to
-hand a write tool without resolving it against the project root first.
+any bare mention of `info.md`, `context.md`, `tasks.md`, `context/`,
+`tasks/`, or `workbench/` in `workflow.md` itself, or in a skill's
+prose, as shorthand, never as a literal path to hand a write tool
+without resolving it against the project root first.
 
 This distinction is not academic: a bare or dot-relative path handed
 directly to a write tool resolves against the agent's working
 directory, not against where any instruction was read from — that
-mismatch has already caused a phase file to be created outside `.ai/`
-in practice. If you're about to call a write tool with an `.ai/`-family
+mismatch has already caused files to be created outside `.ai/` in
+practice. If you're about to call a write tool with an `.ai/`-family
 path, resolve it against the project root explicitly, every time —
 don't assume the ambient working directory already matches.
 
@@ -28,15 +28,15 @@ don't assume the ambient working directory already matches.
 Every skill's cross-references to `workflow.md`, sibling skills, and
 templates use `.ai/workflow/`-anchored paths, not dot-relative ones —
 this is a deliberate change from an earlier, purely-relative
-convention, made after a mirrored skill copy (see `sync-skills.sh`)
-demonstrated that dot-relative links silently break once a file is
-copied somewhere other than its designed location. `sync-skills.sh`
-mirrors skill files to `.agents/skills/`, a different relative depth
-than their canonical location under `skills/` — every dot-relative
-cross-reference inside those skills was only correct at the canonical
-depth; once mirrored, they silently resolved to the wrong files, which
-is very likely what produced confused reasoning in an agent reading
-the mirrored copy.
+convention, made after a mirrored skill copy (see
+`sync-skills.py`) demonstrated that dot-relative links silently break
+once a file is copied somewhere other than its designed location.
+`sync-skills.py` mirrors skill files to `.agents/skills/`, a different
+relative depth than their canonical location under `skills/` — every
+dot-relative cross-reference inside those skills was only correct at
+the canonical depth; once mirrored, they silently resolved to the wrong
+files, which is very likely what produced confused reasoning in an
+agent reading the mirrored copy.
 
 `.ai/workflow/` is the fixed, documented mount point every skill and
 the `AGENTS.md` snippet assumes — not arbitrary. Per-project artifact
@@ -51,20 +51,16 @@ bug that produces no error, just quietly wrong behavior.
 Referenced from
 [`../workflow.md §3`](../workflow.md#3-directory-structure). No config
 file declares which layers a project uses — a directory not existing
-means that layer is off. `.ai/constitution/`, `.ai/context/`,
-`.ai/decisions/`, `.ai/phases/`, and `.ai/workbench/` are all optional;
-`.ai/tasks/` is the one every project has. How a layer comes into
-being the first time it's needed (which skill scaffolds it, what the
-starter file looks like) is documented once, in
+means that layer is off. `.ai/context/` and `.ai/workbench/` are both
+optional; `.ai/tasks/` is the one every project has. How a layer comes
+into being the first time it's needed (which skill scaffolds it, what
+the starter file looks like) is documented once, in
 [scaffold-on-first-use.md](scaffold-on-first-use.md) — not repeated
 per-skill here.
 
-Each layer's own permanent record: `context/` via `context.md`'s
-table, `phases/` via `phases.md`'s table (plus each phase file's own
-task table for its phase-linked tasks), `tasks/` via `tasks.md`'s
-table (orphan tasks only — a phase-linked task's status lives solely
-in its phase file, never duplicated into `tasks.md`), `decisions/` via
-`decisions.md`'s table.
+Each layer's own permanent record: `context/` via `context.md`'s table
+(no `phases.md`, no `decisions.md`); `tasks/` via `tasks.md`'s table
+(root tasks) and parent task files (subtasks).
 
 ## Why `.ai/workbench/` isn't part of the permanent record
 
@@ -83,7 +79,6 @@ way. But "read only what the current task needs" (`workflow.md` §1)
 never includes `.ai/workbench/` content as an implicit input: no skill
 treats anything under it as something it depends on, unless a human
 explicitly points an agent at one specific file in it for that turn. A
-skill that grows its own ephemeral output (the way `build-context`'s
-`context.temp.md`/`build-plan.md` do) can write into `.ai/workbench/`
-directly — this is the general convention, not a
-`build-context`-specific carve-out.
+skill that grows its own ephemeral output can write into
+`.ai/workbench/` directly — this is the general convention, not a
+skill-specific carve-out.

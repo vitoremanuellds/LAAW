@@ -17,11 +17,10 @@ coding-language module or a folder of classes.
 
 <!-- TODO: add techstack -->
 
-| File | Description | Status | Relations |
+| File | Description | Relation | Superseded by |
 |---|---|---|---|
-<!-- c-001-auth-module.md | Auth flow, session handling, token lifecycle | active | related: score-engine.md -->
+<!-- c-001-auth-module.md | Auth flow, session handling, token lifecycle | related: score-engine.md | — -->
 
-**Status** is `active` or `superseded`. When something changes, don't
-delete the old file — mark it superseded and point to what replaced it.
-Whoever writes or updates a context file updates its row here in the
-same step.
+When something changes, don't delete the old file — mark it superseded
+and point to what replaced it. Whoever writes or updates a context file
+updates its row here in the same step.
