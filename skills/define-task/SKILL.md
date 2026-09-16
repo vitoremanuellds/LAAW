@@ -1,6 +1,6 @@
 ---
 name: define-task
-description: Break a plan into individual tasks (tasks/t{ID}-{name}/task.md), or draft a standalone task with no parent (tasks/t{ID}-{name}/task.md, indexed in tasks/tasks.md). Writes enough detail (files, ordered steps, optional pseudocode) that implementation is close to mechanical. On first use, scaffolds .ai/tasks/tasks.md. Supports subtasks: a parent task gets subtask rows in its table during parent planning (status not-started); subtasks are planned separately, one by one or all, each getting its own file and status moving to planned. Not for implementing code.
+description: Break a plan into individual tasks, each with its own task.md file, or draft a standalone task with no parent. Writes enough detail (files, ordered steps, optional pseudocode) that implementation is close to mechanical. On first use, scaffolds .ai/tasks/tasks.md. Supports subtasks — a parent task gets subtask rows in its table during parent planning; subtasks are planned separately, one by one or all, each getting its own file and status moving to planned. Not for implementing code.
 ---
 
 # Skill: define-task
