@@ -11,6 +11,31 @@ just with more slack to work with.
 
 ---
 
+
+
+<!-- TOC -->
+<details><summary>Table of Contents</summary>
+
+  - [The problem](#the-problem)
+  - [How it works](#how-it-works)
+    - [1. Persist knowledge, not reasoning](#1-persist-knowledge-not-reasoning)
+    - [2. Separate *what* from *who decides*](#2-separate-what-from-who-decides)
+  - [One workflow, no profiles](#one-workflow-no-profiles)
+  - [The directory structure](#the-directory-structure)
+  - [Lifecycle & gates](#lifecycle-gates)
+  - [Router skill](#router-skill)
+  - [Bootstrap into a project](#bootstrap-into-a-project)
+    - [1. Wire up `AGENTS.md`](#1-wire-up-agentsmd)
+  - [Agent Workflow](#agent-workflow)
+    - [2. Bootstrap `info.md` and optional layers](#2-bootstrap-infomd-and-optional-layers)
+    - [3. Optional: sync skills to `.agents/skills/`](#3-optional-sync-skills-to-agentsskills)
+  - [Updating the workflow](#updating-the-workflow)
+  - [Best practices](#best-practices)
+  - [What's in this repo](#whats-in-this-repo)
+
+</details>
+
+
 ## The problem
 
 Four things get worse as models get smaller or context gets tighter:

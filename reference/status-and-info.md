@@ -7,6 +7,18 @@ the lookup table and the extended explanations — read it when you're
 actually unsure which skill sets a given value, or need the full
 reasoning behind the ID-order caveat, not as a matter of routine.
 
+
+
+<!-- TOC -->
+<details><summary>Table of Contents</summary>
+
+  - [Which skill sets which status value](#which-skill-sets-which-status-value)
+  - [Where each value lives](#where-each-value-lives)
+  - [ID order ≠ execution order, in full](#id-order-execution-order-in-full)
+
+</details>
+
+
 ## Which skill sets which status value
 
 | Value | Set by |

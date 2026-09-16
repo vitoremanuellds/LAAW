@@ -37,6 +37,22 @@ context files.
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for bootstrap work.
 
+
+
+<!-- TOC -->
+<details><summary>Table of Contents</summary>
+
+  - [When to use](#when-to-use)
+  - [Inputs](#inputs)
+  - [Procedure](#procedure)
+  - [Output](#output)
+
+</details>
+
+
+
+- **Include a Table of Contents** with internal anchor links for files with 2+ `##` sections
+
 ## When to use
 
 A human wants to set up several optional layers deliberately, in one

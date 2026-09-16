@@ -35,6 +35,22 @@ values you set here (`done`) are one of exactly four in a closed enum
 [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-permanent-record)
 for the full list; never invent one not on it.
 
+
+
+<!-- TOC -->
+<details><summary>Table of Contents</summary>
+
+  - [When to use](#when-to-use)
+  - [Inputs](#inputs)
+  - [Procedure](#procedure)
+  - [Output](#output)
+
+</details>
+
+
+
+- **Include a Table of Contents** with internal anchor links for files with 2+ `##` sections
+
 ## When to use
 
 After validation passes, before a task is marked `done` — this is the

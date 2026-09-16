@@ -33,6 +33,22 @@ in a closed enum — see
 [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-permanent-record)
 for the full list; never invent one not on it.
 
+
+
+<!-- TOC -->
+<details><summary>Table of Contents</summary>
+
+  - [When to use](#when-to-use)
+  - [Before anything else: check authority, freshly](#before-anything-else-check-authority-freshly)
+  - [Procedure — task validation](#procedure-task-validation)
+  - [Output](#output)
+
+</details>
+
+
+
+- **Include a Table of Contents** with internal anchor links for files with 2+ `##` sections
+
 ## When to use
 
 After implementation, before review — at task level only

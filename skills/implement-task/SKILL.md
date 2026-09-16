@@ -35,6 +35,22 @@ relative to the project root, not to this skill file — write the full
 paths (the actual code you're editing) are correctly relative to the
 project root already, same as normal.
 
+
+
+<!-- TOC -->
+<details><summary>Table of Contents</summary>
+
+  - [1. What to read](#1-what-to-read)
+  - [2. Procedure](#2-procedure)
+  - [3. Finishing](#3-finishing)
+  - [Output](#output)
+
+</details>
+
+
+
+- **Include a Table of Contents** with internal anchor links for files with 2+ `##` sections
+
 ## 1. What to read
 
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full,

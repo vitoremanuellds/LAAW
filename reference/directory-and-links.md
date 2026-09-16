@@ -4,6 +4,19 @@ Referenced from [`../workflow.md §3`](../workflow.md#3-directory-structure).
 The rules themselves are already fully stated there — read this only
 for the reasoning behind them, which isn't needed on every operation.
 
+
+
+<!-- TOC -->
+<details><summary>Table of Contents</summary>
+
+  - [Why every path must be `.ai/`-prefixed, never bare or dot-relative](#why-every-path-must-be-ai-prefixed-never-bare-or-dot-relative)
+  - [Why cross-references are `.ai/workflow/`-anchored, not dot-relative](#why-cross-references-are-aiworkflow-anchored-not-dot-relative)
+  - [Every layer but `.ai/tasks/` is optional — presence by existence](#every-layer-but-aitasks-is-optional-presence-by-existence)
+  - [Why `.ai/workbench/` isn't part of the permanent record](#why-aiworkbench-isnt-part-of-the-permanent-record)
+
+</details>
+
+
 ## Why every path must be `.ai/`-prefixed, never bare or dot-relative
 
 This document is a reference for understanding the rules, not a

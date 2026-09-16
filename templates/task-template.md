@@ -2,6 +2,26 @@
 
 **ID:** t{ID}       **Status:** in-progress
 
+
+
+<!-- TOC -->
+<details><summary>Table of Contents</summary>
+
+  - [Description](#description)
+  - [TL;DR](#tldr)
+  - [Context](#context)
+    - [Before](#before)
+    - [After](#after)
+  - [In scope](#in-scope)
+  - [Out of scope](#out-of-scope)
+  - [Steps](#steps)
+  - [Validations](#validations)
+  - [Subtasks            ← optional](#subtasks-optional)
+
+</details>
+
+
+
 ## Description
 <what this task is and why — the intent, one short paragraph>
 

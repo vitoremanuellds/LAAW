@@ -38,6 +38,21 @@ values you set here (`done`) are from a closed enum — see
 [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-permanent-record)
 for the full list; never invent one not on it.
 
+
+
+<!-- TOC -->
+<details><summary>Table of Contents</summary>
+
+  - [propagate-context.task — on task completion](#propagate-contexttask-on-task-completion)
+  - [Status enum](#status-enum)
+  - [Output](#output)
+
+</details>
+
+
+
+- **Include a Table of Contents** with internal anchor links for files with 2+ `##` sections
+
 ## propagate-context.task — on task completion
 
 **Precondition:** the task's Status must already be `in-progress` with

@@ -5,6 +5,21 @@
 **Relation:** <related context file(s)>
 **Superseded by:** —
 
+
+
+<!-- TOC -->
+<details><summary>Table of Contents</summary>
+
+  - [<section>](#section)
+  - [Decision variant (for c-{ID} decisions)](#decision-variant-for-c-id-decisions)
+  - [Decision](#decision)
+  - [Context](#context)
+  - [Alternatives Considered](#alternatives-considered)
+  - [Consequences](#consequences)
+
+</details>
+
+
 ## <section>
 <content>
 

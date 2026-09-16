@@ -27,6 +27,35 @@ generation across the entire project.
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for task planning.
 
+
+
+<!-- TOC -->
+<details><summary>Table of Contents</summary>
+
+  - [When to use](#when-to-use)
+  - [Subtasks](#subtasks)
+  - [Inputs](#inputs)
+  - [Procedure](#procedure)
+    - [Planning a parent task (with or without subtasks)](#planning-a-parent-task-with-or-without-subtasks)
+    - [Planning subtasks (after parent is planned)](#planning-subtasks-after-parent-is-planned)
+  - [Task file body](#task-file-body)
+  - [Description](#description)
+  - [TL;DR](#tldr)
+  - [Context](#context)
+    - [Before](#before)
+    - [After](#after)
+  - [In scope](#in-scope)
+  - [Out of scope](#out-of-scope)
+  - [Steps](#steps)
+  - [Validations](#validations)
+  - [Output](#output)
+
+</details>
+
+
+
+- **Include a Table of Contents** with internal anchor links for files with 2+ `##` sections
+
 ## When to use
 
 Task planning: breaking a plan into individual tasks; replanning after

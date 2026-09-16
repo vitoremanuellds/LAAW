@@ -4,6 +4,17 @@ Referenced from [`../workflow.md §2`](../workflow.md#2-starting-point-for-any-a
 The rule itself is already fully stated there — read this only for why
 it exists, which isn't needed on every operation.
 
+
+
+<!-- TOC -->
+<details><summary>Table of Contents</summary>
+
+  - [The lesson](#the-lesson)
+  - [Router awareness](#router-awareness)
+
+</details>
+
+
 ## The lesson
 
 Gate-skip and scope-overstep bugs have repeatedly traced back to a

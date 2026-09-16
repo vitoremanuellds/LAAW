@@ -7,6 +7,29 @@ linked where needed below.
 
 ---
 
+
+
+<!-- TOC -->
+<details><summary>Table of Contents</summary>
+
+  - [1. Principles](#1-principles)
+  - [2. Starting point for any agent](#2-starting-point-for-any-agent)
+  - [3. Directory structure](#3-directory-structure)
+  - [4. Artifact hierarchy & context rule](#4-artifact-hierarchy-context-rule)
+  - [5. Lifecycle & gates](#5-lifecycle-gates)
+  - [6. Deviations](#6-deviations)
+  - [7. Decisions](#7-decisions)
+  - [8. Validation vs Review](#8-validation-vs-review)
+  - [9. Context propagation](#9-context-propagation)
+  - [10. Operation contracts](#10-operation-contracts)
+  - [11. Status: the permanent record](#11-status-the-permanent-record)
+  - [12. Commit discipline](#12-commit-discipline)
+  - [13. Teams (many developers)](#13-teams-many-developers)
+  - [14. What each principle buys](#14-what-each-principle-buys)
+
+</details>
+
+
 ## 1. Principles
 
 1. Agents do not reconstruct information that can be persisted cheaply.

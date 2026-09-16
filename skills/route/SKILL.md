@@ -29,6 +29,21 @@ context files.
 Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
 as every other skill — do not skip it for routing.
 
+
+
+<!-- TOC -->
+<details><summary>Table of Contents</summary>
+
+  - [Operation table](#operation-table)
+  - [Procedure](#procedure)
+  - [Output](#output)
+
+</details>
+
+
+
+- **Include a Table of Contents** with internal anchor links for files with 2+ `##` sections
+
 ## Operation table
 
 Maps user intents to the correct skill. Same entries and order as

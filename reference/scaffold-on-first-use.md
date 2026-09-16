@@ -7,6 +7,17 @@ This document states, once, how a layer comes into existence the first
 time it's actually needed, so no skill repeats the mechanics in its
 own prose.
 
+
+
+<!-- TOC -->
+<details><summary>Table of Contents</summary>
+
+  - [The convention](#the-convention)
+  - [Who owns which layer](#who-owns-which-layer)
+
+</details>
+
+
 ## The convention
 
 Before a skill writes its layer's first real content, it checks

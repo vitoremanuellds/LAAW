@@ -9,6 +9,17 @@ a feature-level concept, a domain area. "Module" here means a
 conceptual group of moving parts that make up a feature, not a
 coding-language module or a folder of classes.
 
+
+
+<!-- TOC -->
+<details><summary>Table of Contents</summary>
+
+  - [Mission](#mission)
+  - [Techstack](#techstack)
+
+</details>
+
+
 ## Mission
 
 <!-- TODO: add mission -->
