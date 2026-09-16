@@ -1,6 +1,6 @@
 ---
 name: define-task
-description: Break a plan into individual tasks (tasks/t{ID}-{name}.md), or draft a standalone task with no parent (tasks/t{ID}-{name}.md, indexed in tasks/tasks.md). Writes enough detail (files, ordered steps, optional pseudocode) that implementation is close to mechanical. On first use, scaffolds .ai/tasks/tasks.md. Not for implementing code.
+description: Break a plan into individual tasks (tasks/t{ID}-{name}.md), or draft a standalone task with no parent (tasks/t{ID}-{name}.md, indexed in tasks/tasks.md). Writes enough detail (files, ordered steps, optional pseudocode) that implementation is close to mechanical. On first use, scaffolds .ai/tasks/tasks.md. Supports subtasks: a parent task can contain a Subtasks table; define-task creates the parent file and all subtask entries, and updates each subtask's status to planned in the table. Not for implementing code.
 ---
 
 # Skill: define-task
@@ -11,9 +11,11 @@ covers what "operation" means and where authority comes from).
 
 - **Can:** read the task's description + `context/`; create the task
   file with implementation-ready detail; scaffold `.ai/tasks/tasks.md`
-  on first use.
-- **Must:** update `.ai/tasks/tasks.md` on every status change —
-  `tasks.md` is the only place status lives for tasks.
+  on first use; manage subtasks (create parent + subtask entries,
+  update subtask statuses).
+- **Must:** update `.ai/tasks/tasks.md` on every status change for
+  root-level tasks — `tasks.md` is the only place status lives for
+  them. For subtasks, update the parent task file's Subtasks table.
 - **Cannot:** implement code; write an ADR — escalate as a deviation
   instead.
 
@@ -34,6 +36,24 @@ all" path is NOT the default: it only happens when the user explicitly
 asks for it. If the request is ambiguous about scope, ask whether to
 draft one task or all before proceeding — never default silently to
 one or to all.
+
+## Subtasks
+
+A task may contain **subtasks** — smaller, more concrete units of work
+that roll up into the parent task. When a task has subtasks:
+
+- `define-task` creates the parent task file and adds rows for every
+  subtask in the parent's Subtasks table, each with Status `planned`.
+- `implement-task` walks through subtasks in order, updating each
+  subtask's status (`not-started` → `planned` → `in-progress` → `done`)
+  as it progresses through them. Subtask statuses live exclusively in
+  the parent task's Subtasks table, **not** in `tasks.md`.
+- A subtask is a row in the parent's Subtasks table; it has no
+  separate file unless it's complex enough to warrant its own
+  `t{ID}-{name}.md` file (in which case the Subtasks table row points
+  to it).
+- Subtask rows are id-ascending; new subtasks added later are appended
+  at the end.
 
 ## Inputs
 
@@ -77,6 +97,8 @@ batch only happens when the user explicitly asks for "all".
    **recursive folder rule** — every task follows the same shape:
    a folder named `t{ID}-{name}/` containing `t{ID}-{name}.md`.
 4. Write the task file body per the **Task file body** section below.
+   If the task has subtasks, add a row for each subtask in the
+   Subtasks table with Status `planned`.
 5. Note dependencies on other tasks explicitly if they exist — this
    determines what can run in parallel. **If this task logically
    precedes tasks that already exist** (e.g. a replan inserts a
@@ -131,7 +153,8 @@ Write every task file with this layout:
 ### Before
 <the knowledge/situation the agent needs to START this task>
 ### After
-<the context/understanding this task PRODUCES once implemented>
+<!-- Filled in by implement-task after implementation; propagate-context
+     reads this section to promote reusable knowledge to context/ -->
 
 ## In scope
 - <the changes this task makes>
@@ -158,9 +181,16 @@ Write every task file with this layout:
   is just a placeholder; `tasks.md` is the source of truth.
 - **The Before section states relevant files and constraints directly,
   self-contained.**
+- **The After section is left empty by `define-task` and filled in by
+  `implement-task` after implementation finishes.** `implement-task`
+  writes the context/understanding this task PRODUCES once implemented.
+  `propagate-context` reads this section to determine what reusable
+  knowledge to promote to `context/`.
 - **Subtasks table** — optional; only present if the task has
   subtasks. Columns: id, name, description, depends on, status.
   Rows are id-ascending; new subtasks are appended at the end.
+  `define-task` adds rows with Status `planned`; `implement-task`
+  updates each subtask's status as it walks through them.
 - **Deviation recording** — same inline `## Deviations` subsection
   pattern as before (added later by whichever operation raises it).
 

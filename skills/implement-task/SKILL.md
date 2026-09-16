@@ -10,7 +10,8 @@ This skill performs the **implementation** operation
 covers what "operation" means and where authority comes from).
 
 - **Can:** read the task file + context; modify project files; run
-  tools.
+  tools; fill in the task's Context After section after implementation;
+  update subtask statuses in the parent's Subtasks table.
 - **Must:** update the task's Status in `.ai/tasks/tasks.md` as it
   progresses; record architectural decisions as context rows for
   `propagate-context` to promote later.
@@ -59,14 +60,24 @@ read:
    one — stop and re-read
    [.ai/workflow/workflow.md §11](.ai/workflow/workflow.md#11-status-the-permanent-record)
    rather than write something new into the table.
-4. Follow the task's Steps in order. Adjust freely only where the task
+4. **If the task has subtasks**, walk through them in id order. For
+   each subtask:
+   - Update its status from `planned` to `in-progress` in the parent's
+     Subtasks table.
+   - Implement the subtask's steps (if it has a separate file, read
+     and follow it; if it's just a table row, execute the steps inline).
+   - Update its status to `done` in the Subtasks table.
+   - If the subtask produced reusable knowledge, note it for
+     `propagate-context` (the parent's Context After section captures
+     the aggregate).
+5. Follow the task's Steps in order. Adjust freely only where the task
    file explicitly marked a detail flexible. Everything else that
-   doesn't match gets raised as a deviation per step 5.
-5. If the plan turns out wrong in a way that changes scope, the
+   doesn't match gets raised as a deviation per step 6.
+6. If the plan turns out wrong in a way that changes scope, the
    library/API doesn't support what was planned, or the strategy
    itself has to change — stop and raise a deviation. Do not silently
    expand scope or improvise past what was approved.
-6. **Decisions are context rows.** If an architectural decision is made
+7. **Decisions are context rows.** If an architectural decision is made
    along the way (a new dependency, a new pattern) that future work
    needs to know about, record it as a note for `propagate-context` to
    promote later, or write it directly as a context row
@@ -76,24 +87,31 @@ read:
 
 ## 3. Finishing
 
-1. Set the task's Status to `done` (the new enum has no `reviewing`
+1. **Fill in the Context After section.** Write the context/understanding
+   this task PRODUCES once implemented — architecture facts, invariants,
+   responsibilities, dependencies, constraints, domain knowledge. This
+   section is read by `propagate-context` to determine what to promote
+   to `context/`. Omit task history, temporary details, reasoning, or
+   anything recorded elsewhere.
+2. Set the task's Status to `done` (the new enum has no `reviewing`
    state; `done` here means implementation complete and ready for
    validation).
-2. Commit: stage the modified/created project files and the updated
-   Status row in `tasks.md`; verify no `.gitignore`d files are
-   included (run `git diff --cached` and check the output); the message
-   should say what was implemented (see
+3. Commit: stage the modified/created project files, the updated Status
+   row in `tasks.md`, and the filled-in Context After section; verify
+   no `.gitignore`d files are included (run `git diff --cached` and
+   check the output); the message should say what was implemented (see
    [.ai/workflow/workflow.md §12](.ai/workflow/workflow.md#12-commit-discipline)).
    Stop for `task-completion-review` → `validate-work` — see
    `.ai/info.md` (read fresh) for whether that's yours to run
    (→ [validate-work](.ai/workflow/skills/validate-work/SKILL.md))
    or a human's.
-3. Do not mark the task complete yourself — completion requires
+4. Do not mark the task complete yourself — completion requires
    validation and review to pass first (see
    [.ai/workflow/workflow.md §5](.ai/workflow/workflow.md#5-lifecycle--gates)).
 
 ## Output
 
 Modified project files; an updated Status row in `.ai/tasks/tasks.md`;
-a decision recorded as a context row if an architectural decision was
-made; the task ready for validation.
+the filled-in Context After section; a decision recorded as a context
+row if an architectural decision was made; the task ready for
+validation.
