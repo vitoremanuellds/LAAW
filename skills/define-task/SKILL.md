@@ -167,16 +167,17 @@ When the user asks to plan the subtasks of a parent task:
 
 1. For each subtask in the parent's Subtasks table (one by one by
    default, or all if the user explicitly asks for "all"):
-   - Mint the next ID for the subtask using
-     `tools/generate-id.py --prefix t`.
+   - Run `tools/generate-id.py --prefix t` to mint the subtask ID.
+     **Never hardcode or guess the ID.**
+   - Add a row to the parent's Subtasks table using the generated ID,
+     the subtask name, a description, dependencies (if any), and Status
+     `planned`.
    - Create the subtask file per the recursive folder rule:
-     `tasks/t{parent-ID}-{parent-name}/t{subtask-ID}-{subtask-name}.md`.
+     `tasks/t{parent-ID}-{parent-name}/t{sub-ID}-{sub-name}/task.md`.
    - Write the subtask file body per the **Task file body** section
      below (full layout: Description, TL;DR, Context, In scope, Out
      of scope, Steps, Validations — no Subtasks section, since
      subtasks are leaf tasks).
-   - Update the subtask's row in the parent's Subtasks table — Status
-     `planned`.
 2. Ask the user whether to draft the next subtask now, or stop —
    before requesting review. Same single-task default as the parent
    path.
