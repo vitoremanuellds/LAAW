@@ -1,74 +1,37 @@
 ---
 name: route
-description: Routes plain-language requests to the correct operation skill. The router does no operation work itself; it only reads the user's request, decides which skill to delegate to, and points the agent at that skill's file.
+description: Entry point for any LAAW session. Reads .ai/tasks/index.md, picks the active root task, and hands off to exactly one skill or asks the pending approval question. Use when the human says "continue", "what's next", or starts work without naming a step.
 ---
 
 # Skill: route
 
-This skill performs **routing** — mapping a plain-language request to the
-correct operation skill. It does no operation work itself; it only reads
-the user's request, decides which skill to delegate to, and points the
-agent at that skill's file.
+Route decides what happens next. It never does task work itself — it ends by handing off to
+exactly one other skill, or by asking the human the pending approval question.
 
-- **Can:** read the user's request; read `../info.md` for gate authority;
-  read `workflow.md` for the operation table; point the agent at the
-  correct skill file.
-- **Must:** read `info.md` fresh, every time; read the matched skill file
-  in full before delegating; never do operation work itself.
-- **Cannot:** implement, validate, review, plan, build context, or
-  propagate — the router only routes.
+## Steps
 
-Always use `tools/generate-id.py --prefix t` to generate IDs for any
-project file that requires an ID. Never hardcode, guess, or manually
-construct IDs — the script is the single source of truth for ID
-generation across the entire project.
+1. Check `.ai/workflow/workflow.md` exists. If not: LAAW is not installed in this project. Tell
+   the human to run `tools/sync-workflow.py <project-root>` from a LAAW checkout, then stop.
+2. Check `.ai/tasks/index.md` exists. If not: hand off to **bootstrap** and stop.
+3. Read `.ai/workflow/workflow.md` (once per session) and `.ai/tasks/index.md` fresh.
+4. The index holds root rows only. Pick the lowest-ID non-`done` root task. If several roots are
+   live, ask the human which one and stop. If none: report "no active tasks" and offer
+   **plan-task** for a new task; stop.
+5. Apply the resume table from workflow.md §7 to that task's status:
 
-Always use `tools/generate-id.py --prefix c` to generate IDs for
-context files.
+   | Status | Action |
+   |---|---|
+   | `draft` | Show the task file and ask "Approve plan for tN?" — unless the human's current message already approves it, in which case hand off to **implement-task** |
+   | `in-progress` | Hand off to **implement-task** — except a super-task whose `Subtasks:` table is all `done` (read its `task.md`): hand off to **propagate-context** |
+   | `impl-review` | Ask "Approve implementation of tN?" (diff summary + validation results) — unless the human's current message already approves it, in which case hand off to **propagate-context** |
+   | `ctx-review` | Ask "Approve context changes for tN?" (exact edits) — unless the human's current message already approves it, in which case hand off to **propagate-context** to record/complete |
 
-Read [.ai/workflow/workflow.md](.ai/workflow/workflow.md) in full, same
-as every other skill — do not skip it for routing.
+6. Hand off and stop. One skill per route decision; never chain more than one hand-off without
+   returning control to the human at an approval gate.
 
+## Rules
 
-
-<!-- TOC -->
-<details><summary>Table of Contents</summary>
-
-  - [Operation table](#operation-table)
-  - [Procedure](#procedure)
-  - [Output](#output)
-
-</details>
-
-
-
-- **Include a Table of Contents** with internal anchor links for files with 2+ `##` sections
-
-## Operation table
-
-Maps user intents to the correct skill. Same entries and order as
-`workflow.md §2`:
-
-| User intent | Skill |
-|---|---|
-| "bootstrap" | `bootstrap/SKILL.md` |
-| "constitution", "mission", "techstack", "context setup" | `create-constitution/SKILL.md` |
-| "plan", "task", "break down" | `define-task/SKILL.md` |
-| "implement", "write", "code" | `implement-task/SKILL.md` |
-| "validate", "check", "test" | `validate-work/SKILL.md` |
-| "review", "check quality", "judgment" | `review-work/SKILL.md` |
-| "build context", "survey", "fill context" | `build-context/SKILL.md` |
-| "propagate", "finalize", "mark done" | `propagate-context/SKILL.md` |
-
-## Procedure
-
-1. Read `../info.md` fresh — policy = gate authority.
-2. Parse the user's request to determine intent.
-3. Match the intent against the operation table above.
-4. Read the matched skill file in full.
-5. Delegate to that skill's procedure.
-
-## Output
-
-The matched skill file is now loaded; the agent proceeds with that
-skill's procedure.
+- Never ask and answer in the same response: if you asked for an approval this turn, stop after
+  asking.
+- Every question names the task ID and points at the artifact (task file, diff, context edits).
+- Re-asking after edits is safe; approvals are not consumed.

@@ -1,52 +1,29 @@
-# <name>
+# t{N} — {name}
 
-**ID:** t{ID}       **Status:** in-progress
+Description: <what this task is and why — one short paragraph>
 
+Context: <what the implementer must know to start; name the .ai/context/ files to re-read>
 
+Steps:
+- [ ] <step 1, small and checkable>
+- [ ] <step 2>
 
-<!-- TOC -->
-<details><summary>Table of Contents</summary>
+<!-- Super-task only (parent file inside the t{N}_{slug}/ folder): replace the Steps block above
+     with a Subtasks table. A task has exactly one of Steps / Subtasks, never both. Child files
+     live in this same folder, named by their own ID: t{N}.1_{slug}.md, ... -->
+<!--
+Subtasks:
+| id | name | status |
+|---|---|---|
+| t{N}.1 | <child name> | draft |
+| t{N}.2 | <child name> | draft |
+-->
 
-  - [Description](#description)
-  - [TL;DR](#tldr)
-  - [Context](#context)
-    - [Before](#before)
-    - [After](#after)
-  - [In scope](#in-scope)
-  - [Out of scope](#out-of-scope)
-  - [Steps](#steps)
-  - [Validations](#validations)
-  - [Subtasks            ← optional](#subtasks-optional)
+Validations:
+- <real command or check that proves done, e.g. `npm test`, build, grep, manual check>
 
-</details>
+Context updates:
+- <.ai/context/ file: exact change to make when this task finishes — or "none">
 
-
-
-## Description
-<what this task is and why — the intent, one short paragraph>
-
-## TL;DR
-<the fastest possible orientation to the task>
-
-## Context
-### Before
-<the knowledge/situation the agent needs to START this task>
-### After
-<the context/understanding this task PRODUCES once implemented>
-
-## In scope
-- <the changes this task makes>
-
-## Out of scope
-- <what is explicitly NOT touched>
-
-## Steps
-1. <ordered step>
-2. <ordered step>
-
-## Validations
-- <how to check done>
-
-## Subtasks            ← optional
-| id | name | description | depends on | status |
-|----|------|-------------|------------|--------|
+Notes:
+<!-- blockers, decisions, validation results; status never lives here -->

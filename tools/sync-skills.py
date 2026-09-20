@@ -35,6 +35,12 @@ def main():
         workflow_dir = script_dir.parent  # .ai/workflow/
         if not workflow_dir.is_dir():
             die(f"no .ai/workflow/ found at {workflow_dir}")
+        if workflow_dir.name != "workflow" or workflow_dir.parent.name != ".ai":
+            die(
+                f"{workflow_dir} is not a standard .ai/workflow/ mount — "
+                "refusing to guess the project root. Pass the destination "
+                "explicitly: python tools/sync-skills.py /path/to/.agents/skills"
+            )
         project_root = workflow_dir.parent.parent  # two levels up
         skills_dest = project_root / ".agents" / "skills"
         print("No destination given — assuming standard mount point.")

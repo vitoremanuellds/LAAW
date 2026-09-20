@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Installs or re-syncs this repo's workflow content into a target project.
 
-Copies workflow.md, skills/, templates/, reference/, README.md, and tools/
+Copies workflow.md, skills/, templates/, README.md, and tools/
 into a target project's .ai/workflow/ — the copy-based replacement for
 `git submodule add`/`git submodule update --remote`.
 
@@ -9,7 +9,7 @@ First run against a target with no .ai/workflow/ yet: fresh install.
 Any later run against the same target: re-sync — .ai/workflow/'s
 content is wholesale-replaced with the source's current state. There
 is no partial-merge logic: .ai/workflow/ is never supposed to be
-hand-edited (workflow.md §3), so there is nothing local to preserve.
+hand-edited (workflow.md §4), so there is nothing local to preserve.
 
 Every run also (re)writes a version-stamp file, .ai/workflow-version,
 as a SIBLING of .ai/workflow/ (never inside it, so .ai/workflow/
@@ -69,7 +69,6 @@ def main():
         "workflow.md",
         "skills",
         "templates",
-        "reference",
         "README.md",
         "tools",
     ]
@@ -78,7 +77,7 @@ def main():
         src = source_dir / item
         dst = dest / item
         if src.is_dir():
-            shutil.copytree(src, dst)
+            shutil.copytree(src, dst, ignore=shutil.ignore_patterns("__pycache__"))
         elif src.is_file():
             shutil.copy2(src, dst)
 
