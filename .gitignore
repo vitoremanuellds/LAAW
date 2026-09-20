@@ -1,2 +1,5 @@
 # Python
 __pycache__/
+
+# never let a tasks.py init land in this checkout by accident
+.ai/

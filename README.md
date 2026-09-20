@@ -23,9 +23,10 @@ and asks for plan approval. `implement-task` does the work — Steps for a
 single task, subtasks walked in ID order for a super-task — runs validations,
 and asks for implementation approval. `propagate-context` writes the task's
 `Context updates` into `.ai/context/`, asks for context approval, marks the
-task `done`, and commits the context. Each task's status lives in one row — roots in
-`.ai/tasks/index.md`, subtasks in the parent's `Subtasks:` table — and every status flip has
-exactly one writer skill (`workflow.md` §2).
+task `done`, and commits the context. All task state (ids, names, statuses) lives in one file,
+`.ai/tasks/state.json`, written only by the tasks CLI (`.ai/workflow/tools/tasks.py`), which
+enforces the legal status transitions; every status flip also has exactly one writer skill
+(`workflow.md` §2).
 
 ## Directory structure
 
@@ -34,13 +35,13 @@ exactly one writer skill (`workflow.md` §2).
   workflow/            ← this repo's content, installed by sync-workflow.py; never hand-edit
     workflow.md        ← the whole workflow, self-contained
     skills/            ← one SKILL.md per operation (6 skills)
-    templates/         ← task-template.md, context-file-template.md
-    tools/             ← sync-workflow.py, sync-skills.py
+    templates/         ← task-template.md, super-task-template.md, context-file-template.md
+    tools/             ← tasks.py, sync-workflow.py, sync-skills.py
   tasks/               ← local working files, gitignored (.ai/tasks/.gitignore contains *)
-    index.md           ← | id | name | status | — root rows only
+    state.json         ← single source of truth: ids, names, statuses, files (CLI-written)
     t1_add-login.md            ← leaf task: flat file
     t2_auth-flow/              ← super-task: folder
-      task.md                  ← parent; Subtasks table holds child status rows
+      task.md                  ← parent (content only; static Subtasks list)
       t2.1_login-form.md       ← child files, named by their own ID
   context/             ← committed project knowledge, one file per topic
     index.md           ← | file | one-line summary |
@@ -55,8 +56,8 @@ committed (by `propagate-context`, on approval).
 
 | Skill | Does |
 |---|---|
-| `route` | Entry point: reads the task index, picks the active root task, asks the pending approval or hands off to exactly one skill |
-| `bootstrap` | One-time scaffold of `.ai/tasks/` and `.ai/context/`; triggers `setup-project` when context is empty |
+| `route` | Entry point: runs `tasks.py next`, then asks the pending approval or hands off to exactly one skill |
+| `bootstrap` | One-time scaffold of `.ai/tasks/` and `.ai/context/` via `tasks.py init`; triggers `setup-project` when context is empty |
 | `setup-project` | One-time interview seeding `.ai/context/` (mission, stack/constraints, standing rules) behind approval |
 | `plan-task` | The only skill that creates tasks: mints IDs, writes task file(s), adds `draft` rows, asks plan approval |
 | `implement-task` | The only skill that modifies project files; runs validations; owns `in-progress` / `impl-review` / subtask `done` |
@@ -85,8 +86,8 @@ Suggested `AGENTS.md` section:
 
 ```markdown
 ## Agent Workflow
-This project uses LAAW. Before acting, every session:
-- `.ai/tasks/index.md` exists → read [.ai/workflow/workflow.md](.ai/workflow/workflow.md)
+This project uses LAAW. Before acting, every session, from the project root:
+- `.ai/tasks/state.json` exists → read [.ai/workflow/workflow.md](.ai/workflow/workflow.md)
   and run [.ai/workflow/skills/route/SKILL.md](.ai/workflow/skills/route/SKILL.md).
 - It doesn't exist → unbootstrapped: run the route skill with "bootstrap".
 Do this fresh each session, not from memory of a previous read.
@@ -96,8 +97,12 @@ Do this fresh each session, not from memory of a previous read.
 
 - **Approvals are human messages only.** The agent never asks and answers in
   the same response; every question names the task ID and the artifact.
-- **One task at a time**, lowest-ID non-done root first (`workflow.md` §7).
-- **Status has one writer per transition** — see the table in `workflow.md` §2.
+- **One task at a time**, lowest-ID non-done root first — `tasks.py next` picks it (§7).
+- **State lives in `state.json`, written only by `tasks.py`** — never hand-edited; the CLI
+  refuses any transition not in the table in `workflow.md` §2, and that table also says which
+  skill may trigger each flip.
+- **Markdown holds content, never status.** Task files carry Steps/Validations/Notes;
+  statuses are read via `tasks.py status`.
 - **A task has either Steps or subtasks, never both.** Super-tasks get
   per-subtask implementation approvals; the parent closes via its own context
   pass.
@@ -131,9 +136,12 @@ workflow.md                    ← the whole workflow, self-contained
 skills/
   route/  bootstrap/  setup-project/  plan-task/  implement-task/  propagate-context/
 templates/
-  task-template.md
+  task-template.md             ← leaf/child scaffold
+  super-task-template.md       ← super-task parent scaffold
   context-file-template.md
 tools/
+  tasks.py                     ← the tasks CLI: single writer of .ai/tasks/state.json
+  test_tasks.py                ← keeps tasks.py's transition table in sync with workflow.md §2
   sync-workflow.py             ← installs/re-syncs .ai/workflow/ into a project
   sync-skills.py               ← optional mirror into .agents/skills/
 ```
