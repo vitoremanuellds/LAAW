@@ -22,7 +22,7 @@ All task state (ids, names, statuses, file paths) lives in ONE file: `.ai/tasks/
 It is written only by the tasks CLI (`python3 .ai/workflow/tools/tasks.py`) — never by hand,
 never via a file-editing tool, no matter what. The CLI validates every `set-status` call
 against the table below and refuses anything else, so the table is also the complete set of
-legal status changes. `tools/test_tasks.py` keeps the CLI's table in sync with this one.
+legal status changes. `tools/tests/` keeps the CLI's table in sync with this one.
 Which skill may trigger each transition:
 
 | From | To | Only writer | Trigger |
@@ -40,8 +40,12 @@ Rules:
 - **No markdown file holds a status.** Task files hold content (Description, Steps, Validations,
   Context updates, Notes); `tasks.py status` is the only place to read one.
 - A task with Steps reaches `impl-review` and waits there for implementation approval.
+- A root task with Steps always passes through `ctx-review` — the `impl-review → done` row
+  above is for subtasks only.
 - A super-task stays `in-progress` while its subtasks are worked; each subtask goes
   `draft → in-progress → impl-review → done` on its own. The parent then moves to the context gate.
+- A super-task with no subtasks never reaches the context gate; plan-task adds the subtasks
+  before work starts (`tasks.py subtask` is refused once the root left `draft`).
 - After any rejection, the fix work happens before the re-ask, and the status flips back first.
 - A `done` task never changes status again; wrong work gets a new task via plan-task.
 
@@ -88,7 +92,8 @@ Rules:
 - Shape follows content: a leaf task is one flat file; a super-task is a folder with `task.md`
   plus one child file per workstream.
 - A task's shape is fixed at plan time; re-planning a draft may change it (`tasks.py rename`,
-  `remove`, `new` — all refused once any status left `draft`).
+  `remove`, `subtask`, `new` — all refused once the target task or any of its siblings left
+  `draft`).
 - Tasks are local working files: `.ai/tasks/.gitignore` contains `*`. Context is committed.
 
 The tasks CLI (run from the project root, or with `--root`):
@@ -101,6 +106,7 @@ rename <id> <new-name>   draft tasks only
 remove <id>              draft tasks only
 set-status <id> <status> validated against §2
 status [id]              one task, or the board
+board                    the whole board as a markdown table
 next                     active task + exact next action/question
 check                    state/file consistency report
 ```

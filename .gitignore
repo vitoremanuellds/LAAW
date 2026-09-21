@@ -1,5 +1,6 @@
 # Python
 __pycache__/
+.venv/
 
 # never let a tasks.py init land in this checkout by accident
 .ai/

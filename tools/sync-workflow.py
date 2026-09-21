@@ -5,6 +5,10 @@ Copies workflow.md, skills/, templates/, README.md, and tools/
 into a target project's .ai/workflow/ — the copy-based replacement for
 `git submodule add`/`git submodule update --remote`.
 
+tools/ is shipped as its top-level scripts plus the laaw_tasks/ package
+only: the tests/ suite and .venv/ are development-only and are NOT
+installed into projects.
+
 First run against a target with no .ai/workflow/ yet: fresh install.
 Any later run against the same target: re-sync — .ai/workflow/'s
 content is wholesale-replaced with the source's current state. There
@@ -77,7 +81,19 @@ def main():
         src = source_dir / item
         dst = dest / item
         if src.is_dir():
-            shutil.copytree(src, dst, ignore=shutil.ignore_patterns("__pycache__"))
+            if item == "tools":
+                # Ship the CLI (top-level scripts + laaw_tasks/ package)
+                # but never the development-only tests/ suite or .venv/.
+                if dst.exists():
+                    shutil.rmtree(dst)
+                dst.mkdir(parents=True, exist_ok=True)
+                for f in sorted(src.iterdir()):
+                    if f.is_file():
+                        shutil.copy2(f, dst / f.name)
+                    elif f.is_dir() and f.name not in ("tests", ".venv", "__pycache__"):
+                        shutil.copytree(f, dst / f.name, ignore=shutil.ignore_patterns("__pycache__", ".venv"))
+            else:
+                shutil.copytree(src, dst, ignore=shutil.ignore_patterns("__pycache__", ".venv"))
         elif src.is_file():
             shutil.copy2(src, dst)
 

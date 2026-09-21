@@ -12,7 +12,7 @@ approval question.
 ## Steps
 
 1. Check `.ai/workflow/workflow.md` exists. If not: LAAW is not installed in this project.
-   Tell the human to run `tools/sync-workflow.py <project-root>` from a LAAW checkout, then stop.
+   Tell the human to run `tools/sync-workflow.py <LAAW-checkout> <project-root>` from a LAAW checkout, then stop.
 2. From the project root run:
 
    ```text

@@ -36,7 +36,7 @@ enforces the legal status transitions; every status flip also has exactly one wr
     workflow.md        ← the whole workflow, self-contained
     skills/            ← one SKILL.md per operation (6 skills)
     templates/         ← task-template.md, super-task-template.md, context-file-template.md
-    tools/             ← tasks.py, sync-workflow.py, sync-skills.py
+    tools/             ← tasks.py + laaw_tasks/, sync-workflow.py, sync-skills.py
   tasks/               ← local working files, gitignored (.ai/tasks/.gitignore contains *)
     state.json         ← single source of truth: ids, names, statuses, files (CLI-written)
     t1_add-login.md            ← leaf task: flat file
@@ -97,7 +97,8 @@ Do this fresh each session, not from memory of a previous read.
 
 - **Approvals are human messages only.** The agent never asks and answers in
   the same response; every question names the task ID and the artifact.
-- **One task at a time**, lowest-ID non-done root first — `tasks.py next` picks it (§7).
+- **One task at a time** — `tasks.py next` works the lowest-ID non-done root; if several
+  roots are live it lists them and the human chooses (§7).
 - **State lives in `state.json`, written only by `tasks.py`** — never hand-edited; the CLI
   refuses any transition not in the table in `workflow.md` §2, and that table also says which
   skill may trigger each flip.
@@ -140,8 +141,11 @@ templates/
   super-task-template.md       ← super-task parent scaffold
   context-file-template.md
 tools/
-  tasks.py                     ← the tasks CLI: single writer of .ai/tasks/state.json
-  test_tasks.py                ← keeps tasks.py's transition table in sync with workflow.md §2
-  sync-workflow.py             ← installs/re-syncs .ai/workflow/ into a project
+  tasks.py                     ← CLI entry point: single writer of .ai/tasks/state.json
+  laaw_tasks/                  ← the implementation: state.py, scaffold.py, report.py,
+                                 persistence.py, cli.py, errors.py
+  tests/                       ← unittest suite (keeps the transition table in sync with
+                                 workflow.md §2; NOT installed into projects)
+  sync-workflow.py             ← installs/re-syncs .ai/workflow/ into a project (skips tests/)
   sync-skills.py               ← optional mirror into .agents/skills/
 ```

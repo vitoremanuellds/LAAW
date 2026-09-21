@@ -10,7 +10,7 @@ Bootstrap creates the working layout. It never touches project code and never cr
 ## Steps
 
 1. Check `.ai/workflow/workflow.md` exists. If not: LAAW is not installed — tell the human to run
-   `tools/sync-workflow.py <project-root>` from a LAAW checkout, then stop.
+   `tools/sync-workflow.py <LAAW-checkout> <project-root>` from a LAAW checkout, then stop.
 2. Check `.ai/tasks/state.json` exists. If it does: already bootstrapped — report and stop
    (route takes over).
 3. From the project root run:
