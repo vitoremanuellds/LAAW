@@ -1,6 +1,6 @@
 ---
 name: plan-project
-description: Project-level planning: several root tasks for the whole project (each a leaf or a super-task), wired together with depends-on, all scaffolded as drafts via tasks.py. Asks one plan approval for the whole board. Use when the human wants a plan with several root tasks (a project or milestone plan), not a single task.
+description: "Project-level planning: several root tasks for the whole project (each a leaf or a super-task), wired together with depends-on, all scaffolded as drafts via tasks.py. Asks one plan approval for the whole board. Use when the human wants a plan with several root tasks (a project or milestone plan), not a single task."
 ---
 
 # Skill: plan-project
