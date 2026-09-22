@@ -20,14 +20,19 @@ approval question.
    ```
 
    - If it reports **no state file** (not bootstrapped): hand off to **bootstrap** and stop.
-   - If it reports **no active tasks**: report that and offer **plan-task** for new work; stop.
+   - If it reports **no active tasks**: report that and offer **plan-task** (a single task) or
+     **plan-project** (several root tasks for the project); stop.
    - If it reports **multiple active roots**: ask the human which one to work; stop.
 3. Follow exactly what it printed:
    - **It printed a question** ("Approve … for tN?"): unless the human's current message already
      answers that exact question, show the artifact it named (task file, diff summary +
      validation results, exact context edits), ask the question, and stop. If the human's
      current message already answers it, do the hand-off the output names, in this turn.
+   - **It printed a block** ("… is BLOCKED by …"): report the block and the blocking task to the
+     human; ask whether to resume the blocker or revise the plan (plan-task/plan-project); stop.
    - **It printed a hand-off** (implement-task / propagate-context): hand off and stop.
+   - **It printed a `Next:` line after a status flip**: do exactly what it says — the same
+     rules apply, including stopping after an approval question.
 
 ## Rules
 

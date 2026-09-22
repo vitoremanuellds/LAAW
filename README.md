@@ -34,7 +34,7 @@ enforces the legal status transitions; every status flip also has exactly one wr
 .ai/
   workflow/            ← this repo's content, installed by sync-workflow.py; never hand-edit
     workflow.md        ← the whole workflow, self-contained
-    skills/            ← one SKILL.md per operation (6 skills)
+    skills/            ← one SKILL.md per operation (7 skills)
     templates/         ← task-template.md, super-task-template.md, context-file-template.md
     tools/             ← tasks.py + laaw_tasks/, sync-workflow.py, sync-skills.py
   tasks/               ← local working files, gitignored (.ai/tasks/.gitignore contains *)
@@ -59,7 +59,8 @@ committed (by `propagate-context`, on approval).
 | `route` | Entry point: runs `tasks.py next`, then asks the pending approval or hands off to exactly one skill |
 | `bootstrap` | One-time scaffold of `.ai/tasks/` and `.ai/context/` via `tasks.py init`; triggers `setup-project` when context is empty |
 | `setup-project` | One-time interview seeding `.ai/context/` (mission, stack/constraints, standing rules) behind approval |
-| `plan-task` | The only skill that creates tasks: mints IDs, writes task file(s), adds `draft` rows, asks plan approval |
+| `plan-task` | The only skill that plans a single task: mints IDs, writes task file(s), adds `draft` rows, asks plan approval |
+| `plan-project` | Project-level plan: several root tasks (each leaf or super-task) wired with `depends-on`, one board-wide plan approval |
 | `implement-task` | The only skill that modifies project files; runs validations; owns `in-progress` / `impl-review` / subtask `done` |
 | `propagate-context` | Applies Context updates to `.ai/context/`; owns `ctx-review` and `done`; commits context |
 
@@ -98,12 +99,14 @@ Do this fresh each session, not from memory of a previous read.
 - **Approvals are human messages only.** The agent never asks and answers in
   the same response; every question names the task ID and the artifact.
 - **One task at a time** — `tasks.py next` works the lowest-ID non-done root; if several
-  roots are live it lists them and the human chooses (§7).
+  roots are live it lists them and the human chooses (§7). Roots may declare `depends-on`
+  (CLI-enforced): a root whose deps aren't all `done` is blocked and cannot leave `draft`.
 - **State lives in `state.json`, written only by `tasks.py`** — never hand-edited; the CLI
   refuses any transition not in the table in `workflow.md` §2, and that table also says which
   skill may trigger each flip.
-- **Markdown holds content, never status.** Task files carry Steps/Validations/Notes;
-  statuses are read via `tasks.py status`.
+- **Markdown holds content, never status.** Task files carry scope, Steps/Validations/Notes;
+  statuses are read via `tasks.py status`. Step text is a frozen record after plan approval —
+  only the checkbox may flip.
 - **A task has either Steps or subtasks, never both.** Super-tasks get
   per-subtask implementation approvals; the parent closes via its own context
   pass.
@@ -135,7 +138,7 @@ releases, so treat every commit as a potential breaking change (pin with
 README.md
 workflow.md                    ← the whole workflow, self-contained
 skills/
-  route/  bootstrap/  setup-project/  plan-task/  implement-task/  propagate-context/
+  route/  bootstrap/  setup-project/  plan-task/  plan-project/  implement-task/  propagate-context/
 templates/
   task-template.md             ← leaf/child scaffold
   super-task-template.md       ← super-task parent scaffold

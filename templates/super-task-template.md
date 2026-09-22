@@ -2,6 +2,12 @@
 
 Description: {description}
 
+In scope:
+- <what the super-task as a whole covers>
+
+Out of scope:
+- <what it explicitly does NOT do; name the task or where that work belongs>
+
 Context: <what the implementer must know to start; name the .ai/context/ files to re-read>
 
 Subtasks:

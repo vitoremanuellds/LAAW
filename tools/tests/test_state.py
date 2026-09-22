@@ -89,6 +89,29 @@ class StateIOTests(unittest.TestCase):
         self.assertEqual(parent.id, "t2")
         self.assertEqual(st.find("t9"), (None, None))
 
+    def test_depends_survives_roundtrip(self):
+        st = State(self.store, {"roots": [
+            {"id": "t1", "name": "A", "status": "draft", "file": "t1_a.md"},
+            {"id": "t2", "name": "B", "status": "draft", "file": "t2_b.md", "depends": ["t1"]},
+        ]})
+        st.save()
+        self.assertEqual(self.store.load_state()["roots"][1]["depends"], ["t1"])
+        self.assertEqual(State.load(self.store).roots[1].depends, ["t1"])
+        # the key may be absent on older state files
+        self.assertEqual(State.load(self.store).roots[0].depends, [])
+
+    def test_set_status_refused_while_blocked(self):
+        st = State(self.store, {"roots": [
+            {"id": "t1", "name": "A", "status": "in-progress", "file": "t1_a.md"},
+            {"id": "t2", "name": "B", "status": "draft", "file": "t2_b.md", "depends": ["t1"]},
+        ]})
+        with self.assertRaises(TaskError) as ctx:
+            st.set_status("t2", "in-progress")
+        self.assertIn("blocked by t1", str(ctx.exception))
+        st.roots[0].status = "done"
+        self.assertEqual(st.set_status("t2", "in-progress"), "draft")  # previous status
+        self.assertEqual(st.roots[1].status, "in-progress")
+
 
 if __name__ == "__main__":
     unittest.main()

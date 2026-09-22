@@ -27,15 +27,16 @@ class Task:
     to serialise back to the shape expected by state.json.
     """
 
-    __slots__ = ("id", "name", "status", "file", "description", "children", "is_super")
+    __slots__ = ("id", "name", "status", "file", "description", "children", "is_super", "depends")
 
-    def __init__(self, id, name, status="draft", file=None, description=None, children=None, is_super=None):
+    def __init__(self, id, name, status="draft", file=None, description=None, children=None, is_super=None, depends=None):
         self.id = id
         self.name = name
         self.status = status
         self.file = file
         self.description = description
         self.children = children or []
+        self.depends = list(depends or [])
         # A super-task has (or will get) subtasks. Recorded explicitly, not
         # inferred from children, so it survives a save/load round-trip while
         # the children list is still empty.
@@ -54,6 +55,7 @@ class Task:
             description=data.get("description"),
             children=[cls.from_dict(c) for c in data.get("children", [])],
             is_super="children" in data,
+            depends=data.get("depends", []),
         )
 
     # ---- serialisation
@@ -69,6 +71,8 @@ class Task:
             d["description"] = self.description
         if self.is_super or self.children:
             d["children"] = [c.to_dict() for c in self.children]
+        if self.depends:
+            d["depends"] = list(self.depends)
         return d
 
     # ---- shape helpers
@@ -170,14 +174,40 @@ def apply_status(task, parent, status):
 def require_draft(task, verb):
     """Refuse a shape change unless task (and every child of it) is still draft.
 
-    verb is the base form ("rename"/"remove") — it is conjugated in the
-    messages. workflow.md §4: a task's shape is fixed at plan time.
+    verb is a past participle ("renamed"/"removed"/"re-wired") used verbatim
+    in the messages. workflow.md §4: a task's shape is fixed at plan time.
     """
     if task.status != "draft":
-        raise TaskError(f"{task.id} is not draft (it is {task.status}) — only draft tasks may be {verb}ed on re-plan (workflow.md §4).")
+        raise TaskError(f"{task.id} is not draft (it is {task.status}) — only draft tasks may be {verb} on re-plan (workflow.md §4).")
     for c in task.children:
         if c.status != "draft":
             raise TaskError(f"child {c.id} is not draft (it is {c.status}) — cannot {verb} {task.id} (workflow.md §4).")
+
+
+def require_replannable(task, parent, verb):
+    """Refuse a draft-level change on a child unless the child is still draft and
+    its parent is still draft or in-progress.
+
+    A live super-task can still be re-planned: subtasks that have not started
+    may be added, renamed, removed, and re-wired while siblings are worked
+    (workflow.md §4). Once the parent reaches the context gate, nothing changes.
+    """
+    if task.status != "draft":
+        raise TaskError(f"{task.id} is not draft (it is {task.status}) — only draft tasks may be {verb} on re-plan (workflow.md §4).")
+    if parent.status not in ("draft", "in-progress"):
+        raise TaskError(
+            f"{task.id} cannot be {verb} — parent {parent.id} is {parent.status} "
+            "(re-planning ends at the context gate; workflow.md §4)."
+        )
+
+
+def unmet_dependencies(task, statuses):
+    """[(dep_id, status-or-None)] for task.depends entries that are not done.
+
+    statuses maps every known task id to its status; a dep id that is missing
+    maps to None and still counts as blocking.
+    """
+    return [(d, statuses.get(d)) for d in task.depends if statuses.get(d) != DONE]
 
 
 # ---------------------------------------------------------------- the model
@@ -279,7 +309,63 @@ class State:
         task, parent = self.find(tid)
         if task is None:
             raise TaskError(f"no task with id {tid}. See: tasks.py board")
+        self._assert_unblocked(task)
         return apply_status(task, parent, status)
+
+    def _assert_unblocked(self, task):
+        """Refuse any flip of a blocked task (depends-on list not all done, §4)."""
+        if not task.depends:
+            return
+        statuses = {t.id: t.status for t, _ in self.all_tasks()}
+        blocked = unmet_dependencies(task, statuses)
+        if blocked:
+            names = ", ".join(f"{d} ({statuses.get(d) or 'unknown'})" for d, _ in blocked)
+            raise TaskError(
+                f"{task.id} is blocked by {names} — its depends-on tasks must all be done "
+                f"before {task.id} can leave draft (workflow.md §4)."
+            )
+
+    # ------------------------------------------------------------ depends-on
+
+    def set_depends(self, tid, dep_ids):
+        """Replace a task's depends-on list (draft tasks only; §4). Returns the task."""
+        task, parent = self.find(tid)
+        if task is None:
+            raise TaskError(f"no task with id {tid}. See: tasks.py board")
+        if parent is not None:
+            require_replannable(task, parent, "re-wired")
+        else:
+            require_draft(task, "re-wired")
+        task.depends = list(dict.fromkeys(dep_ids))
+        self._validate_depends()
+        return task
+
+    def _validate_depends(self):
+        """Validate every depends-on list: ids exist, no self-dependency, no cycles."""
+        by_id = {t.id: t for t, _ in self.all_tasks()}
+        for task, _ in self.all_tasks():
+            for d in task.depends:
+                if d == task.id:
+                    raise TaskError(f"{task.id} cannot depend on itself.")
+                if d not in by_id:
+                    raise TaskError(f"{task.id} depends on unknown task '{d}'. Use: tasks.py board")
+        white, grey, black = 0, 1, 2
+        color = {tid: white for tid in by_id}
+
+        def visit(tid):
+            color[tid] = grey
+            for d in by_id[tid].depends:
+                if color[d] == grey:
+                    raise TaskError(
+                        f"depends-on cycle detected ({tid} → {d}). Dependencies must form a partial order."
+                    )
+                if color[d] == white:
+                    visit(d)
+            color[tid] = black
+
+        for tid in by_id:
+            if color[tid] == white:
+                visit(tid)
 
     # ------------------------------------------------------------ lifecycle
     # draft-only; file side-effects go through the store
@@ -301,10 +387,10 @@ class State:
             raise TaskError(f"no task with id {root_id}. See: tasks.py board")
         if not root.is_super:
             raise TaskError(f"{root_id} is not a super-task. Create one with: tasks.py new <name> --super")
-        if root.status != "draft":
+        if root.status not in ("draft", "in-progress"):
             raise TaskError(
-                f"{root.id} left draft (it is {root.status}) — its shape is fixed; "
-                "subtasks can only be added while it is draft (workflow.md §4)."
+                f"{root.id} left in-progress (it is {root.status}) — its shape is fixed; "
+                "subtasks can only be added while it is draft or in-progress (workflow.md §4)."
             )
         cid = self.next_child_id(root)
         folder = root.file.rsplit("/", 1)[0]
@@ -325,9 +411,9 @@ class State:
         if task is None:
             raise TaskError(f"no task with id {tid}. See: tasks.py board")
         if parent is not None:
-            require_draft(parent, "rename")  # parent + every sibling must still be draft
+            require_replannable(task, parent, "renamed")
         else:
-            require_draft(task, "rename")
+            require_draft(task, "renamed")
         old_name = task.name
         new_slug = scaffold.Slugifier.slugify(new_name)
         if not parent and task.is_super:
@@ -359,9 +445,9 @@ class State:
         if task is None:
             raise TaskError(f"no task with id {tid}. See: tasks.py board")
         if parent is not None:
-            require_draft(parent, "remove")  # parent + every sibling must still be draft
+            require_replannable(task, parent, "removed")
         else:
-            require_draft(task, "remove")
+            require_draft(task, "removed")
         if not parent and task.is_super:
             self.store.remove_tree(task.file.rsplit("/", 1)[0])
         else:
@@ -397,6 +483,13 @@ class State:
                     problems.append(f"child id {child.id} is not under root {rid}.")
         if len(seen_root) != root_num:
             warnings.append(f"root ids are not contiguous 1..{root_num} (removed drafts leave gaps — usually fine).")
+        ids = {t.id for t, _ in self.all_tasks()}
+        for task, _ in self.all_tasks():
+            for d in task.depends:
+                if d not in ids:
+                    problems.append(f"{task.id}: depends on unknown task '{d}'.")
+                elif d == task.id:
+                    problems.append(f"{task.id}: depends on itself.")
         # context index (prose-maintained, so warnings only)
         index = self.store.context_index()
         if index is not None:

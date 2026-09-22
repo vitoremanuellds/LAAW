@@ -28,9 +28,16 @@ construct an ID, slug, or task filename yourself, and never hand-edit `state.jso
    registers them as `draft`. Read the IDs from its output.
 4. Fill each task file's sections (the CLI left the template placeholders in place):
    - `Description` — what and why, one paragraph.
+   - `In scope` / `Out of scope` — what the task covers, and what it explicitly does not (name
+     where the out-of-scope work belongs, if anywhere).
    - `Context` — what the implementer must know; **list the `.ai/context/` files you read in
      step 1** — the human checks this selection at plan approval.
-   - `Steps` (leaf or child) — small, checkable, in order.
+   - `Steps` (leaf or child) — **implementation-ready**: concrete, checkable, in order. Each
+     step is a small action or a short pseudocode block the implementer can execute without
+     re-designing — abstract enough to stay code-free, concrete enough that it is not a second
+     planning exercise. A step the implementer would have to break down again is too abstract.
+   - If this task can only start once other existing root tasks are `done`, wire it with
+     `tasks.py depends t{N} t{A} …` (draft tasks only) and say so in the approval summary.
    - For a super-task parent: the `Subtasks:` list — one line per child:
      `- t{N}.{k} (t{N}.{k}_{slug}.md) — child name` (static; no status column).
    - `Validations` — real commands/checks that prove done (tests, builds, greps, manual checks).
@@ -40,9 +47,11 @@ construct an ID, slug, or task filename yourself, and never hand-edit `state.jso
 
 ## Rules
 
+- If the human wants **several root tasks** (a project or milestone plan), hand off to
+  **plan-project** instead — one root per request is this skill's scope.
 - On rejection: revise the files, re-ask. If the name or shape changes: `tasks.py rename` /
-  `remove` (both refused once anything left `draft`), then re-scaffold. Tasks stay `draft`
-  until the human approves — you never call `set-status`.
+  `remove` / `depends` (all draft-only), then re-scaffold. Tasks stay `draft` until the human
+  approves — you never call `set-status`.
 - Never hand-edit `state.json`, never construct IDs/slugs/filenames, never start
   implementation in the same turn you asked.
 - Keep plans small enough that each task's Validations can actually be run.

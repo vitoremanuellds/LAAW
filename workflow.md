@@ -37,8 +37,11 @@ Which skill may trigger each transition:
 | `ctx-review` | `done` | propagate-context | context approved; `.ai/context/` committed |
 
 Rules:
-- **No markdown file holds a status.** Task files hold content (Description, Steps, Validations,
-  Context updates, Notes); `tasks.py status` is the only place to read one.
+- **No markdown file holds a status.** Task files hold content (Description, In scope, Out of
+  scope, Steps, Validations, Context updates, Notes); `tasks.py status` is the only place to read one.
+- A **blocked** task — its depends-on list is not all `done` — cannot move past `draft`; the CLI
+  refuses the flip and `next` marks it. Depends-on lists are set with `tasks.py depends` while a
+  task is still draft (workflow.md §4).
 - A task with Steps reaches `impl-review` and waits there for implementation approval.
 - A root task with Steps always passes through `ctx-review` — the `impl-review → done` row
   above is for subtasks only.
@@ -91,9 +94,12 @@ Rules:
   the CLI. Agents never construct an ID, slug, or task filename.
 - Shape follows content: a leaf task is one flat file; a super-task is a folder with `task.md`
   plus one child file per workstream.
-- A task's shape is fixed at plan time; re-planning a draft may change it (`tasks.py rename`,
-  `remove`, `subtask`, `new` — all refused once the target task or any of its siblings left
-  `draft`).
+- A task's shape is fixed at plan time; **re-planning** may still change any task that is still
+  `draft`: `tasks.py rename`, `remove`, `depends`, and — for a live super-task — `subtask` (adding
+  a child) and `remove`/`rename` (dropping or renaming a child that has not started). The CLI
+  refuses any operation that would touch a task that left `draft`; a super-task stops accepting
+  children once it reaches the context gate. A `done` task is never re-planned — wrong work gets
+  a new task via plan-task.
 - Tasks are local working files: `.ai/tasks/.gitignore` contains `*`. Context is committed.
 
 The tasks CLI (run from the project root, or with `--root`):
@@ -101,15 +107,20 @@ The tasks CLI (run from the project root, or with `--root`):
 ```text
 init                     create .ai/tasks/ (state.json, .gitignore) and .ai/context/ (index.md)
 new <name> [--super] [--desc T]
-subtask <root-id> <name> [--desc T]
+subtask <root-id> <name> [--desc T]      draft or in-progress super-tasks
 rename <id> <new-name>   draft tasks only
 remove <id>              draft tasks only
-set-status <id> <status> validated against §2
+set-status <id> <status> validated against §2 (refused while blocked)
+depends <id> <dep-id>…  set the depends-on list (draft tasks only; replaces it; --clear empties it)
 status [id]              one task, or the board
-board                    the whole board as a markdown table
+board                    the whole board as a markdown table (includes depends-on)
 next                     active task + exact next action/question
 check                    state/file consistency report
 ```
+
+Every `set-status` prints a `Next:` line saying exactly what the agent should do next — including
+the approval question to ask and where to stop. `next` and `board` say the same on resume. Agents
+follow that output; an approval question always ends the turn.
 
 ## 5. Task files
 
@@ -122,9 +133,15 @@ One file per task, scaffolded from `templates/task-template.md` (leaf/child) or
 
 Description: …
 
+In scope:             ← what this task covers; checked by the human at plan approval
+- …
+
+Out of scope:         ← what it explicitly does NOT do, and where that work belongs
+- …
+
 Context: …            ← what the implementer must know; names the .ai/context/ files read at plan time
 
-Steps:                ← leaf/child tasks only
+Steps:                ← leaf/child tasks only; implementation-ready
 - [ ] …
 
 <!-- super-task parent instead of Steps:
@@ -143,6 +160,13 @@ Notes:                ← blockers, decisions, deviations (status never lives he
 ```
 
 - A task has **either** `Steps` or subtasks, never both.
+- Every task has `In scope` and `Out of scope`; out-of-scope items name where the work belongs
+  if anywhere.
+- Steps must be **implementation-ready**: concrete, in order, each one a small action or a short
+  pseudocode block the implementer can execute without re-designing — abstract enough to stay
+  code-free, concrete enough that it is not a second planning exercise. Pseudocode and well-defined
+  micro-steps are encouraged. After plan approval a step's text is a record: implement-task may
+  only flip `- [ ]` to `- [x]` — never reword, merge, or delete step text.
 - The parent's `Subtasks:` list is static content (ids + filenames + names); child statuses
   live in `state.json` and are read via `tasks.py status`.
 - The parent's plan approval covers the whole breakdown; each child gets its own
@@ -170,6 +194,7 @@ below documents what it prints; follow its output:
 
 | Status | `next` prints / action |
 |---|---|
+| blocked (depends-on not all `done`) | "tN is BLOCKED by tX (status)" — do not work it; resume the blocking task or ask the human to revise the plan |
 | `draft` | "Approve plan for tN?" — or if the human's current message approves it, hand to implement-task |
 | `in-progress` | hand to implement-task — except a super-task whose subtasks are all `done` → propagate-context |
 | `impl-review` | "Approve implementation of tN?" — or if the human's current message approves it, hand to propagate-context |

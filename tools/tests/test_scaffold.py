@@ -86,22 +86,40 @@ class LifecycleScaffoldTests(unittest.TestCase):
             self.st.add_root("Leaf")
         self.assertIn("already exists", str(ctx.exception))
 
-    def test_add_subtask_refused_after_root_left_draft(self):
-        """Shape is fixed at plan time (workflow.md §4): no new subtasks once live."""
+    def test_add_subtask_allowed_while_root_in_progress(self):
+        """Re-planning a live super-task (workflow.md §4): new subtasks may be
+        added while the root is in-progress."""
         task, _ = self.st.add_root("Super", is_super=True)
         task.status = "in-progress"
+        child, rel = self.st.add_subtask("t1", "Late child")
+        self.assertEqual(child.id, "t1.1")
+        self.assertTrue(rel)
+
+    def test_add_subtask_refused_at_context_gate(self):
+        """No new subtasks once the super-task reached the context gate."""
+        task, _ = self.st.add_root("Super", is_super=True)
+        task.status = "ctx-review"
         with self.assertRaises(TaskError) as ctx:
             self.st.add_subtask("t1", "Late child")
-        self.assertIn("left draft", str(ctx.exception))
+        self.assertIn("left in-progress", str(ctx.exception))
 
-    def test_rename_child_refused_when_sibling_live(self):
+    def test_rename_child_allowed_while_sibling_live(self):
+        """A draft child of a live super-task may still be renamed (§4) — a
+        sibling being worked does not freeze the other draft children."""
         self.st.add_root("Super", is_super=True)
         first, _ = self.st.add_subtask("t1", "One")
         self.st.add_subtask("t1", "Two")
         first.status = "in-progress"
+        task = self.st.rename("t1.2", "Two renamed")
+        self.assertEqual(task.name, "Two renamed")
+
+    def test_rename_child_refused_once_child_left_draft(self):
+        self.st.add_root("Super", is_super=True)
+        first, _ = self.st.add_subtask("t1", "One")
+        first.status = "in-progress"
         with self.assertRaises(TaskError) as ctx:
-            self.st.rename("t1.2", "Two renamed")
-        self.assertIn("child t1.1 is not draft", str(ctx.exception))
+            self.st.rename("t1.1", "One renamed")
+        self.assertIn("t1.1 is not draft", str(ctx.exception))
 
     def test_remove_missing_file_raises_task_error(self):
         self.st.add_root("Leaf")

@@ -84,6 +84,16 @@ class TestNextOutput(unittest.TestCase):
         self.assertIn("t1 — Leaf (draft)", out)
         self.assertIn("t2 — Super (in-progress)", out)
 
+    def test_blocked_root_is_flagged(self):
+        out = self.show(root(status="draft", depends=["t2"]), super_task())
+        self.assertIn("t1 — Leaf (draft) [BLOCKED by t2 (in-progress)]", out)
+
+    def test_blocked_next_subtask_flagged(self):
+        kids = [child(id="t2.1", status=DONE), child(id="t2.2", depends=["t9"])]
+        out = self.show(super_task(children=kids))
+        self.assertIn("Next subtask of t2: t2.2", out)
+        self.assertIn("BLOCKED by t9 (unknown)", out)
+
 
 class TestNextGuidance(unittest.TestCase):
     def guidance(self, task, parent=None):
@@ -121,14 +131,33 @@ class TestNextGuidance(unittest.TestCase):
         g = self.guidance(super_task())
         self.assertIn("stays in-progress", g)
 
+    def test_approval_guidance_says_stop(self):
+        self.assertIn("then stop", self.guidance(root(status="impl-review")))
+        self.assertIn("then stop", self.guidance(root(status="ctx-review")))
+        self.assertIn("STOP", self.guidance(child(status="in-progress")))
+
+    def test_done_child_stops_when_next_blocked(self):
+        done = child(id="t2.1", status=DONE)
+        nxt = child(id="t2.2", depends=["t9"])
+        parent = Task(id="t2", name="Super", children=[done, nxt])
+        statuses = {"t2": "in-progress", "t2.1": DONE, "t2.2": "draft", "t9": "in-progress"}
+        g = NextGuidance().get_guidance(done, parent, statuses)
+        self.assertIn("blocked by t9 (in-progress)", g)
+        self.assertNotIn("Continue", g)
+
 
 class TestBoard(unittest.TestCase):
     def test_board_lists_all_rows(self):
         board = BoardRenderer().render([root(status="draft"), super_task()])
-        self.assertIn("| id | name | status |", board)
+        self.assertIn("| id | name | status | depends |", board)
         self.assertIn("| t1 | Leaf | draft |", board)
         self.assertIn("| t2 | Super | in-progress |", board)
         self.assertIn("| t2.1 | Child | draft |", board)
+
+    def test_board_shows_depends(self):
+        board = BoardRenderer().render([root(depends=["t2", "t3"]), super_task()])
+        self.assertIn("| t1 | Leaf | draft | t2, t3 |", board)
+        self.assertIn("| t2.1 | Child | draft | — |", board)
 
 
 class TestCheck(unittest.TestCase):

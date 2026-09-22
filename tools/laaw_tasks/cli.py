@@ -102,9 +102,21 @@ class CLI:
         st.save()
         task, parent = st.find(args.id)
         print(f"OK: {task.id} {cur} → {args.status}.")
-        g = NextGuidance().get_guidance(task, parent)
+        statuses = {t.id: t.status for t, _ in st.all_tasks()}
+        g = NextGuidance().get_guidance(task, parent, statuses)
         if g:
             print(f"Next: {g}")
+
+    def cmd_depends(self, args):
+        if not args.dep_ids and not args.clear:
+            raise TaskError("give one or more dep ids, or --clear.")
+        st = State.load(self.store)
+        task = st.set_depends(args.id, [] if args.clear else args.dep_ids)
+        st.save()
+        if task.depends:
+            print(f"OK: {task.id} now depends on {', '.join(task.depends)}.")
+        else:
+            print(f"OK: {task.id} has no depends-on.")
 
     def cmd_status(self, args):
         st = State.load(self.store)
@@ -114,7 +126,10 @@ class CLI:
             if task is None:
                 raise TaskError(f"no task with id {tid}. See: tasks.py board")
             kind = "child of " + parent.id if parent else "root"
-            print(f"{task.id} | {task.name} | {task.status} | {kind} | file: {task.file}")
+            line = f"{task.id} | {task.name} | {task.status} | {kind} | file: {task.file}"
+            if task.depends:
+                line += f" | depends: {', '.join(task.depends)}"
+            print(line)
             return
         print(BoardRenderer().render(st.roots))
 
@@ -144,6 +159,7 @@ class CLI:
         "rename": "cmd_rename",
         "remove": "cmd_remove",
         "set-status": "cmd_set_status",
+        "depends": "cmd_depends",
         "status": "cmd_status",
         "board": "cmd_status",
         "next": "cmd_next",
@@ -190,6 +206,10 @@ def build_parser():
     p = sub.add_parser("set-status", parents=[common], help="flip a status (validated against workflow.md §2)")
     p.add_argument("id")
     p.add_argument("status", choices=STATUSES)
+    p = sub.add_parser("depends", parents=[common], help="set a task's depends-on list (draft tasks only, replaces it)")
+    p.add_argument("id")
+    p.add_argument("dep_ids", nargs="*", help="task ids this task depends on")
+    p.add_argument("--clear", action="store_true", help="remove all depends-on entries")
     p = sub.add_parser("status", parents=[common], help="one task's status line, or the board")
     p.add_argument("id", nargs="?")
     sub.add_parser("board", parents=[common], help="the whole board as a markdown table")
