@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """Installs or re-syncs this repo's workflow content into a target project.
 
-Copies workflow.md, skills/, templates/, README.md, and tools/
+Copies workflow.md, skills/, README.md, and tools/
 into a target project's .ai/workflow/ — the copy-based replacement for
 `git submodule add`/`git submodule update --remote`.
 
-tools/ is shipped as its top-level scripts plus the laaw_tasks/ package
-only: the tests/ suite and .venv/ are development-only and are NOT
-installed into projects.
+tools/ is shipped as its top-level scripts only: the tests/ suite
+and .venv/ are development-only and are NOT installed into projects.
 
 First run against a target with no .ai/workflow/ yet: fresh install.
 Any later run against the same target: re-sync — .ai/workflow/'s
@@ -72,7 +71,6 @@ def main():
     items_to_copy = [
         "workflow.md",
         "skills",
-        "templates",
         "README.md",
         "tools",
     ]
@@ -82,7 +80,7 @@ def main():
         dst = dest / item
         if src.is_dir():
             if item == "tools":
-                # Ship the CLI (top-level scripts + laaw_tasks/ package)
+                # Ship the CLI (top-level scripts only)
                 # but never the development-only tests/ suite or .venv/.
                 if dst.exists():
                     shutil.rmtree(dst)
@@ -90,7 +88,7 @@ def main():
                 for f in sorted(src.iterdir()):
                     if f.is_file():
                         shutil.copy2(f, dst / f.name)
-                    elif f.is_dir() and f.name not in ("tests", ".venv", "__pycache__"):
+                    elif f.is_dir() and f.name not in ("tests", ".venv", "__pycache__", "laaw_tasks"):
                         shutil.copytree(f, dst / f.name, ignore=shutil.ignore_patterns("__pycache__", ".venv"))
             else:
                 shutil.copytree(src, dst, ignore=shutil.ignore_patterns("__pycache__", ".venv"))

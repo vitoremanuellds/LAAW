@@ -1,57 +1,51 @@
----
-name: plan-task
-description: The only skill that creates tasks. Reads workflow, board, and context chosen by index; scaffolds task file(s) via tasks.py new/subtask (the CLI mints IDs, slugs, files, and draft state); fills the task file sections; asks for plan approval. Use when the human wants new work started or says "plan a task".
----
+# plan-task
 
-# Skill: plan-task
+Plan a task: fill its file sections (In scope, Out of scope, Context, Steps/Validations,
+Context updates) and ask for plan approval.
 
-Plan-task turns a request into task file(s). It is the only skill that creates tasks — and it
-does so through the tasks CLI, which mints IDs, slugs, filenames, and `draft` state. Never
-construct an ID, slug, or task filename yourself, and never hand-edit `state.json`.
+## When to use
+
+- After a task is created (`created` status) and its file is drafted (`planning` status).
+- When the human asks to plan a task or re-plan it.
 
 ## Steps
 
-1. Read `.ai/workflow/workflow.md` (once per session) and run `python3 .ai/workflow/tools/tasks.py board`
-   fresh. Choose context by index (workflow.md §8): read `.ai/context/index.md`, open
-   `project.md` plus every file whose name or summary matches the task, and note which files
-   you read. Explore the project only as much as needed to plan honestly.
-2. Decide the shape:
-   - **Leaf task** — one coherent unit of work → a flat file with `Steps`.
-   - **Super-task** — several independent workstreams that share a goal → a folder with a parent
-     `task.md` plus one child file per workstream.
-   - A task has exactly one of these, never both.
-3. Scaffold via the tasks CLI (from the project root):
-   - Leaf: `python3 .ai/workflow/tools/tasks.py new "<Name>" --desc "<one line>"`
-   - Super-task: `... new "<Name>" --super --desc "<one line>"`, then one
-     `... subtask t{N} "<child name>" --desc "<one line>"` per workstream.
-   The CLI mints the IDs (`t{N}`, `t{N}.{k}`), writes the files from the templates, and
-   registers them as `draft`. Read the IDs from its output.
-4. Fill each task file's sections (the CLI left the template placeholders in place):
-   - `Description` — what and why, one paragraph.
-   - `In scope` / `Out of scope` — what the task covers, and what it explicitly does not (name
-     where the out-of-scope work belongs, if anywhere).
-   - `Context` — what the implementer must know; **list the `.ai/context/` files you read in
-     step 1** — the human checks this selection at plan approval.
-   - `Steps` (leaf or child) — **implementation-ready**: concrete, checkable, in order. Each
-     step is a small action or a short pseudocode block the implementer can execute without
-     re-designing — abstract enough to stay code-free, concrete enough that it is not a second
-     planning exercise. A step the implementer would have to break down again is too abstract.
-   - If this task can only start once other existing root tasks are `done`, wire it with
-     `tasks.py depends t{N} t{A} …` (draft tasks only) and say so in the approval summary.
-   - For a super-task parent: the `Subtasks:` list — one line per child:
-     `- t{N}.{k} (t{N}.{k}_{slug}.md) — child name` (static; no status column).
-   - `Validations` — real commands/checks that prove done (tests, builds, greps, manual checks).
-   - `Context updates` — the exact `.ai/context/` changes this task will make when it finishes,
-     or `none`. For a super-task parent: what you expect the children to report.
-5. Show the task file(s) and ask: "Approve plan for t{N}?" (root ID from the CLI output), then stop.
+1. Run `python3 .ai/workflow/tools/laaw.py status <task-id>` to get the task's current state.
+2. Read `workflow.md` (§2, §5, §8) for task file rules and re-read discipline.
+3. If the task is in `created` status (no file yet), run:
+   ```
+   python3 .ai/workflow/tools/laaw.py draft <task-id>
+   ```
+   This writes the task file template and transitions to `planning`.
+4. Read `.ai/context/index.md`, then `project.md` plus every file whose name or summary
+   matches the task (workflow.md §8). List the files read in the task's `Context:` section.
+5. Fill the task file sections:
+   - **In scope**: what this task covers (one short paragraph + bullet list).
+   - **Out of scope**: what it explicitly does NOT do, naming where that work belongs.
+   - **Context**: files read from `.ai/context/` (workflow.md §8).
+   - **Steps** (leaf/child only): implementation-ready, concrete actions. Each step is small
+     enough to execute without re-designing. After plan approval, step text is a record —
+     implement-task may only flip `- [ ]` to `- [x]`.
+   - **Validations**: commands/checks proving the work is done.
+   - **Context updates**: exact changes to make in `.ai/context/` when this task finishes.
+   - **Subtasks** (super-task parent only): static list of child IDs + filenames + names.
+     Add children with `laaw.py subtask <root-id> <name>` before work starts.
+6. Save the task file.
+7. Run `python3 .ai/workflow/tools/laaw.py set-status <task-id> planning` if not already done.
+8. Ask the human: **"Approve plan for <task-id>?"** — show the task file. On approval,
+   stop and wait for the human's answer. Do not ask and answer in the same response.
 
-## Rules
+## Re-planning
 
-- If the human wants **several root tasks** (a project or milestone plan), hand off to
-  **plan-project** instead — one root per request is this skill's scope.
-- On rejection: revise the files, re-ask. If the name or shape changes: `tasks.py rename` /
-  `remove` / `depends` (all draft-only), then re-scaffold. Tasks stay `draft` until the human
-  approves — you never call `set-status`.
-- Never hand-edit `state.json`, never construct IDs/slugs/filenames, never start
-  implementation in the same turn you asked.
-- Keep plans small enough that each task's Validations can actually be run.
+- Tasks still in `created` or `planning` status can be re-planned: rename, remove, add/remove
+  subtasks, or change depends-on lists.
+- Tasks that left `created` (i.e., are `planning` or beyond) can be re-planned too, but
+  `laaw.py` refuses operations that would touch tasks that are `in-progress` or beyond.
+- A `done` task is never re-planned — wrong work gets a new task via `laaw.py new`.
+
+## Notes
+
+- A super-task with no subtasks never reaches the context gate; add subtasks before work starts.
+- The parent's plan approval covers the whole breakdown; each child gets its own
+  implementation approval.
+- Use `laaw.py board` to see the whole board; `laaw.py next` for the exact next action.

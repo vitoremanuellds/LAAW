@@ -1,44 +1,43 @@
----
-name: propagate-context
-description: The context pass and the only path to done. Applies a task's Context updates to .ai/context/ (plus subtask files for super-tasks), flips to ctx-review via tasks.py set-status, asks for context approval, then flips to done and commits .ai/context/. Use when route hands off an impl-review task with approved implementation, or a super-task whose subtasks are all done.
----
+# propagate-context
 
-# Skill: propagate-context
+Aggregate and record context changes approved by the human.
 
-Propagate-context closes the loop: it turns a finished task's `Context updates` into real
-context files, gets approval, and marks the task `done`. It is the only skill allowed to
-trigger `ctx-review` and `done` — always via `tasks.py set-status <id> <status>` — and the
-only skill that commits `.ai/context/`.
+For **subtasks**: propagate their `Context updates` to the parent task's `Context updates` section.
+For **root tasks**: write the aggregated `Context updates` to `.ai/context/` files.
 
-## Preconditions (check fresh with `tasks.py status <id>`)
+## When to use
 
-- A task with Steps: `impl-review` and the human's current message approves its implementation.
-- A super-task: `in-progress` and every subtask `done`.
-- If neither holds, stop and let route re-decide.
+- After a task's implementation is approved and it is in `contextualizing` status.
+- When the human asks to propagate context.
 
 ## Steps
 
-1. Read `.ai/workflow/workflow.md` (once per session), the task file, **and for a super-task
-   every child file in the parent folder** (named by their own IDs), plus
-   `.ai/context/index.md` and every context file you are about to edit — fresh, this turn.
-2. Collect `Context updates` from the task file; for a super-task, merge in each subtask's
-   `Context updates` (the parent's aggregate should already reflect them — flag any mismatch to
-   the human instead of guessing).
-3. Apply the exact edits:
-   - Edit topic files in place; create a new topic file only when the update names one that does
-     not exist yet.
-   - Keep context per workflow.md §6: small, factual, present tense; split a file past ~100
-     lines.
-   - Update `.ai/context/index.md` rows for any added/removed files.
-4. `tasks.py set-status t{N} ctx-review`. Show the exact context diff (per file), then ask:
-   "Approve context changes for t{N}?" and stop.
-5. On rejection: revise the edits, keep `ctx-review`, re-ask.
-6. On approval (human's current message): `set-status t{N} done`. If the project is a git repo:
-   `git add .ai/context && git commit -m "t{N}: context"`. Report the task complete and stop.
+1. Run `python3 .ai/workflow/tools/laaw.py status <task-id>` to get the task's current state.
+2. Read `workflow.md` (§2, §5, §6) for context rules.
+3. Determine if the task is a root or a child:
+   - **Child task**: Read the parent's task file. Merge the child's `Context updates` into
+     the parent's `Context updates` section. Save the parent file.
+   - **Root task**: Read `.ai/context/index.md`, then every file the task's `Context updates`
+     section references. Make the exact changes listed in the task's `Context updates` section.
+     Update `.ai/context/index.md` if new files were created or summaries changed.
+4. Ask the human: **"Approve context changes for <task-id>?"**
+   - For **subtasks**: show the changes made to the parent task's `Context updates` section.
+   - For **root tasks**: show the exact edits to `.ai/context/` files.
+   On approval, stop and wait for the human's answer. Do not ask and answer in the same response.
 
-## Rules
+## Context approval outcomes
 
-- Never edit project code here — implementation was already approved.
-- Never commit anything outside `.ai/context/`.
-- Never hand-edit `state.json`; if the CLI refuses a flip, report the error instead of forcing it.
-- A super-task's subtasks stay `done` in state; only the parent moves to `done`.
+- **Approved**:
+  1. Run `python3 .ai/workflow/tools/laaw.py set-status <task-id> done` to complete the task.
+  2. Record the approval as its first action.
+  3. For **root tasks** only: commit context changes:
+     `git add .ai/context && git commit -m "<task-id>: context"`.
+  4. Continue to the next task.
+- **Rejected**: Fix the issues, re-ask.
+
+## Notes
+
+- Context changes to `.ai/context/` happen **only** for root tasks, always behind approval.
+- Subtask context updates are aggregated up to the parent; the parent's `Context updates`
+  section contains the full set of changes from all its children.
+- Use `laaw.py board` to see the whole board; `laaw.py next` for the exact next action.

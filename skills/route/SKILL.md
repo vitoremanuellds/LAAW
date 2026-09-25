@@ -1,43 +1,34 @@
----
-name: route
-description: Entry point for any LAAW session. Runs tasks.py next, which picks the active root task, and either hands off to exactly one skill or asks the pending approval question. Use when the human says "continue", "what's next", or starts work without naming a step.
----
+# route
 
-# Skill: route
+Determine which skill should handle the next action, based on the current task status and
+the human's message.
 
-Route decides what happens next. It never does task work itself — it follows the output of
-`tasks.py next`, handing off to exactly one other skill, or asking the human the pending
-approval question.
+## When to use
+
+Use **every turn** as the first step. The human's message may contain:
+- An approval answer ("yes", "approved", "looks good")
+- A question or request
+- A re-ask or revision
 
 ## Steps
 
-1. Check `.ai/workflow/workflow.md` exists. If not: LAAW is not installed in this project.
-   Tell the human to run `tools/sync-workflow.py <LAAW-checkout> <project-root>` from a LAAW checkout, then stop.
-2. From the project root run:
+1. Run `python3 .ai/workflow/tools/laaw.py next` to get the current active task and its status.
+2. Read `workflow.md` (§2, §7) to understand the status and expected gate.
+3. Match the human's message to the expected gate:
 
-   ```text
-   python3 .ai/workflow/tools/tasks.py next
-   ```
+| Current status | Expected gate | If human answers YES → | Skill to route to |
+|---|---|---|---|
+| `planning` | Plan approval | `set-status planning → in-progress` | implement-task |
+| `in-progress` | Implementation approval | (fix work if no) | implement-task |
+| `contextualizing` | Context approval | `set-status contextualizing → done` | propagate-context |
 
-   - If it reports **no state file** (not bootstrapped): hand off to **bootstrap** and stop.
-   - If it reports **no active tasks**: report that and offer **plan-task** (a single task) or
-     **plan-project** (several root tasks for the project); stop.
-   - If it reports **multiple active roots**: ask the human which one to work; stop.
-3. Follow exactly what it printed:
-   - **It printed a question** ("Approve … for tN?"): unless the human's current message already
-     answers that exact question, show the artifact it named (task file, diff summary +
-     validation results, exact context edits), ask the question, and stop. If the human's
-     current message already answers it, do the hand-off the output names, in this turn.
-   - **It printed a block** ("… is BLOCKED by …"): report the block and the blocking task to the
-     human; ask whether to resume the blocker or revise the plan (plan-task/plan-project); stop.
-   - **It printed a hand-off** (implement-task / propagate-context): hand off and stop.
-   - **It printed a `Next:` line after a status flip**: do exactly what it says — the same
-     rules apply, including stopping after an approval question.
+4. If the human's message does **not** answer an approval question, or if it's a new request,
+   route to plan-task or another appropriate skill.
+5. If the status is `created`, the next action is `laaw.py draft` to write the task file template.
+6. Output the routing decision and the exact next action.
 
-## Rules
+## Notes
 
-- Never ask and answer in the same response: if you asked for an approval this turn, stop after asking.
-- Every question names the task ID and points at the artifact (task file, diff, context edits).
-- Never do task work yourself, never hand off to more than one skill per route decision.
-- Never hand-edit `.ai/tasks/state.json` — if `tasks.py` refuses something, report the error
-  to the human instead of working around it.
+- Never guess the skill. Always read `next` output first.
+- The status in `state.json` is the source of truth; never infer status from file contents.
+- If `next` reports multiple active roots, let the human choose which to work on.

@@ -19,36 +19,40 @@ asks and answers in the same response.
 ## 2. Statuses — single-writer table
 
 All task state (ids, names, statuses, file paths) lives in ONE file: `.ai/tasks/state.json`.
-It is written only by the tasks CLI (`python3 .ai/workflow/tools/tasks.py`) — never by hand,
+It is written only by the tasks CLI (`python3 .ai/workflow/tools/laaw.py`) — never by hand,
 never via a file-editing tool, no matter what. The CLI validates every `set-status` call
 against the table below and refuses anything else, so the table is also the complete set of
 legal status changes. `tools/tests/` keeps the CLI's table in sync with this one.
+
+Linear 5-state flow:
+
+```text
+created ──draft──▶ planning ──approve plan──▶ in-progress ──approve impl──▶ contextualizing ──approve ctx──▶ done
+```
+
 Which skill may trigger each transition:
 
 | From | To | Only writer | Trigger |
 |---|---|---|---|
-| — | `draft` | plan-task | `tasks.py new` / `subtask` scaffolds the task(s) |
-| `draft` | `in-progress` | implement-task | plan approved (root), or a subtask's turn comes |
-| `impl-review` | `in-progress` | implement-task | implementation rejected → fix work |
-| `in-progress` | `impl-review` | implement-task | Steps done, Validations run, Context updates filled |
-| `impl-review` | `done` | implement-task | implementation approved (subtasks only) |
-| `impl-review` | `ctx-review` | propagate-context | task with Steps: context changes written |
-| `in-progress` | `ctx-review` | propagate-context | super-task: all subtasks `done`, parent Validations run, context changes written |
-| `ctx-review` | `done` | propagate-context | context approved; `.ai/context/` committed |
+| — | `created` | laaw.py | `laaw.py <state.json> new` / `subtask` registers the task (no file written yet) |
+| `created` | `planning` | laaw.py | `laaw.py <state.json> draft` writes the task file template |
+| `planning` | `in-progress` | implement-task | plan approved (root), or a subtask's turn comes |
+| `in-progress` | `contextualizing` | implement-task | Steps done, Validations run, Context updates filled |
+| `contextualizing` | `done` | propagate-context | context approved; `.ai/context/` committed |
 
 Rules:
 - **No markdown file holds a status.** Task files hold content (Description, In scope, Out of
-  scope, Steps, Validations, Context updates, Notes); `tasks.py status` is the only place to read one.
-- A **blocked** task — its depends-on list is not all `done` — cannot move past `draft`; the CLI
-  refuses the flip and `next` marks it. Depends-on lists are set with `tasks.py depends` while a
-  task is still draft (workflow.md §4).
-- A task with Steps reaches `impl-review` and waits there for implementation approval.
-- A root task with Steps always passes through `ctx-review` — the `impl-review → done` row
-  above is for subtasks only.
+  scope, Steps, Validations, Context updates, Notes); `laaw.py status` is the only place to read one.
+- A **blocked** task — its depends-on list is not all `done` — cannot move past `created`; the CLI
+  refuses the flip and `next` marks it. Depends-on lists are set with `laaw.py depends` while a
+  task is still `created` (workflow.md §4).
+- A task with Steps reaches `contextualizing` and waits there for context approval.
+- A root task with Steps always passes through `contextualizing` — the `in-progress → done` path
+  is for subtasks only.
 - A super-task stays `in-progress` while its subtasks are worked; each subtask goes
-  `draft → in-progress → impl-review → done` on its own. The parent then moves to the context gate.
+  `created → planning → in-progress → contextualizing → done` on its own. The parent then moves to the context gate.
 - A super-task with no subtasks never reaches the context gate; plan-task adds the subtasks
-  before work starts (`tasks.py subtask` is refused once the root left `draft`).
+  before work starts (`laaw.py subtask` is refused once the root left `created`).
 - After any rejection, the fix work happens before the re-ask, and the status flips back first.
 - A `done` task never changes status again; wrong work gets a new task via plan-task.
 
@@ -57,14 +61,14 @@ Rules:
 - Human-only: an approval is a human message answering the specific question asked. Never ask
   and answer in the same response. Re-asking after edits is safe; approvals are not consumed.
 - Every question names the task ID and points at the artifact being approved.
-- The agent records each approval as its first action — a `tasks.py set-status` call — then
+- The agent records each approval as its first action — a `laaw.py set-status` call — then
   continues in the same turn.
 
 | Gate | Question asked | Recorded by |
 |---|---|---|
-| Plan | "Approve plan for tN?" (task file shown/linked) | implement-task: `set-status` `draft → in-progress` |
-| Implementation | "Approve implementation of tN?" (diff summary + validation results shown) | subtask: implement-task sets `done`; task with Steps: propagate-context sets `ctx-review` |
-| Context | "Approve context changes for tN?" (exact edits shown) | propagate-context: `set-status` `ctx-review → done` |
+| Plan | "Approve plan for tN?" (task file shown/linked) | implement-task: `set-status` `planning → in-progress` |
+| Implementation | "Approve implementation of tN?" (diff summary + validation results shown) | subtask: implement-task sets `done`; task with Steps: propagate-context sets `contextualizing` |
+| Context | "Approve context changes for tN?" (exact edits shown) | propagate-context: `set-status` `contextualizing → done` |
 
 ## 4. Layout and IDs
 
@@ -73,8 +77,7 @@ Rules:
   workflow/            ← synced LAAW copy; never hand-edit
     workflow.md
     skills/<name>/SKILL.md
-    templates/
-    tools/             ← tasks.py lives here
+    tools/             ← laaw.py lives here
   tasks/               ← local working files, gitignored
     state.json         ← single source of truth: ids, names, statuses, files
     t1_add-login.md            ← leaf task: flat file
@@ -95,9 +98,9 @@ Rules:
 - Shape follows content: a leaf task is one flat file; a super-task is a folder with `task.md`
   plus one child file per workstream.
 - A task's shape is fixed at plan time; **re-planning** may still change any task that is still
-  `draft`: `tasks.py rename`, `remove`, `depends`, and — for a live super-task — `subtask` (adding
+  `created`: `laaw.py rename`, `remove`, `depends`, and — for a live super-task — `subtask` (adding
   a child) and `remove`/`rename` (dropping or renaming a child that has not started). The CLI
-  refuses any operation that would touch a task that left `draft`; a super-task stops accepting
+  refuses any operation that would touch a task that left `created`; a super-task stops accepting
   children once it reaches the context gate. A `done` task is never re-planned — wrong work gets
   a new task via plan-task.
 - Tasks are local working files: `.ai/tasks/.gitignore` contains `*`. Context is committed.
@@ -107,11 +110,12 @@ The tasks CLI (run from the project root, or with `--root`):
 ```text
 init                     create .ai/tasks/ (state.json, .gitignore) and .ai/context/ (index.md)
 new <name> [--super] [--desc T]
-subtask <root-id> <name> [--desc T]      draft or in-progress super-tasks
-rename <id> <new-name>   draft tasks only
-remove <id>              draft tasks only
+draft <id>               write task file template, flip created → planning
+subtask <root-id> <name> [--desc T]    register a child of a super-task
+rename <id> <new-name>   created/planning tasks only
+remove <id>              created/planning tasks only
 set-status <id> <status> validated against §2 (refused while blocked)
-depends <id> <dep-id>…  set the depends-on list (draft tasks only; replaces it; --clear empties it)
+depends <id> <dep-id>…  set the depends-on list (created/planning tasks only; replaces it; --clear empties it)
 status [id]              one task, or the board
 board                    the whole board as a markdown table (includes depends-on)
 next                     active task + exact next action/question
@@ -124,12 +128,12 @@ follow that output; an approval question always ends the turn.
 
 ## 5. Task files
 
-One file per task, scaffolded from `templates/task-template.md` (leaf/child) or
-`templates/super-task-template.md` (super-task parent) — scaffolding is done by
-`tasks.py new` / `subtask`, which also registers the task in `state.json`:
+One file per task, scaffolded by `laaw.py draft` — which also transitions the task to `planning`:
 
 ```markdown
 # tN — name
+
+Status: created
 
 Description: …
 
@@ -168,7 +172,7 @@ Notes:                ← blockers, decisions, deviations (status never lives he
   micro-steps are encouraged. After plan approval a step's text is a record: implement-task may
   only flip `- [ ]` to `- [x]` — never reword, merge, or delete step text.
 - The parent's `Subtasks:` list is static content (ids + filenames + names); child statuses
-  live in `state.json` and are read via `tasks.py status`.
+  live in `state.json` and are read via `laaw.py status`.
 - The parent's plan approval covers the whole breakdown; each child gets its own
   implementation approval. The parent's `Context updates` aggregate what the children report.
 
@@ -186,7 +190,7 @@ Notes:                ← blockers, decisions, deviations (status never lives he
 On every resume, from the project root run:
 
 ```text
-python3 .ai/workflow/tools/tasks.py next
+python3 .ai/workflow/tools/laaw.py next
 ```
 
 It picks the lowest-ID non-`done` root and prints the exact action or question — the table
@@ -195,10 +199,10 @@ below documents what it prints; follow its output:
 | Status | `next` prints / action |
 |---|---|
 | blocked (depends-on not all `done`) | "tN is BLOCKED by tX (status)" — do not work it; resume the blocking task or ask the human to revise the plan |
-| `draft` | "Approve plan for tN?" — or if the human's current message approves it, hand to implement-task |
+| `created` | "Draft the task file (laaw.py draft), fill sections, then ask plan approval" |
+| `planning` | "Approve plan for tN?" — or if the human's current message approves it, hand to implement-task |
 | `in-progress` | hand to implement-task — except a super-task whose subtasks are all `done` → propagate-context |
-| `impl-review` | "Approve implementation of tN?" — or if the human's current message approves it, hand to propagate-context |
-| `ctx-review` | "Approve context changes for tN?" — or if the human's current message approves it, hand to propagate-context to record/complete |
+| `contextualizing` | "Approve context changes for tN?" — or if the human's current message approves it, hand to propagate-context to record/complete |
 
 If `next` reports several live roots, let the human choose. If it reports none, offer plan-task.
 
@@ -206,7 +210,7 @@ If `next` reports several live roots, let the human choose. If it reports none, 
 
 Before acting, re-read — never from memory of an earlier read: this file (once per session),
 the active task file, and the `.ai/context/` files you need. Task state is re-read via
-`tasks.py` (it is cheap and always current — never trust a status read in an earlier turn).
+`laaw.py` (it is cheap and always current — never trust a status read in an earlier turn).
 Context is chosen by index, not read wholesale:
 
 - **plan-task** reads `.ai/context/index.md`, opens `project.md` plus every file whose name or
