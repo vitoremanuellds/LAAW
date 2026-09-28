@@ -1,6 +1,8 @@
 # LAAW Workflow
 
-Read this file at the start of every session. It is the reference for how the agent works in this project. It is a condensed version of the full LAAW specification.
+Read this file at the start of every session. It is the reference for how the agent works in this project.
+
+LAAW is not a project management solution — it is a workflow for the user to work with the agent. Tasks are done sequentially, not in parallel, by a single agent. The tasks folder is git-ignored for that reason, so tasks and IDs are unique per user. If you want parallel agents, give each agent its own git worktree and bootstrap the project in each one.
 
 ## Principles
 
@@ -8,7 +10,7 @@ Read this file at the start of every session. It is the reference for how the ag
 2. **Human gates.** The human approves the plan, then the implementation, then the propagated context. Never skip a gate.
 3. **Deviations are recorded.** Anything that deviates from the approved plan is noted in the task file's Notes section.
 4. **Context propagates.** After implementation, the information the task created is written back into the context files.
-5. **Files stay small.** Any file larger than 100 lines is split into smaller files. The entry point links unidirectionally to its children; children do not link back.
+5. **Files stay small.** Any file inside `.ai/` larger than 100 lines is split into smaller files. The entry point links unidirectionally to its children; children do not link back. This rule applies only to files inside `.ai/`, not to project code, and does not apply to `workflow/workflow.md` itself — it is the session entry point and is always read in full.
 
 ## Layout
 
@@ -22,6 +24,7 @@ All agent-generated files live in `.ai/`:
 │   ├── t01_add-login.md    # simple task
 │   └── t02_add-auth/       # supertask folder
 │       ├── task.md         # supertask plan
+│       ├── new-info.md     # staging area for subtask context
 │       ├── t02.1_jwt-service.md
 │       └── t02.2_user-model.md
 └── context/                # project wiki (committed)
@@ -53,6 +56,7 @@ Every task — simple task, supertask, or subtask — has a status. Subtasks kee
 | `planning` | the plan file exists and is being iterated with the user |
 | `in-progress` | the plan is approved and the agent is implementing |
 | `propagating-context` | the implementation is approved and the agent is propagating the context |
+| `cancelled` | the user abandoned the task; work stopped (terminal state) |
 | `done` | fully complete (terminal state) |
 
 A dependency is satisfied only when its status is `done`.
@@ -70,8 +74,9 @@ Every task file (simple, supertask, or subtask) contains:
 | Steps | always | what to do, may include pseudocode |
 | Validations | always | how to verify; may include human-only checks |
 | Subtask table | supertasks only | like the task index, for its subtasks |
-| New info | supertasks only | staging area for subtask context |
-| Notes | optional | deviations and relevant observations |
+| Notes | always | deviations and relevant observations; required, initially empty |
+
+Subtask context does not live in the task file: it is staged in a dedicated `new-info.md` file inside the supertask folder, linked from `task.md`.
 
 ## Context files (`.ai/context/`)
 
@@ -90,7 +95,9 @@ Keeping context current is part of propagation: files a task changed are updated
 
 - **Dependencies gate implementation.** Never implement a task whose dependencies are not `done`. If asked, refuse and name the unsatisfied dependencies.
 - **Registering ≠ planning.** Registering a task = adding its index row. Planning = creating its file. For simple tasks and supertasks, do both in one swoop. For subtasks, never: a subtask file is only created when the user explicitly asks.
-- **Splitting.** Files over 100 lines are split; the entry point links one-way to the children.
+- **Approved plans are immutable.** After a plan is approved, the only mutable parts of the task file are the Notes section (and, for supertasks, the subtask table). `new-info.md` is the staging file and is appended to during propagation. If a plan turns out to be unimplementable, the agent stops, notifies the user, and the user must re-plan the whole task with the agent (the status goes back to `planning`). When the re-planned task is approved again, the agent reports its dependent tasks so the user can check the new plan still satisfies them.
+- **Cancellation never unblocks.** A cancelled dependency can never become `done`, so its dependents are blocked forever unless the user acts on them. The agent never cascades cancellation: it reports the dependent tasks and the user decides for each (cancel it too, re-plan it without the dependency, or replace the dependency with a new task). Dependencies live in the index's Dependencies column, which is the mutable state ledger — re-pointing a dependency is an index edit.
+- **Splitting.** Any `.ai/` file over 100 lines is split (except `workflow/workflow.md`, which is always read in full); the entry point links one-way to the children.
 
 ## Loops
 
@@ -106,11 +113,12 @@ Keeping context current is part of propagation: files a task changed are updated
    If any dependency is not completed → refuse, name the dependencies.
    Implement, iterating with the user until the implementation is approved.
    - User requests a change incompatible with the plan → note the deviation in Notes.
-   - Plan turns out unimplementable → notify the user, note the deviation.
+   - Plan turns out unimplementable → stop, notify the user, note the deviation. The user re-plans the whole task (status back to `planning`).
+   - User asks to abandon or cancel the task → mark it `cancelled` in the index (or the supertask's subtask table), stop the work, and scan the index and all supertask subtask tables for tasks that depend on it. Report them to the user — they will never unblock — and let the user decide for each: cancel it too, re-plan it without the dependency, or replace the dependency with a new task. Never cancel dependents automatically.
 
 3. PROPAGATE CONTEXT
    Agent writes the task's information back:
-   - subtask → the supertask's task.md "New info" section
+   - subtask → the supertask's `new-info.md`
    - simple task → the context files (create new, update existing, mark obsolete)
    User approves the propagated context.
 ```
@@ -125,16 +133,16 @@ Keeping context current is part of propagation: files a task changed are updated
    User explicitly asks to plan the subtask (default: one at a time; the user may
    ask to plan several or all in advance).
    Then run IMPLEMENT and PROPAGATE, with propagation going to the supertask's
-   "New info" section.
+   `new-info.md`.
 
 3. FINAL PROPAGATION:
-   Move the "New info" content into the context files.
+   Move the `new-info.md` content into the context files.
 ```
 
 ## Skills
 
 Use the skills installed for this workflow:
 
-- `plan-task` — register and plan a task; decides simple vs supertask.
-- `implement-task` — check dependencies, implement, record deviations, run validations.
+- `plan-task` — register and plan a task, or plan a subtask of an existing supertask; decides simple vs supertask.
+- `implement-task` — check dependencies, implement, record deviations, handle cancellation, run validations.
 - `propagate-context` — write context back to the right place.
