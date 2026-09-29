@@ -14,7 +14,7 @@ Read `.ai/workflow/workflow.md` first if you have not read it this session.
    - Subtask: `.ai/tasks/t{0N}_supertask-name/t{0N}.{n}_subtask-name.md`
 2. Check dependencies from the index (`.ai/tasks/index.md`, or the supertask's Subtask table for subtasks). If any dependency is not `done`:
    - **Refuse to implement.** Tell the user which dependencies are unsatisfied. Stop.
-3. Read the task file and the context files listed in its Context section.
+3. Read the task file and the context files linked in its Context section. This is your context for the task: do not read any other files from the codebase before finishing these.
 4. Set the task's status to `in-progress` in the index (or the supertask's subtask table).
 5. Implement following the Steps section, staying inside In scope.
 6. Iterate with the user until the implementation is approved:
@@ -29,4 +29,5 @@ Read `.ai/workflow/workflow.md` first if you have not read it this session.
 - The approved plan is the contract and is immutable: after approval, the only mutable parts of the task file are Notes (and, for supertasks, the subtask table). Any departure from the plan is a deviation and must be recorded in Notes.
 - A cancelled dependency never becomes `done`, so its dependents are blocked until the user acts on them. The index's Dependencies column is the mutable state ledger — re-pointing a dependency is an index edit.
 - Do not expand scope. If you discover work that is out of scope, note it in Notes and tell the user; do not do it.
+- Context comes from the plan's Context section first: read the linked `.ai/context/` files before reading any other files from the codebase.
 - Keep any new or edited project files consistent with the documented architecture in `.ai/context/`.

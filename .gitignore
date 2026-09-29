@@ -3,6 +3,8 @@ __pycache__/
 .venv/
 
 # never let a tasks.py init land in this checkout by accident
-.ai/
 .agents/skills/
 prompt.md
+
+# LAAW: tasks are per-user; context and workflow are committed
+.ai/tasks/
