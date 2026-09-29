@@ -16,7 +16,7 @@ LAAW is not a project management solution — it is a workflow for the user to w
 |---|---|
 | `laaw.py` | CLI to bootstrap LAAW into a project |
 | `workflow.md` | Condensed workflow reference, read by the agent at the start of every session |
-| `skills/` | The workflow skills: `plan-task`, `implement-task`, `propagate-context` |
+| `skills/` | The workflow skills: `plan-task`, `implement-task`, `propagate-context`; plus optional `bootstrap-project` and `gather-context` |
 
 ## Bootstrap a project
 
