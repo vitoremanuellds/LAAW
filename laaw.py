@@ -6,7 +6,7 @@ Subcommands:
                         target project. `path` defaults to the current
                         directory. Also creates the .ai/tasks/ and
                         .ai/context/ skeleton with their indexes, and makes
-                        sure .ai/tasks/ is git-ignored.
+                        sure .ai/tasks/ and .ai/workflow/ are git-ignored.
   sync skills <path>    Copy the skills from the LAAW skills/ folder into the
                         given path.
 """
@@ -60,19 +60,16 @@ def sync_workflow(target: Path) -> None:
             index.write_text(template)
             print(f"created {index}")
 
-    # Keep .ai/tasks/ out of the repo by default.
+    # Keep per-user folders (tasks, workflow copies) out of the repo by default.
     gitignore = target / ".gitignore"
-    entry = ".ai/tasks/\n"
-    if gitignore.exists():
-        content = gitignore.read_text()
-        if ".ai/tasks" not in content:
-            if not content.endswith("\n"):
-                content += "\n"
-            gitignore.write_text(content + entry)
-            print(f"updated {gitignore} (+ .ai/tasks/)")
-    else:
-        gitignore.write_text(entry)
-        print(f"created {gitignore}")
+    entries = [".ai/tasks/", ".ai/workflow/"]
+    content = gitignore.read_text() if gitignore.exists() else ""
+    if content and not content.endswith("\n"):
+        content += "\n"
+    added = [e for e in entries if e.rstrip("/") not in content]
+    if added:
+        gitignore.write_text(content + "".join(e + "\n" for e in added))
+        print(f"updated {gitignore} (+ {' '.join(added)})")
 
     print(f"workflow synced into {target}")
 

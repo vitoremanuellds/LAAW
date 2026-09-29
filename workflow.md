@@ -2,7 +2,7 @@
 
 Read this file at the start of every session. It is the reference for how the agent works in this project.
 
-LAAW is not a project management solution — it is a workflow for the user to work with the agent. Tasks are done sequentially, not in parallel, by a single agent. The tasks folder is git-ignored for that reason, so tasks and IDs are unique per user. If you want parallel agents, give each agent its own git worktree and bootstrap the project in each one.
+LAAW is not a project management solution — it is a workflow for the user to work with the agent. Tasks are done sequentially, not in parallel, by a single agent. The tasks folder is git-ignored for that reason, so tasks and IDs are unique per user. The workflow folder is also git-ignored: it is a copy of the LAAW checkout's `workflow.md`, which stays the source of truth. If you want parallel agents, give each agent its own git worktree and bootstrap the project in each one.
 
 ## Principles
 
@@ -99,6 +99,7 @@ Keeping context current is part of propagation: files a task changed are updated
 - **Registering ≠ planning.** Registering a task = adding its index row. Planning = creating its file. For simple tasks and supertasks, do both in one swoop. For subtasks, never: a subtask file is only created when the user explicitly asks.
 - **Approved plans are immutable.** After a plan is approved, the only mutable parts of the task file are the Notes section (and, for supertasks, the subtask table). `new-info.md` is the staging file and is appended to during propagation. If a plan turns out to be unimplementable, the agent stops, notifies the user, and the user must re-plan the whole task with the agent (the status goes back to `planning`). When the re-planned task is approved again, the agent reports its dependent tasks so the user can check the new plan still satisfies them.
 - **Cancellation never unblocks.** A cancelled dependency can never become `done`, so its dependents are blocked forever unless the user acts on them. The agent never cascades cancellation: it reports the dependent tasks and the user decides for each (cancel it too, re-plan it without the dependency, or replace the dependency with a new task). Dependencies live in the index's Dependencies column, which is the mutable state ledger — re-pointing a dependency is an index edit.
+- **Git.** `laaw.py sync workflow` adds `.ai/tasks/` and `.ai/workflow/` to `.gitignore`. Only `.ai/context/` is committed.
 - **Splitting.** Any `.ai/` file over 100 lines is split (except `workflow/workflow.md`, which is always read in full); the entry point links one-way to the children.
 - **Simple vs supertask.** Hard signals force a supertask: the plan file exceeds 100 lines, or the work spans 2+ modules in `.ai/context/`. The size trigger (estimated >600 lines of net change) requires the agent to present a split proposal or a documented justification in the plan. The estimate and the decision go into the plan file so the user can veto at the plan gate.
 

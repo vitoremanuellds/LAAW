@@ -6,5 +6,6 @@ __pycache__/
 .agents/skills/
 prompt.md
 
-# LAAW: tasks are per-user; context and workflow are committed
+# LAAW: tasks and workflow copies are per-user; only context is committed
 .ai/tasks/
+.ai/workflow/
