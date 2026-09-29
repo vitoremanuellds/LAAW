@@ -89,6 +89,8 @@ The project's wiki: architecture, mission, tech stack, modules, decisions. Descr
 | project.md | Mission and tech stack | valid |
 | auth-module.md | Auth module: JWT service… | valid |
 
+Context files describe the project's current state, not its history: they never mention task IDs, task names, or task files.
+
 Keeping context current is part of propagation: files a task changed are updated; files a task made obsolete are marked not valid in the index.
 
 ## Rules

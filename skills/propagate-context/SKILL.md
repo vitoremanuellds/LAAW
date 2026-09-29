@@ -13,7 +13,7 @@ Read `.ai/workflow/workflow.md` first if you have not read it this session.
    - **Subtask** (file lives inside a supertask folder) → propagate to the supertask's `new-info.md` staging file.
    - **Simple task** → propagate to the context files in `.ai/context/`.
 
-2. Gather the information the implementation created: new modules, architecture decisions, API surface, conventions, gotchas. Ignore trivia — context is for what a future agent needs.
+2. Gather the information the implementation created: new modules, architecture decisions, API surface, conventions, gotchas. Ignore trivia — context is for what a future agent needs. Describe the project's current state, not what a task did.
 
 3. Write it back:
    - **Subtask:** append the information to the supertask's `new-info.md`. If the file does not exist, create it (and link it from `task.md`).
@@ -25,6 +25,7 @@ Read `.ai/workflow/workflow.md` first if you have not read it this session.
    - **Supertask final propagation** (when all subtasks are done): take the content of the supertask's `new-info.md` and distribute it into the context files as above.
 
 4. Respect the 100-line limit for `.ai/` files: if a context file grows past 100 lines, split it into smaller files and keep the entry point linking one-way to the children.
+5. Keep context agnostic to tasks: never mention task IDs, task names, or task files inside `.ai/context/` files (including the index). If a context file already contains such references, drop them while you are there.
 
-5. Present the changes to the user. The user approves the context; only after approval is the propagation done.
-6. Once the user approves the context, set the task's status to `done` (in the index, or in the supertask's subtask table).
+6. Present the changes to the user. The user approves the context; only after approval is the propagation done.
+7. Once the user approves the context, set the task's status to `done` (in the index, or in the supertask's subtask table).
