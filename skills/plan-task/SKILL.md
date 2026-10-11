@@ -38,8 +38,8 @@ For a new task, classify it using these criteria:
 - **Hard signals → supertask, no debate:**
   - the plan file would exceed 100 lines;
   - the work spans 2+ modules/layers defined in `.ai/context/`.
-- **Size trigger → present a split proposal:** estimated more than 600 lines of net change. If the work genuinely cannot be split into ≥2 independently verifiable chunks, it stays a simple task — but the plan must record the estimate and why it is not splittable.
-- **Transparency:** always write the estimate (files touched, lines of change, modules spanned) and the simple/supertask decision with its reasoning into the plan file, so the user can veto it at the plan gate.
+- **Sizing → present a split proposal (vetoable at the plan gate):** a task is sized to fit one 64k session — plan + implementation + propagation — and one honest review. A split proposal fires if **any** of: estimated more than 200 lines of net change with tests and fixtures counted in full; more than 5 files; more than 5 independent design decisions (count them in the plan's Steps); the change touches a public API, persistence/migration, security, or wire format; the verification pass (tests, build) plausibly needs more than one fix round. If the work genuinely cannot be split, it stays a simple task — but record the estimate and why. A split, when it happens, must leave every subtask ending in a state that passes its own validations: verification loops must not stack.
+- **Transparency:** always write the estimate with concrete file names — an estimate without file names is not an estimate — the session budget (plan+context ≈5k tokens, reading ≈3× the changed lines, the edits, two test rounds ≈10–15k, gate buffer), and the decision with its reasoning into the plan file, so the user can veto it at the plan gate. The hard cap is not vetoable: more than 300 lines of total diff including tests, or more than 3 distinct design decisions in flight at once — past that the review gate is a rubber-stamp.
 
 ## Rules
 
