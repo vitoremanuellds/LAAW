@@ -22,7 +22,7 @@ Read `.ai/workflow/workflow.md` first if you have not read it this session.
    - Subtask: `t{N}.{next}`, read from the supertask's Subtask table.
 5. Register the task:
    - New task: add a row to the index table with ID, Status, Name, Description (≤ 180 chars), Type (`simple` or `supertask`), Dependencies. Set the status to `planning` once the plan file is created. Tasks registered without a plan file stay `not-planned`.
-   - Subtask: its row already exists in the supertask's Subtask table (add it if missing). Set its status to `planning` once the plan file is created. Do not touch the top-level index.
+   - Subtask: its row already exists in the supertask's Subtask table (add it if missing). Once the plan file is created, set its status to `planning` in the Subtask table, and set the owning supertask's status to `in-progress` in the top-level index (if it is not already `in-progress`). That status change is the only touch on the top-level index allowed when planning a subtask.
 6. Create the plan file:
    - Simple task: `.ai/tasks/t{0N}_task-name.md`
    - Supertask: `.ai/tasks/t{0N}_task-name/task.md`, with a Subtask table listing its subtasks. Do NOT create subtask files or `new-info.md` yet — subtask files are only created when the user asks for them, and `new-info.md` is created on first subtask propagation.

@@ -135,7 +135,8 @@ Keeping context current is part of propagation: files a task changed are updated
 
 2. For each subtask (in order):
    User explicitly asks to plan the subtask (default: one at a time; the user may
-   ask to plan several or all in advance).
+   ask to plan several or all in advance). Planning a subtask sets the
+   supertask's row in the top-level task index to `in-progress` right away.
    Then run IMPLEMENT and PROPAGATE, with propagation going to the supertask's
    `new-info.md`.
 

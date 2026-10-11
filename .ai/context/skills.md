@@ -6,7 +6,7 @@ Core (part of the task loop):
 
 | Skill | When | What it does |
 |---|---|---|
-| `plan-task` | User asks to plan | Registers the task, creates the plan file, decides simple vs supertask, context before codebase |
+| `plan-task` | User asks to plan | Registers the task, creates the plan file, decides simple vs supertask, subtask planning sets the supertask `in-progress` in the index, context before codebase |
 | `implement-task` | User asks to implement an approved task | Checks dependencies, implements, records deviations, handles cancellation, runs validations |
 | `propagate-context` | After implementation is approved | Writes the task's information back into `.ai/context/` (or the supertask's `new-info.md`) |
 
