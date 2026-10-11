@@ -61,7 +61,23 @@ context propagation, use the `plan-task`, `implement-task`, and
 `propagate-context` skills.
 ```
 
-Adjust the paths if you installed the skills somewhere else.
+Installed the workflow or the skills somewhere else? See [Non-default install locations](#non-default-install-locations).
+
+## Non-default install locations
+
+`workflow.md` and the skills use the default locations as their vocabulary: they refer to `.ai/workflow/workflow.md`, `.ai/tasks/`, and `.ai/context/`, and expect the skills under `.agents/skills` (or `~/.agents/skills` for a global install). If you installed the workflow files or the skills somewhere else, the agent cannot discover that on its own — add the mapping to the `Workflow` section in `AGENTS.md`:
+
+```markdown
+LAAW locations in this project:
+- workflow reference: `.ai/workflow/workflow.md` → `<actual>/workflow.md`
+- tasks: `.ai/tasks/` → `<actual>/tasks/`
+- context: `.ai/context/` → `<actual>/context/`
+- skills: installed at `<actual>/skills/`
+```
+
+Any file a skill creates under `.ai/` (for example `gather-context`'s `.ai/.queue.md`) follows the same mapping.
+
+Note: `laaw.py sync workflow` only creates the default `.ai/` layout; any other layout is set up by hand, which is exactly why the agent needs the mapping.
 
 ## How a task flows
 
