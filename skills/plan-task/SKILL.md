@@ -27,6 +27,7 @@ Read `.ai/workflow/workflow.md` first if you have not read it this session.
    - Simple task: `.ai/tasks/t{0N}_task-name.md`
    - Supertask: `.ai/tasks/t{0N}_task-name/task.md`, with a Subtask table listing its subtasks. Do NOT create subtask files or `new-info.md` yet — subtask files are only created when the user asks for them, and `new-info.md` is created on first subtask propagation.
    - Subtask: `.ai/tasks/t{0N}_supertask-name/t{0N}.{n}_subtask-name.md`
+   - A plan file that outgrows 100 lines and must stay (a supertask's `task.md`, a subtask file, or a simple plan whose split proposal was vetoed) is split into `<base>_att_<descriptive>.md` files, named per the att convention in `workflow.md` and linked from the main file.
 7. The plan file must contain: Title, Description, Context, In scope / Out of scope, Steps (with pseudocode where useful), Validations (including any human-only checks), and Notes (required, initially empty).
    - Context lists the relevant `.ai/context/` files **with their paths** (e.g. `../../context/auth-module.md`). It is the direct door to context: whoever implements this task reads those files first, before touching the codebase.
 
@@ -42,7 +43,7 @@ For a new task, classify it using these criteria:
 
 ## Rules
 
-- Keep the plan file under 100 lines. If it grows beyond that, the task is a supertask (hard signal above).
+- Keep the plan file under 100 lines. If it grows beyond that, the task is a supertask (hard signal above). A file that must stay and outgrows 100 lines is split into att files named per the att convention in `workflow.md`.
 - Subtask files are only created when the user explicitly asks to plan that subtask — never on your own initiative.
 - Context before codebase: read `.ai/context/index.md` first, then only the files that look relevant to the task's scope, and only then read codebase files.
 - Present the plan to the user. Iterate with the user until the plan is approved. Do not start implementing.
