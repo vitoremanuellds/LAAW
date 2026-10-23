@@ -1,10 +1,7 @@
-"""Status and Action enums for the LAAW task state machine.
-
-Transition legality lives in can_transition; this module only names the states
-and actions so every other module imports one shared vocabulary.
-"""
+"""Status and Action enums plus the transition table for the LAAW task state machine."""
 
 from enum import Enum
+from typing import Dict, Optional
 
 
 class Status(Enum):
@@ -27,3 +24,38 @@ class Action(Enum):
     PROPAGATE = "propagate"
     DONE = "done"
     CANCEL = "cancel"
+
+
+# Maps each action to {status it is legal from: status it results in}.
+# None as a key means "no current status" (only register uses it).
+TRANSITIONS: Dict[Action, Dict[Optional[Status], Status]] = {
+    Action.REGISTER: {None: Status.NOT_PLANNED},
+    Action.PLAN: {
+        Status.NOT_PLANNED: Status.PLANNING,
+        Status.IN_PROGRESS: Status.PLANNING,
+        Status.PROPAGATING_CONTEXT: Status.PLANNING,
+    },
+    Action.IMPLEMENT: {
+        Status.PLANNING: Status.IN_PROGRESS,
+        Status.PROPAGATING_CONTEXT: Status.IN_PROGRESS,
+    },
+    Action.PROPAGATE: {Status.IN_PROGRESS: Status.PROPAGATING_CONTEXT},
+    Action.DONE: {Status.PROPAGATING_CONTEXT: Status.DONE},
+    Action.CANCEL: {
+        Status.NOT_PLANNED: Status.CANCELLED,
+        Status.PLANNING: Status.CANCELLED,
+        Status.IN_PROGRESS: Status.CANCELLED,
+        Status.PROPAGATING_CONTEXT: Status.CANCELLED,
+    },
+}
+
+
+def can_transition(current: Optional[Status], action: Action) -> bool:
+    return current in TRANSITIONS[action]
+
+
+def resulting_status(current: Optional[Status], action: Action) -> Status:
+    try:
+        return TRANSITIONS[action][current]
+    except KeyError:
+        raise ValueError(f"illegal transition: {action.value} from {current}")
