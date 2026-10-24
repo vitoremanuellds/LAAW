@@ -21,7 +21,7 @@ def ensure_dir(path: str) -> None:
     Path(path).mkdir(parents=True, exist_ok=True)
 
 
-def list_files(directory: str) -> list:
+def list_files(directory: str) -> list[str]:
     root = Path(directory)
     if not root.is_dir():
         return []

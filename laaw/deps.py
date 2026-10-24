@@ -1,11 +1,9 @@
 """Dependency logic for the LAAW CLI. Pure — operates on a ProjectState, no IO."""
 
-from typing import List, Optional, Tuple
-
 from .model.state import ProjectState
 
 
-def scope_of(state: ProjectState, task_id: str) -> Tuple[str, Optional[str]]:
+def scope_of(state: ProjectState, task_id: str) -> tuple[str, str | None]:
     """Return (kind, parent_id). kind is 'top' or 'sub'; parent_id is None for top."""
     if state.find_task_or_none(task_id) is not None:
         return "top", None
@@ -16,21 +14,19 @@ def scope_of(state: ProjectState, task_id: str) -> Tuple[str, Optional[str]]:
     raise KeyError(f"no task or subtask with id {task_id}")
 
 
-def deps_of(state: ProjectState, task_id: str) -> List[str]:
-    kind, _ = scope_of(state, task_id)
+def deps_of(state: ProjectState, task_id: str) -> list[str]:
+    kind, parent_id = scope_of(state, task_id)
     if kind == "top":
         return state.find_task(task_id).deps
-    parent_id = scope_of(state, task_id)[1]
+    assert parent_id is not None
     return state.find_subtask(parent_id, task_id).deps
 
 
 def status_of(state: ProjectState, task_id: str):
-    from .status import Status
-
-    kind, _ = scope_of(state, task_id)
+    kind, parent_id = scope_of(state, task_id)
     if kind == "top":
         return state.find_task(task_id).status
-    parent_id = scope_of(state, task_id)[1]
+    assert parent_id is not None
     return state.find_subtask(parent_id, task_id).status
 
 
@@ -48,8 +44,8 @@ def can_depend(state: ProjectState, task_id: str, dep_id: str) -> bool:
 def would_create_cycle(state: ProjectState, task_id: str, dep_id: str) -> bool:
     if not can_depend(state, task_id, dep_id):
         return False
-    seen = set()
-    frontier = [dep_id]
+    seen: set[str] = set()
+    frontier: list[str] = [dep_id]
     while frontier:
         current = frontier.pop()
         if current == task_id:
@@ -61,7 +57,7 @@ def would_create_cycle(state: ProjectState, task_id: str, dep_id: str) -> bool:
     return False
 
 
-def unsatisfied_deps(state: ProjectState, task_id: str) -> List[str]:
+def unsatisfied_deps(state: ProjectState, task_id: str) -> list[str]:
     from .status import Status
 
     return [dep for dep in deps_of(state, task_id) if status_of(state, dep) is not Status.DONE]
@@ -71,7 +67,7 @@ def is_implementable(state: ProjectState, task_id: str) -> bool:
     return not unsatisfied_deps(state, task_id)
 
 
-def dependents(state: ProjectState, task_id: str) -> List[str]:
+def dependents(state: ProjectState, task_id: str) -> list[str]:
     result = []
     for task in state.tasks:
         if task_id in task.deps:

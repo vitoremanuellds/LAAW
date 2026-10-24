@@ -1,7 +1,6 @@
 """Status and Action enums plus the transition table for the LAAW task state machine."""
 
 from enum import Enum
-from typing import Dict, Optional
 
 
 class Status(Enum):
@@ -28,7 +27,7 @@ class Action(Enum):
 
 # Maps each action to {status it is legal from: status it results in}.
 # None as a key means "no current status" (only register uses it).
-TRANSITIONS: Dict[Action, Dict[Optional[Status], Status]] = {
+TRANSITIONS: dict[Action, dict[Status | None, Status]] = {
     Action.REGISTER: {None: Status.NOT_PLANNED},
     Action.PLAN: {
         Status.NOT_PLANNED: Status.PLANNING,
@@ -50,11 +49,11 @@ TRANSITIONS: Dict[Action, Dict[Optional[Status], Status]] = {
 }
 
 
-def can_transition(current: Optional[Status], action: Action) -> bool:
+def can_transition(current: Status | None, action: Action) -> bool:
     return current in TRANSITIONS[action]
 
 
-def resulting_status(current: Optional[Status], action: Action) -> Status:
+def resulting_status(current: Status | None, action: Action) -> Status:
     try:
         return TRANSITIONS[action][current]
     except KeyError:

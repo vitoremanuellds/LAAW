@@ -1,7 +1,7 @@
 """Task dataclass (simple or supertask). Pure — no filesystem access."""
 
 from dataclasses import dataclass, field
-from typing import List
+from typing import Any
 
 from ..status import Status
 from .subtask import Subtask
@@ -14,11 +14,11 @@ class Task:
     desc: str
     type: str  # "simple" or "supertask"
     status: Status
-    deps: List[str] = field(default_factory=list)
-    subtasks: List[Subtask] = field(default_factory=list)
+    deps: list[str] = field(default_factory=list)
+    subtasks: list[Subtask] = field(default_factory=list)
 
-    def to_dict(self) -> dict:
-        data = {
+    def to_dict(self) -> dict[str, Any]:
+        data: dict[str, Any] = {
             "id": self.id,
             "name": self.name,
             "desc": self.desc,
@@ -31,8 +31,10 @@ class Task:
         return data
 
     @classmethod
-    def from_dict(cls, data: dict) -> "Task":
-        subtasks = [Subtask.from_dict(s) for s in data.get("subtasks", [])]
+    def from_dict(cls, data: dict[str, Any]) -> "Task":
+        raw_subtasks = data.get("subtasks", [])
+        assert isinstance(raw_subtasks, list)
+        subtasks = [Subtask.from_dict(s) for s in raw_subtasks]
         return cls(
             id=data["id"],
             name=data["name"],

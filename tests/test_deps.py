@@ -9,7 +9,8 @@ from laaw.model.task import Task
 from laaw.status import Status
 
 
-def make_task(tid, status=Status.DONE, dep=None, subtasks=None):
+def make_task(tid: str, status: Status = Status.DONE, dep: str | None = None,
+              subtasks: list[Subtask] | None = None) -> Task:
     return Task(id=tid, name=tid, desc="", type="supertask" if subtasks else "simple",
                 status=status, deps=[dep] if dep else [], subtasks=subtasks or [])
 

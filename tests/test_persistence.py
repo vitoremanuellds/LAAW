@@ -2,6 +2,7 @@
 
 import tempfile
 import unittest
+from typing import override
 
 from laaw import persistence
 from laaw.model.state import ProjectState
@@ -11,10 +12,13 @@ from laaw.status import Status
 
 
 class SaveLoadTextTest(unittest.TestCase):
-    def setUp(self):
-        self._tmp = tempfile.TemporaryDirectory()
-        self.addCleanup(self._tmp.cleanup)
-        self.dir = self._tmp.name
+    dir: str = ""
+
+    @override
+    def setUp(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.dir = tmp.name
 
     def test_given_text_when_save_then_load_round_trips(self):
         # arrange
@@ -34,10 +38,13 @@ class SaveLoadTextTest(unittest.TestCase):
 
 
 class EnsureDirTest(unittest.TestCase):
-    def setUp(self):
-        self._tmp = tempfile.TemporaryDirectory()
-        self.addCleanup(self._tmp.cleanup)
-        self.dir = self._tmp.name
+    dir: str = ""
+
+    @override
+    def setUp(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.dir = tmp.name
 
     def test_given_nested_path_when_ensure_dir_then_creates_tree(self):
         # arrange
@@ -57,10 +64,13 @@ class EnsureDirTest(unittest.TestCase):
 
 
 class ListFilesTest(unittest.TestCase):
-    def setUp(self):
-        self._tmp = tempfile.TemporaryDirectory()
-        self.addCleanup(self._tmp.cleanup)
-        self.dir = self._tmp.name
+    dir: str = ""
+
+    @override
+    def setUp(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.dir = tmp.name
 
     def test_given_files_when_list_then_returns_sorted_names(self):
         # arrange
@@ -79,10 +89,14 @@ class ListFilesTest(unittest.TestCase):
 
 
 class StateRoundTripTest(unittest.TestCase):
-    def setUp(self):
-        self._tmp = tempfile.TemporaryDirectory()
-        self.addCleanup(self._tmp.cleanup)
-        self.dir = self._tmp.name
+    dir: str = ""
+    path: str = ""
+
+    @override
+    def setUp(self) -> None:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.dir = tmp.name
         self.path = f"{self.dir}/tasks.json"
 
     def test_given_state_when_save_then_load_round_trips(self):

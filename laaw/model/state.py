@@ -6,7 +6,7 @@ tasks.json document shape lives here; actual file IO is persistence.py (t07.2).
 """
 
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Any
 
 from ..constants import SLUG_SEPARATOR, ZERO_PAD_WIDTH
 from .subtask import Subtask
@@ -16,16 +16,18 @@ from .task import Task
 @dataclass
 class ProjectState:
     version: int = 1
-    tasks: List[Task] = field(default_factory=list)
+    tasks: list[Task] = field(default_factory=list)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {"version": self.version, "tasks": [t.to_dict() for t in self.tasks]}
 
     @classmethod
-    def from_dict(cls, data: dict) -> "ProjectState":
+    def from_dict(cls, data: dict[str, Any]) -> "ProjectState":
+        raw_tasks = data.get("tasks", [])
+        assert isinstance(raw_tasks, list)
         return cls(
             version=data.get("version", 1),
-            tasks=[Task.from_dict(t) for t in data.get("tasks", [])],
+            tasks=[Task.from_dict(t) for t in raw_tasks],
         )
 
     # --- lookup -------------------------------------------------------------
@@ -56,7 +58,7 @@ class ProjectState:
 
     # --- slug ---------------------------------------------------------------
 
-    def slug(self, name: str, taken: Optional[set] = None) -> str:
+    def slug(self, name: str, taken: set[str] | None = None) -> str:
         base = kebab(name)
         taken = taken or set()
         candidate = base
@@ -73,7 +75,7 @@ class ProjectState:
             raise ValueError(f"task id {task.id} already exists")
         self.tasks.append(task)
 
-    def find_task_or_none(self, task_id: str) -> Optional[Task]:
+    def find_task_or_none(self, task_id: str) -> Task | None:
         for task in self.tasks:
             if task.id == task_id:
                 return task

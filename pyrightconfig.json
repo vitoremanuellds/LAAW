@@ -1,0 +1,12 @@
+{
+  "venvPath": ".",
+  "include": ["laaw", "tests"],
+  "pythonVersion": "3.12",
+  "typeCheckingMode": "standard",
+  "reportExplicitAny": "none",
+  "reportUnusedCallResult": "none",
+  "reportUnknownVariableType": "none",
+  "reportUnknownParameterType": "none",
+  "reportUnknownMemberType": "none",
+  "reportUnknownArgumentType": "none"
+}

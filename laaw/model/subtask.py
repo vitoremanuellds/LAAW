@@ -1,7 +1,7 @@
 """Dataclasses for the LAAW task model. Pure — no filesystem access."""
 
 from dataclasses import dataclass, field
-from typing import List
+from typing import Any
 
 from ..status import Status
 
@@ -12,9 +12,9 @@ class Subtask:
     name: str
     desc: str
     status: Status
-    deps: List[str] = field(default_factory=list)
+    deps: list[str] = field(default_factory=list)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "name": self.name,
@@ -24,7 +24,7 @@ class Subtask:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "Subtask":
+    def from_dict(cls, data: dict[str, Any]) -> "Subtask":
         return cls(
             id=data["id"],
             name=data["name"],
