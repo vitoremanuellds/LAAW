@@ -60,6 +60,20 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=_dispatch("check"))
 
+    p = cmd.add_parser("render")
+    p.set_defaults(func=_dispatch("render"))
+
+    sync_parser = sub.add_parser("sync")
+    sync_cmd = sync_parser.add_subparsers(dest="command", required=True)
+
+    p = sync_cmd.add_parser("workflow")
+    p.add_argument("path", nargs="?", default=".")
+    p.set_defaults(func=_dispatch("sync_workflow"))
+
+    p = sync_cmd.add_parser("skills")
+    p.add_argument("path")
+    p.set_defaults(func=_dispatch("sync_skills"))
+
     args = parser.parse_args(argv)
     return args.func(args)
 

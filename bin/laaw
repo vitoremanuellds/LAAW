@@ -1,0 +1,9 @@
+#!/bin/sh
+# Thin wrapper for the LAAW CLI (requires Python 3 on PATH).
+# Resolves the repo root from its own location so `laaw` works from any cwd.
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+LAAW_ROOT=$(cd -- "$SCRIPT_DIR/.." && pwd)
+if command -v python >/dev/null 2>&1; then
+    exec env PYTHONPATH="$LAAW_ROOT${PYTHONPATH:+:$PYTHONPATH}" python -m laaw "$@"
+fi
+exec env PYTHONPATH="$LAAW_ROOT${PYTHONPATH:+:$PYTHONPATH}" python3 -m laaw "$@"
