@@ -1,9 +1,9 @@
 """Pure markdown rendering of the generated table files. No filesystem access."""
 
-from .constants import GENERATED_HEADER
-from .model.state import ProjectState
-from .model.subtask import Subtask
-from .model.task import Task
+from ..constants import GENERATED_HEADER
+from ..model.state import ProjectState
+from ..model.subtask import Subtask
+from ..model.task import Task
 
 TABLE_HEADER = ("ID", "Status", "Name", "Description", "Type", "Dependencies")
 

@@ -8,7 +8,7 @@ from laaw import persistence
 from laaw.model.state import ProjectState
 from laaw.model.subtask import Subtask
 from laaw.model.task import Task
-from laaw.status import Status
+from laaw.domain.status import Status
 
 
 class SaveLoadTextTest(unittest.TestCase):

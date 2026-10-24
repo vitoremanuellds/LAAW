@@ -4,7 +4,7 @@ import unittest
 
 from laaw.model.state import ProjectState, format_number, kebab
 from laaw.model.task import Task
-from laaw.status import Status
+from laaw.domain.status import Status
 
 
 class FormatNumberTest(unittest.TestCase):

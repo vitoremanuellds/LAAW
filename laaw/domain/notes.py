@@ -1,7 +1,7 @@
 """Notes rendering for the LAAW CLI. Pure — takes Notes, returns markdown files."""
 
-from .constants import GENERATED_HEADER, NOTES_FILE_WORD_CAP, NOTE_WORD_CAP, TAG_ORDER
-from .model.note import Note
+from ..constants import GENERATED_HEADER, NOTES_FILE_WORD_CAP, NOTE_WORD_CAP, TAG_ORDER
+from ..model.note import Note
 
 
 def validate_note(note: Note) -> None:

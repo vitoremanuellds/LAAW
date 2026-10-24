@@ -2,7 +2,7 @@
 
 import unittest
 
-from laaw import notes
+from laaw.domain import notes
 from laaw.constants import NOTES_FILE_WORD_CAP, NOTE_WORD_CAP
 from laaw.model.note import Note
 

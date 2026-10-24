@@ -3,7 +3,8 @@
 from dataclasses import dataclass, field
 from typing import Any
 
-from ..status import Status
+from ..domain.status import Status
+from .note import Note
 from .subtask import Subtask
 
 
@@ -16,6 +17,7 @@ class Task:
     status: Status
     deps: list[str] = field(default_factory=list)
     subtasks: list[Subtask] = field(default_factory=list)
+    notes: list[Note] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         data: dict[str, Any] = {
@@ -28,6 +30,8 @@ class Task:
         }
         if self.subtasks:
             data["subtasks"] = [s.to_dict() for s in self.subtasks]
+        if self.notes:
+            data["notes"] = [n.to_dict() for n in self.notes]
         return data
 
     @classmethod
@@ -35,6 +39,9 @@ class Task:
         raw_subtasks = data.get("subtasks", [])
         assert isinstance(raw_subtasks, list)
         subtasks = [Subtask.from_dict(s) for s in raw_subtasks]
+        raw_notes = data.get("notes", [])
+        assert isinstance(raw_notes, list)
+        notes = [Note.from_dict(n) for n in raw_notes]
         return cls(
             id=data["id"],
             name=data["name"],
@@ -43,4 +50,5 @@ class Task:
             status=Status(data["status"]),
             deps=list(data.get("deps", [])),
             subtasks=subtasks,
+            notes=notes,
         )

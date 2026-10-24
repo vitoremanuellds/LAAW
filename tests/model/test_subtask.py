@@ -3,7 +3,7 @@
 import unittest
 
 from laaw.model.subtask import Subtask
-from laaw.status import Status
+from laaw.domain.status import Status
 
 
 class SubtaskTest(unittest.TestCase):

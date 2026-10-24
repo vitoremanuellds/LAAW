@@ -2,7 +2,7 @@
 
 import unittest
 
-from laaw.status import Action, Status, can_transition, resulting_status
+from laaw.domain.status import Action, Status, can_transition, resulting_status
 
 
 # Every (current, action) -> expected legality, per the spec. None = no current status.

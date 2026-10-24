@@ -1,6 +1,6 @@
 """Dependency logic for the LAAW CLI. Pure — operates on a ProjectState, no IO."""
 
-from .model.state import ProjectState
+from ..model.state import ProjectState
 
 
 def scope_of(state: ProjectState, task_id: str) -> tuple[str, str | None]:

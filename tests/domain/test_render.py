@@ -2,12 +2,12 @@
 
 import unittest
 
-from laaw import render
+from laaw.domain import render
 from laaw.constants import GENERATED_HEADER
 from laaw.model.state import ProjectState
 from laaw.model.subtask import Subtask
 from laaw.model.task import Task
-from laaw.status import Status
+from laaw.domain.status import Status
 
 
 def simple_task(

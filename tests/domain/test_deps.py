@@ -2,11 +2,11 @@
 
 import unittest
 
-from laaw import deps
+from laaw.domain import deps
 from laaw.model.state import ProjectState
 from laaw.model.subtask import Subtask
 from laaw.model.task import Task
-from laaw.status import Status
+from laaw.domain.status import Status
 
 
 def make_task(tid: str, status: Status = Status.DONE, dep: str | None = None,

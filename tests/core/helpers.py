@@ -1,4 +1,4 @@
-"""Shared helpers for CLI lifecycle command tests."""
+"""Shared helpers for core orchestrator tests."""
 
 import json
 from pathlib import Path
@@ -21,13 +21,13 @@ def state_json_bytes(tmp: str) -> bytes:
     return (Path(tmp) / "tasks.json").read_bytes()
 
 
-def run_in_dir(cmd_module, args, tmp: str) -> int:
-    """Run a command module with base._tasks_dir patched to `tmp`."""
-    from laaw.cli import base
+def run_in_dir(func, tmp: str, *args, **kwargs):
+    """Run a core function with tasks_dir patched to `tmp`."""
+    from laaw.core import base
 
-    original = base._tasks_dir
-    base._tasks_dir = lambda: tmp
+    original = base.tasks_dir
+    base.tasks_dir = lambda: tmp
     try:
-        return cmd_module.run(args)
+        return func(*args, **kwargs)
     finally:
-        base._tasks_dir = original
+        base.tasks_dir = original
