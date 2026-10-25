@@ -117,7 +117,10 @@ Keeping context current is part of propagation: files a task changed are updated
    User asks to implement. `laaw task implement` refuses if any dependency is not
    done — refuse, name the dependencies. Implement, iterating with the user until
    the implementation is approved. Record a progress note after each Step
-   (`laaw task note <id> --tag progress ...`).
+   (`laaw task note <id> --tag progress ...`). A note records what the
+   implementation created as it happened — progress per step, deviations,
+   decisions/gotchas worth keeping; notes are CLI-owned state rendered into
+   `notes.md`, not prose appended to `task.md`.
    - User requests a change incompatible with the plan → note the deviation
      (`--tag deviation`).
    - Plan turns out unimplementable → stop, notify the user, note the deviation. The
