@@ -9,7 +9,7 @@ Read `.ai/workflow/workflow.md` first if you have not read it this session.
 
 ## Steps
 
-1. Verify the `.ai/` skeleton exists. If not, stop and tell the user to run `laaw.py sync workflow <project>`.
+1. Verify the `.ai/` skeleton exists (`.ai/workflow/`, `.ai/tasks/`, `.ai/context/index.md`). If not, stop and tell the user to run `laaw sync workflow <project>`.
 2. Read **only the file tree** of the project (e.g. `rg --files`, `find . -type f`). Do not read file contents.
 3. From the tree alone, list your assumptions about the project (structure, stack, entry points, module boundaries) and your questions. Present them to the user. **Do not proceed until the user has answered.**
 4. Create the queue file `.ai/.queue.md`: one path per line, ordered the way a person would read the project, top-down along the dependency tree:
