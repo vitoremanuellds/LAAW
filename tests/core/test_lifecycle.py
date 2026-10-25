@@ -381,6 +381,47 @@ class LifecycleTest(unittest.TestCase):
         self.assertTrue((folder / "task.md").is_file())
         self.assertTrue((folder / "notes.md").is_file())
 
+    def test_given_subtask_when_plan_then_succeeds_when_supertask_already_in_progress(self):
+        # arrange: supertask already in-progress (a sibling subtask was planned first)
+        from laaw.model.subtask import Subtask
+        from tests.core.helpers import read_state, run_in_dir, write_state
+
+        state = ProjectState(tasks=[
+            Task(id="t07", name="Auth", desc="d", type="supertask", status=Status.IN_PROGRESS,
+                 subtasks=[Subtask(id="t07.1", name="JWT", desc="d", status=Status.PLANNING),
+                           Subtask(id="t07.2", name="Service", desc="d", status=Status.NOT_PLANNED)]),
+        ])
+        write_state(self.dir, state)
+
+        # act
+        message, code = run_in_dir(lifecycle.plan, self.dir, "t07.2")
+
+        # assert
+        self.assertEqual(code, 0)
+        loaded = read_state(self.dir)
+        self.assertEqual(loaded.tasks[0].subtasks[1].status, Status.PLANNING)
+        self.assertEqual(loaded.tasks[0].status, Status.IN_PROGRESS)  # unchanged
+
+    def test_given_subtask_when_plan_then_refused_when_supertask_terminal(self):
+        # arrange: supertask done; planning its subtask must refuse
+        from laaw.core.base import Refuse
+        from laaw.model.subtask import Subtask
+        from tests.core.helpers import run_in_dir, state_json_bytes, write_state
+
+        state = ProjectState(tasks=[
+            Task(id="t07", name="Auth", desc="d", type="supertask", status=Status.DONE,
+                 subtasks=[Subtask(id="t07.1", name="JWT", desc="d", status=Status.NOT_PLANNED)]),
+        ])
+        write_state(self.dir, state)
+        before = state_json_bytes(self.dir)
+
+        # act
+        with self.assertRaises(Refuse):
+            run_in_dir(lifecycle.plan, self.dir, "t07.1")
+
+        # assert
+        self.assertEqual(state_json_bytes(self.dir), before)
+
     def test_given_subtask_when_implement_then_in_progress(self):
         # arrange
         from laaw.model.subtask import Subtask

@@ -111,6 +111,35 @@ def done(task_id: str) -> tuple[str, int]:
     return f"{task_id} → done", 0
 
 
+def remove(task_id: str) -> tuple[str, int]:
+    tasks_dir = _dir()
+    state = load_or_empty(tasks_dir)
+    resolved = _find_any(state, task_id)
+    if resolved.status is not Status.CANCELLED:
+        raise Refuse(f"can only remove cancelled tasks ({task_id} is {resolved.status.value})")
+
+    blocked = dependents(state, task_id)
+    if blocked:
+        raise Refuse(f"{task_id} has dependents: {', '.join(blocked)}")
+
+    folder = _folder_for(state, tasks_dir, resolved)  # computed before mutation
+
+    if resolved.kind == "top":
+        parent = state.find_task(resolved.id)
+        if parent.subtasks:
+            raise Refuse(f"{task_id} still has subtasks: {', '.join(s.id for s in parent.subtasks)}")
+        state.tasks.remove(parent)
+    else:
+        assert resolved.parent_id is not None
+        parent = state.find_task(resolved.parent_id)
+        sub = state.find_subtask(resolved.parent_id, resolved.id)
+        parent.subtasks.remove(sub)
+
+    _delete_tree(folder)
+    save_and_render(state, tasks_dir)
+    return f"{task_id} removed", 0
+
+
 def cancel(task_id: str) -> tuple[str, int]:
     tasks_dir = _dir()
     state = load_or_empty(tasks_dir)
@@ -163,6 +192,18 @@ def _scaffold(folder: Path, name: str) -> None:
     notes_md = folder / "notes.md"
     if not notes_md.is_file():
         persistence.save_text(str(notes_md), GENERATED_HEADER + "\n")
+
+
+def _delete_tree(folder: Path) -> None:
+    if not folder.is_dir():
+        return
+    paths = sorted((p for p in folder.rglob("*") if p != folder), key=lambda p: len(str(p)), reverse=True)
+    for path in paths:
+        if path.is_file() or path.is_symlink():
+            path.unlink()
+        elif path.is_dir():
+            path.rmdir()
+    folder.rmdir()
 
 
 def _dir() -> str:
