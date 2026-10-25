@@ -4,15 +4,32 @@ from pathlib import Path
 
 from .. import persistence
 from ..constants import GENERATED_HEADER, TASK_MD_SECTIONS
-from ..domain.deps import dependents, unsatisfied_deps
+from ..domain.deps import dependents, register_subtask, unsatisfied_deps
 from ..domain.status import Action, Status, can_transition, resulting_status
+from ..model.state import Resolved
 from ..model.task import Task
 from .base import Refuse, load_or_empty, save_and_render, task_folder
 
 
-def register(name: str, desc: str, deps: list[str]) -> tuple[str, int]:
+def register(
+    name: str,
+    desc: str,
+    deps: list[str],
+    subtask_of: str | None = None,
+) -> tuple[str, int]:
     tasks_dir = _dir()
     state = load_or_empty(tasks_dir)
+
+    if subtask_of is not None:
+        try:
+            subtask = register_subtask(state, subtask_of, name, desc[:180], deps)
+        except ValueError as e:
+            raise Refuse(str(e))
+        parent = state.find_task(subtask_of)
+        parent.subtasks.append(subtask)
+        save_and_render(state, tasks_dir)
+        return f"registered {subtask.id} under {subtask_of}", 0
+
     for dep in deps:
         if state.find_task_or_none(dep) is None:
             raise Refuse(f"unknown dep {dep}")
@@ -36,78 +53,102 @@ def register(name: str, desc: str, deps: list[str]) -> tuple[str, int]:
 def plan(task_id: str) -> tuple[str, int]:
     tasks_dir = _dir()
     state = load_or_empty(tasks_dir)
-    task = _find(state, task_id)
-    if not can_transition(task.status, Action.PLAN):
-        raise Refuse(f"cannot plan from status {task.status.value}")
+    resolved = _find_any(state, task_id)
+    if not can_transition(resolved.status, Action.PLAN):
+        raise Refuse(f"cannot plan from status {resolved.status.value}")
 
-    task.status = resulting_status(task.status, Action.PLAN)
-    folder = Path(tasks_dir) / task_folder(task.id, task.name)
+    target = _target(state, resolved)
+    target.status = resulting_status(resolved.status, Action.PLAN)
+    folder = _folder_for(state, tasks_dir, resolved)
     persistence.ensure_dir(str(folder))
-    _scaffold(folder, task.name)
+    _scaffold(folder, resolved.name)
+    if resolved.kind == "sub":
+        supertask = state.find_task(resolved.parent_id or "")
+        if not can_transition(supertask.status, Action.IMPLEMENT):
+            raise Refuse(f"cannot set supertask {supertask.id} to in-progress from status {supertask.status.value}")
+        supertask.status = resulting_status(supertask.status, Action.IMPLEMENT)
     save_and_render(state, tasks_dir)
-    return f"{task.id} → planning", 0
+    return f"{task_id} → planning", 0
 
 
 def implement(task_id: str) -> tuple[str, int]:
     tasks_dir = _dir()
     state = load_or_empty(tasks_dir)
-    task = _find(state, task_id)
-    if not can_transition(task.status, Action.IMPLEMENT):
-        raise Refuse(f"cannot implement from status {task.status.value}")
+    resolved = _find_any(state, task_id)
+    if not can_transition(resolved.status, Action.IMPLEMENT):
+        raise Refuse(f"cannot implement from status {resolved.status.value}")
 
     blocked = unsatisfied_deps(state, task_id)
     if blocked:
         raise Refuse(f"unsatisfied deps: {', '.join(blocked)}")
 
-    task.status = resulting_status(task.status, Action.IMPLEMENT)
+    _target(state, resolved).status = resulting_status(resolved.status, Action.IMPLEMENT)
     save_and_render(state, tasks_dir)
-    return f"{task.id} → in-progress", 0
+    return f"{task_id} → in-progress", 0
 
 
 def propagate(task_id: str) -> tuple[str, int]:
     tasks_dir = _dir()
     state = load_or_empty(tasks_dir)
-    task = _find(state, task_id)
-    if not can_transition(task.status, Action.PROPAGATE):
-        raise Refuse(f"cannot propagate from status {task.status.value}")
+    resolved = _find_any(state, task_id)
+    if not can_transition(resolved.status, Action.PROPAGATE):
+        raise Refuse(f"cannot propagate from status {resolved.status.value}")
 
-    task.status = resulting_status(task.status, Action.PROPAGATE)
+    _target(state, resolved).status = resulting_status(resolved.status, Action.PROPAGATE)
     save_and_render(state, tasks_dir)
-    return f"{task.id} → propagating-context", 0
+    return f"{task_id} → propagating-context", 0
 
 
 def done(task_id: str) -> tuple[str, int]:
     tasks_dir = _dir()
     state = load_or_empty(tasks_dir)
-    task = _find(state, task_id)
-    if not can_transition(task.status, Action.DONE):
-        raise Refuse(f"cannot mark done from status {task.status.value}")
+    resolved = _find_any(state, task_id)
+    if not can_transition(resolved.status, Action.DONE):
+        raise Refuse(f"cannot mark done from status {resolved.status.value}")
 
-    task.status = resulting_status(task.status, Action.DONE)
+    _target(state, resolved).status = resulting_status(resolved.status, Action.DONE)
     save_and_render(state, tasks_dir)
-    return f"{task.id} → done", 0
+    return f"{task_id} → done", 0
 
 
 def cancel(task_id: str) -> tuple[str, int]:
     tasks_dir = _dir()
     state = load_or_empty(tasks_dir)
-    task = _find(state, task_id)
-    if not can_transition(task.status, Action.CANCEL):
-        raise Refuse(f"cannot cancel from status {task.status.value}")
+    resolved = _find_any(state, task_id)
+    if not can_transition(resolved.status, Action.CANCEL):
+        raise Refuse(f"cannot cancel from status {resolved.status.value}")
 
-    task.status = resulting_status(task.status, Action.CANCEL)
+    _target(state, resolved).status = resulting_status(resolved.status, Action.CANCEL)
     save_and_render(state, tasks_dir)
     blocked = dependents(state, task_id)
     if blocked:
-        return f"{task.id} → cancelled; blocked dependents: {', '.join(blocked)}", 0
-    return f"{task.id} → cancelled", 0
+        return f"{task_id} → cancelled; blocked dependents: {', '.join(blocked)}", 0
+    return f"{task_id} → cancelled", 0
 
 
-def _find(state, task_id: str):
+def _find_any(state, task_id: str) -> Resolved:
     try:
-        return state.find_task(task_id)
+        return state.find_any(task_id)
     except KeyError:
-        raise Refuse(f"no task with id {task_id}")
+        raise Refuse(f"no task or subtask with id {task_id}")
+
+
+def _target(state, resolved: Resolved):
+    """The mutable Task or Subtask behind a resolved id."""
+    if resolved.kind == "top":
+        return state.find_task(resolved.id)
+    assert resolved.parent_id is not None
+    return state.find_subtask(resolved.parent_id, resolved.id)
+
+
+def _folder_for(state, tasks_dir: str, resolved: Resolved) -> Path:
+    if resolved.kind == "top":
+        task = state.find_task(resolved.id)
+        return Path(tasks_dir) / task_folder(task.id, task.name)
+    assert resolved.parent_id is not None
+    parent = state.find_task(resolved.parent_id)
+    sub = state.find_subtask(resolved.parent_id, resolved.id)
+    return Path(tasks_dir) / task_folder(parent.id, parent.name) / task_folder(sub.id, sub.name)
 
 
 def _scaffold(folder: Path, name: str) -> None:

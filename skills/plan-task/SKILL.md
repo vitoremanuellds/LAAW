@@ -19,7 +19,7 @@ Read `.ai/workflow/workflow.md` first if you have not read it this session.
    - **New simple task / new supertask** — classify using the Simple vs supertask rule in workflow.md (hard signals first, then the sizing split proposal).
 4. Register and plan via the CLI:
    - New task: `laaw task register --name <name> [--desc "..."] [--deps ...]` (→ `not-planned`), then `laaw task plan <id>` (→ `planning`; scaffolds `task.md` + `notes.md`). Do both in one swoop.
-   - Subtask: the subtask row must already exist in the supertask's state (defined when the supertask was planned); if it is missing, stop and tell the user. Then `laaw task plan <id>`. Planning a subtask sets the owning supertask to `in-progress` automatically.
+   - Subtask: register each listed subtask into state with `laaw task register --subtask-of <supertask-id>` when the supertask is planned (rows only, status stays `not-planned`). The row must exist before it can be planned; if it is missing, stop and tell the user. Then `laaw task plan <id>`. Planning a subtask sets the owning supertask to `in-progress` automatically.
 5. Write the plan content into the scaffolded `task.md`: Title, Description, Context (with paths to `.ai/context/` files), In scope / Out of scope, Steps, Validations. The model owns this content; everything else is CLI-generated.
    - If the plan outgrows its size limit and must stay, split it into att files per the Splitting rule in workflow.md and link them from `task.md`.
 

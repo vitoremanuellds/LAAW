@@ -166,6 +166,90 @@ class QueryTest(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("unknown dep t99", message)
 
+    def test_given_planning_subtask_without_task_md_when_check_then_drift(self):
+        # arrange
+        from laaw.model.subtask import Subtask
+        from tests.core.helpers import run_in_dir, write_state
+
+        state = ProjectState(tasks=[
+            Task(id="t07", name="Auth", desc="d", type="supertask", status=Status.IN_PROGRESS,
+                 subtasks=[Subtask(id="t07.1", name="JWT", desc="d", status=Status.PLANNING)]),
+        ])
+        write_state(self.dir, state)
+        (Path(self.dir) / "t07_auth").mkdir(parents=True)
+
+        # act
+        message, code = run_in_dir(query.check, self.dir)
+
+        # assert
+        self.assertEqual(code, 1)
+        self.assertIn("t07.1", message)
+
+    def test_given_orphan_subtask_folder_when_check_then_drift(self):
+        # arrange
+        from laaw.model.subtask import Subtask
+        from tests.core.helpers import run_in_dir, write_state
+
+        state = ProjectState(tasks=[
+            Task(id="t07", name="Auth", desc="d", type="supertask", status=Status.PLANNING,
+                 subtasks=[Subtask(id="t07.1", name="JWT", desc="d", status=Status.NOT_PLANNED)]),
+        ])
+        write_state(self.dir, state)
+        parent = Path(self.dir) / "t07_auth"
+        parent.mkdir(parents=True)
+        (parent / "task.md").write_text("# Auth\n")
+        (parent / "t07.1_jwt").mkdir(parents=True)
+        (parent / "t09.9_orphan").mkdir(parents=True)
+
+        # act
+        message, code = run_in_dir(query.check, self.dir)
+
+        # assert
+        self.assertEqual(code, 1)
+        self.assertIn("subtask folder t07_auth/t09.9_orphan has no matching task in state", message)
+
+    def test_given_subtask_when_deps_then_implementable(self):
+        # arrange
+        from laaw.model.subtask import Subtask
+        from tests.core.helpers import run_in_dir, write_state
+
+        state = ProjectState(tasks=[
+            Task(id="t07", name="Auth", desc="d", type="supertask", status=Status.IN_PROGRESS,
+                 subtasks=[
+                     Subtask(id="t07.1", name="a", desc="d", status=Status.DONE),
+                     Subtask(id="t07.2", name="b", desc="d", status=Status.PLANNING, deps=["t07.1"]),
+                 ]),
+        ])
+        write_state(self.dir, state)
+
+        # act
+        message, code = run_in_dir(query.deps, self.dir, "t07.2")
+
+        # assert
+        self.assertEqual(code, 0)
+        self.assertIn("implementable", message)
+
+    def test_given_subtask_when_dependents_then_lists_sibling(self):
+        # arrange
+        from laaw.model.subtask import Subtask
+        from tests.core.helpers import run_in_dir, write_state
+
+        state = ProjectState(tasks=[
+            Task(id="t07", name="Auth", desc="d", type="supertask", status=Status.IN_PROGRESS,
+                 subtasks=[
+                     Subtask(id="t07.1", name="a", desc="d", status=Status.PLANNING),
+                     Subtask(id="t07.2", name="b", desc="d", status=Status.PLANNING, deps=["t07.1"]),
+                 ]),
+        ])
+        write_state(self.dir, state)
+
+        # act
+        message, code = run_in_dir(query.dependents, self.dir, "t07.1")
+
+        # assert
+        self.assertEqual(code, 0)
+        self.assertIn("t07.2", message)
+
 
 if __name__ == "__main__":
     unittest.main()

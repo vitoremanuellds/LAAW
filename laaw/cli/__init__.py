@@ -17,6 +17,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--name", required=True)
     p.add_argument("--desc", default="")
     p.add_argument("--deps", nargs="*", default=[])
+    p.add_argument("--subtask-of", default=None, metavar="PARENT_ID")
     p.set_defaults(func=_dispatch("register"))
 
     for name in ("plan", "implement", "propagate", "done", "cancel"):

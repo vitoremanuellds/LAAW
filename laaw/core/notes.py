@@ -2,29 +2,38 @@
 
 from ..domain.notes import validate_note
 from ..model.note import Note
+from ..model.state import Resolved
 from .base import Refuse, load_or_empty, save_and_render
 
 
 def add_note(task_id: str, tag: str, text: str) -> tuple[str, int]:
     tasks_dir = _dir()
     state = load_or_empty(tasks_dir)
-    task = _find(state, task_id)
+    resolved = _find_any(state, task_id)
 
     note = Note(tag=tag, text=text)
     try:
         validate_note(note)
     except ValueError as e:
         raise Refuse(str(e))
-    task.notes.append(note)
+    target = _target(state, resolved)
+    target.notes.append(note)
     save_and_render(state, tasks_dir)
     return f"note added to {task_id} ({tag})", 0
 
 
-def _find(state, task_id: str):
+def _find_any(state, task_id: str) -> Resolved:
     try:
-        return state.find_task(task_id)
+        return state.find_any(task_id)
     except KeyError:
-        raise Refuse(f"no task with id {task_id}")
+        raise Refuse(f"no task or subtask with id {task_id}")
+
+
+def _target(state, resolved: Resolved):
+    if resolved.kind == "top":
+        return state.find_task(resolved.id)
+    assert resolved.parent_id is not None
+    return state.find_subtask(resolved.parent_id, resolved.id)
 
 
 def _dir() -> str:

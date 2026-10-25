@@ -8,9 +8,27 @@ tasks.json document shape lives here; actual file IO is persistence.py (t07.2).
 from dataclasses import dataclass, field
 from typing import Any
 
+from ..domain.status import Status
+
 from ..constants import SLUG_SEPARATOR, ZERO_PAD_WIDTH
 from .subtask import Subtask
 from .task import Task
+
+
+@dataclass(frozen=True)
+class Resolved:
+    """A task or subtask resolved by id, with its scope.
+
+    `parent_id` is None for top-level tasks. `name`/`status` are copies at
+    resolution time; mutations go through the underlying object via the
+    core layer's `_target`, never through this wrapper.
+    """
+
+    kind: str  # 'top' or 'sub'
+    parent_id: str | None
+    id: str
+    name: str
+    status: Status
 
 
 @dataclass
@@ -44,6 +62,17 @@ class ProjectState:
             if sub.id == subtask_id:
                 return sub
         raise KeyError(f"no subtask {subtask_id} under {parent_id}")
+
+    def find_any(self, task_id: str) -> Resolved:
+        """Resolve a top-level task or a subtask by id."""
+        task = self.find_task_or_none(task_id)
+        if task is not None:
+            return Resolved(kind="top", parent_id=None, id=task.id, name=task.name, status=task.status)
+        for t in self.tasks:
+            for sub in t.subtasks:
+                if sub.id == task_id:
+                    return Resolved(kind="sub", parent_id=t.id, id=sub.id, name=sub.name, status=sub.status)
+        raise KeyError(f"no task or subtask with id {task_id}")
 
     # --- id generation ------------------------------------------------------
 

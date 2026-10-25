@@ -94,6 +94,44 @@ class ProjectStateSlugTest(unittest.TestCase):
         self.assertEqual(result, "add-auth-3")
 
 
+class ProjectStateFindAnyTest(unittest.TestCase):
+    def test_given_top_level_id_when_find_any_then_resolves_top(self):
+        # arrange
+        task = Task(id="t01", name="a", desc="", type="simple", status=Status.DONE)
+        state = ProjectState(tasks=[task])
+        # act
+        result = state.find_any("t01")
+        # assert
+        self.assertEqual(result.kind, "top")
+        self.assertIsNone(result.parent_id)
+        self.assertEqual(result.id, "t01")
+        self.assertEqual(result.name, "a")
+        self.assertEqual(result.status, Status.DONE)
+
+    def test_given_subtask_id_when_find_any_then_resolves_sub_with_parent(self):
+        # arrange
+        from laaw.model.subtask import Subtask
+        state = ProjectState(tasks=[
+            Task(id="t07", name="auth", desc="", type="supertask", status=Status.IN_PROGRESS,
+                 subtasks=[Subtask(id="t07.1", name="a", desc="", status=Status.NOT_PLANNED)]),
+        ])
+        # act
+        result = state.find_any("t07.1")
+        # assert
+        self.assertEqual(result.kind, "sub")
+        self.assertEqual(result.parent_id, "t07")
+        self.assertEqual(result.id, "t07.1")
+        self.assertEqual(result.name, "a")
+        self.assertEqual(result.status, Status.NOT_PLANNED)
+
+    def test_given_missing_id_when_find_any_then_raises_key_error(self):
+        # arrange
+        state = ProjectState()
+        # act / assert
+        with self.assertRaises(KeyError):
+            state.find_any("t99")
+
+
 class ProjectStateLookupTest(unittest.TestCase):
     def test_given_task_when_find_then_returns_it(self):
         # arrange

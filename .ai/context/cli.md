@@ -22,21 +22,21 @@ Core functions take structured params and return `(message, exit_code)`; they ra
 ## Commands
 
 - Lifecycle:
-  - `task register --name [--desc] [--deps ...]` — creates a top-level task in `not-planned`; next id from state; folder created via persistence; unknown dep → refuse.
-  - `task plan <id>` — transition check; scaffolds `task.md` (section headings only, from `TASK_MD_SECTIONS`) and empty `notes.md` if absent; legal from not-planned, in-progress, propagating-context (re-plan).
-  - `task implement <id>` — transition check + deps gate: refuses listing `unsatisfied_deps`; resume edge from propagating-context.
+  - `task register --name [--desc] [--deps ...] [--subtask-of PARENT_ID]` — without the flag, creates a top-level task in `not-planned`; next id from state; folder created via persistence; unknown dep → refuse. With `--subtask-of`, appends a subtask row (`tNN.n`, status `not-planned`) to the parent's state; refuses unknown or non-supertask parents and out-of-scope deps.
+  - `task plan <id>` — transition check; accepts task or subtask IDs; scaffolds `task.md` (section headings only, from `TASK_MD_SECTIONS`) and empty `notes.md` if absent; legal from not-planned, in-progress, propagating-context (re-plan). For a subtask the folder is `<parent>/<tNN.n>_<slug>/` and the owning supertask's status is set to `in-progress`.
+  - `task implement <id>` — transition check + deps gate (task or subtask ID): refuses listing `unsatisfied_deps`; resume edge from propagating-context.
   - `task propagate <id>`, `task done <id>` — transition check only.
-  - `task cancel <id>` — transition check; prints dependents as blocked list.
+  - `task cancel <id>` — transition check (task or subtask ID); prints dependents as blocked list (sibling subtasks included).
 - Edit:
-  - `task rename <id> --name` — only from `not-planned`/`planning`; moves the folder, updates name; refuse if `in-progress`+.
+  - `task rename <id> --name` — task or subtask ID; only from `not-planned`/`planning`; moves the folder (subtask folders stay inside the parent folder), updates name; refuse if `in-progress`+.
   - `task desc <id> --desc` — any non-terminal; clamped to 180 chars.
-  - `task dep-add <id> tXX` — any non-terminal; refuses on unknown/out-of-scope dep or cycle; warns when the new dep is not `done`.
+  - `task dep-add <id> tXX` — task or subtask ID, any non-terminal; refuses on unknown/out-of-scope dep or cycle; warns when the new dep is not `done`.
   - `task dep-remove <id> tXX` — any non-terminal; refuses if the dep is not present.
-  - `task promote <id>` — flips a top-level task from `simple` to `supertask`; pre-implementation only, like rename; refuses if already a supertask. There is no demote: cancel and re-create instead.
-  - `task note <id> --tag --text` — appends a tagged note (150-word cap enforced), re-renders notes files.
+  - `task promote <id>` — flips a top-level task from `simple` to `supertask`; pre-implementation only, like rename; refuses subtask IDs and tasks that are already supertasks. There is no demote: cancel and re-create instead.
+  - `task note <id> --tag --text` — task or subtask ID; appends a tagged note (150-word cap enforced) to the task/subtask's state, re-renders notes files into its folder.
 - Query:
-  - `task deps <id>` / `task dependents <id>` — read-only reports; `--json` for machine output. `deps` exits 1 when the task is blocked.
-  - `task check` — drift report: planning+ tasks have task.md; folder↔state match; deps reference existing ids; no cycles; scoping respected. Exits 1 on any drift.
+  - `task deps <id>` / `task dependents <id>` — task or subtask ID; read-only reports; `--json` for machine output. `deps` exits 1 when the task is blocked.
+  - `task check` — drift report: planning+ tasks and subtasks have task.md; top-level and subtask folders ↔ state match (orphan subtask folders flagged); deps reference existing ids; no cycles; scoping respected. Exits 1 on any drift.
 - Bootstrap:
   - `sync workflow [path]` — copies `workflow.md` from the LAAW checkout into `<target>/.ai/workflow/`; creates `.ai/tasks/index.md` and `.ai/context/index.md` skeletons if absent; appends missing `.gitignore` entries (`.ai/tasks/`, `.ai/workflow/`) without duplicates.
   - `sync skills <path>` — copies each skill folder from the LAAW checkout's `skills/` into `<dest>` (re-running overwrites).
@@ -46,11 +46,12 @@ Every command: load → validate (refuse before writing) → mutate → save →
 
 ## Model and rendering
 
-- `Task.to_dict()` / `Task.from_dict()`: serialize a task; the `subtasks` key is present only when non-empty (simple tasks omit it). `Subtask` and `Note` round-trip losslessly.
+- `Task.to_dict()` / `Task.from_dict()`: serialize a task; the `subtasks` and `notes` keys are present only when non-empty. `Subtask` and `Note` round-trip losslessly (`Subtask.notes` serializes like `Task.notes`).
 - `ProjectState.to_dict()` / `from_dict()`: serialize the whole `tasks.json` document shape (`version` + ordered `tasks`).
 - `next_top_level_id()` → `tNN` (zero-padded to 2, widens past 99); `next_subtask_id(parent)` → `tNN.N`.
 - `slug(name, taken)` → kebab-case with collision auto-suffix `-2`, `-3`, …
 - `add_task` raises `ValueError` on duplicate id; `find_task`/`find_subtask` raise `KeyError` when missing.
+- `ProjectState.find_any(id)` → `Resolved(kind, parent_id, id, name, status)`: resolves a top-level task or a subtask by id (`parent_id` is None for top); every core orchestrator resolves IDs through it, so all ID-addressed commands accept `tNN.n`.
 - `Task.notes: list[Note]` lives in the model and is serialized into tasks.json only when non-empty (mirrors the `subtasks` key). Notes are state, not files — rendering regenerates `notes.md`/`notes_<n>.md` from them on every save.
 
 Rendering (`domain/render.py`, pure):
@@ -76,10 +77,18 @@ Dependency graph (`domain/deps.py`, pure):
 
 - `scope_of(state, id)` → `(kind, parent_id)`: kind `'top'` or `'sub'`; basis for all sibling checks.
 - `deps_of(state, id)`, `status_of(state, id)` — resolve a task-or-subtask's deps/status by id.
+- `register_subtask(state, parent_id, name, desc, deps)` → `Subtask` (not-planned): validates the parent is an existing supertask and dep scope; the caller appends it to `parent.subtasks`.
 - `can_depend(state, task_id, dep_id)` — true only if same scope (same parent for subtasks), not the same id, and both exist.
 - `would_create_cycle(state, task_id, dep_id)` — DFS from `dep_id` following deps; true if it reaches `task_id`. Short-circuits when `can_depend` is false.
 - `unsatisfied_deps(state, id)`, `is_implementable(state, id)` — a dep is satisfied only when its status is `done`.
 - `dependents(state, id)` — sorted ids of all tasks/subtasks that list `id` as a dep (what would be blocked if it were cancelled).
+
+## Subtask handling
+
+- Subtasks live in state under their parent's `subtasks` list; the only CLI path into state is `register --subtask-of`. A subtask row must exist before it can be planned (planning a supertask does not auto-register its listed subtasks).
+- Subtask folders are nested: `<parent_folder>/<tNN.n>_<slug>/`; created by `plan`, never by `register`. `save_and_render` renders each subtask's notes files into its own folder and the parent's `subtasks.md` on every save.
+- Planning a subtask sets the owning supertask to `in-progress` (refused if that transition is illegal for the supertask).
+- Deps stay sibling-scoped: a subtask may only depend on siblings in the same supertask; `can_depend` enforces it and `check` flags violations.
 
 ## Conventions and gotchas
 

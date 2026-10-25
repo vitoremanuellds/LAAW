@@ -14,7 +14,7 @@ from .base import Refuse, load_or_empty, task_folder
 
 def deps(task_id: str, as_json: bool = False) -> tuple[str, int]:
     state = load_or_empty(_dir())
-    _find(state, task_id)
+    _find_any(state, task_id)
     unsatisfied = unsatisfied_deps(state, task_id)
     implementable = is_implementable(state, task_id)
     if as_json:
@@ -27,7 +27,7 @@ def deps(task_id: str, as_json: bool = False) -> tuple[str, int]:
 
 def dependents(task_id: str, as_json: bool = False) -> tuple[str, int]:
     state = load_or_empty(_dir())
-    _find(state, task_id)
+    _find_any(state, task_id)
     blocked = _dependents(state, task_id)
     if as_json:
         return json.dumps({"id": task_id, "dependents": blocked}), 0
@@ -59,17 +59,26 @@ def _drift(state, tasks_dir: str) -> list[str]:
             problems.append(f"{task.id}: missing folder {folder.name}")
             continue
         folders_on_disk.add(folder.name)
-        if task.status is not Status.NOT_PLANNED and not (folder / "task.md").is_file():
+        if not task.status.terminal and task.status is not Status.NOT_PLANNED and not (folder / "task.md").is_file():
             problems.append(f"{task.id}: status {task.status.value} but no task.md")
         for dep in task.deps:
             if state.find_task_or_none(dep) is None:
                 problems.append(f"{task.id}: unknown dep {dep}")
         for sub in task.subtasks:
+            sub_folder = folder / task_folder(sub.id, sub.name)
+            if not sub.status.terminal and sub.status is not Status.NOT_PLANNED and not (sub_folder / "task.md").is_file():
+                problems.append(f"{sub.id}: status {sub.status.value} but no task.md")
             for dep in sub.deps:
                 if not can_depend(state, sub.id, dep):
                     problems.append(f"{sub.id}: invalid dep {dep} (scope)")
                 elif would_create_cycle(state, sub.id, dep):
                     problems.append(f"{sub.id}: cycle via dep {dep}")
+            if sub_folder.is_dir():
+                folders_on_disk.add(f"{folder.name}/{sub_folder.name}")
+
+    for name in _disk_subfolders(tasks_dir):
+        if name not in folders_on_disk:
+            problems.append(f"subtask folder {name} has no matching task in state")
 
     for name in _disk_folders(tasks_dir):
         if name not in folders_on_disk:
@@ -85,6 +94,19 @@ def _disk_folders(tasks_dir: str) -> list[str]:
     return sorted(p.name for p in root.iterdir() if p.is_dir())
 
 
+def _disk_subfolders(tasks_dir: str) -> list[str]:
+    """Subtask folders on disk as '<parent>/<sub>' names, excluding state-matched ones."""
+    root = Path(tasks_dir)
+    if not root.is_dir():
+        return []
+    result: list[str] = []
+    for parent in sorted(p.name for p in root.iterdir() if p.is_dir()):
+        parent_path = root / parent
+        for sub in sorted(p.name for p in parent_path.iterdir() if p.is_dir()):
+            result.append(f"{parent}/{sub}")
+    return result
+
+
 def _dependents(state, task_id: str) -> list[str]:
     result = []
     for task in state.tasks:
@@ -96,11 +118,11 @@ def _dependents(state, task_id: str) -> list[str]:
     return sorted(result)
 
 
-def _find(state, task_id: str):
+def _find_any(state, task_id: str) -> None:
     try:
-        state.find_task(task_id)
+        state.find_any(task_id)
     except KeyError:
-        raise Refuse(f"no task with id {task_id}")
+        raise Refuse(f"no task or subtask with id {task_id}")
 
 
 def _dir() -> str:

@@ -1,6 +1,7 @@
 """Dependency logic for the LAAW CLI. Pure — operates on a ProjectState, no IO."""
 
 from ..model.state import ProjectState
+from ..model.subtask import Subtask
 
 
 def scope_of(state: ProjectState, task_id: str) -> tuple[str, str | None]:
@@ -76,3 +77,35 @@ def dependents(state: ProjectState, task_id: str) -> list[str]:
             if task_id in sub.deps:
                 result.append(sub.id)
     return sorted(result)
+
+
+def register_subtask(
+    state: ProjectState,
+    parent_id: str,
+    name: str,
+    desc: str,
+    deps: list[str],
+) -> Subtask:
+    """Build a subtask row for `parent_id` without mutating state.
+
+    Raises ValueError when the parent is unknown, not a supertask, or a dep
+    is out of sibling scope. The caller appends the result to
+    `parent.subtasks`.
+    """
+    from .status import Status
+
+    parent = state.find_task_or_none(parent_id)
+    if parent is None:
+        raise ValueError(f"unknown parent {parent_id}")
+    if parent.type != "supertask":
+        raise ValueError(f"{parent_id} is not a supertask")
+    for dep in deps:
+        if not can_depend(state, state.next_subtask_id(parent_id), dep):
+            raise ValueError(f"{dep} is not a valid dep of a subtask of {parent_id}")
+    return Subtask(
+        id=state.next_subtask_id(parent_id),
+        name=name,
+        desc=desc,
+        status=Status.NOT_PLANNED,
+        deps=list(deps),
+    )

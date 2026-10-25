@@ -76,6 +76,27 @@ class CoreNotesTest(unittest.TestCase):
         self.assertIn("## decision", rendered)
         self.assertIn("## gotcha", rendered)
 
+    def test_given_subtask_when_add_note_then_note_stored_and_rendered_in_subtask_folder(self):
+        # arrange
+        from laaw.model.subtask import Subtask
+        from tests.core.helpers import read_state, run_in_dir, write_state
+
+        state = ProjectState(tasks=[
+            Task(id="t07", name="Auth", desc="d", type="supertask", status=Status.IN_PROGRESS,
+                 subtasks=[Subtask(id="t07.1", name="JWT", desc="d", status=Status.PLANNING)]),
+        ])
+        write_state(self.dir, state)
+
+        # act
+        message, code = run_in_dir(notes.add_note, self.dir, "t07.1", "progress", "step done")
+
+        # assert
+        self.assertEqual(code, 0)
+        loaded = read_state(self.dir)
+        self.assertEqual(len(loaded.tasks[0].subtasks[0].notes), 1)
+        rendered = (Path(self.dir) / "t07_auth" / "t07.1_jwt" / "notes.md").read_text()
+        self.assertIn("## progress", rendered)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -41,6 +41,11 @@ def save_and_render(state: ProjectState, tasks_dir: str) -> None:
         notes_files = render_notes(list(task.notes))
         for filename, text in notes_files.items():
             persistence.save_text(str(folder / filename), text)
+        for sub in task.subtasks:
+            sub_folder = folder / task_folder(sub.id, sub.name)
+            sub_notes = render_notes(list(sub.notes))
+            for filename, text in sub_notes.items():
+                persistence.save_text(str(sub_folder / filename), text)
 
 
 def notes_of(state: ProjectState, task_id: str) -> list[Note]:
