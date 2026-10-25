@@ -23,7 +23,7 @@ def _group_by_tag(notes: list[Note]) -> list[tuple[str, list[Note]]]:
 
 
 def _section_lines(tag: str, notes: list[Note]) -> list[str]:
-    return [f"## {tag}"] + [f"- {note.text}" for note in notes]
+    return [f"## {tag}", ""] + [f"- {note.text}" for note in notes]
 
 
 def _file_text(body_lines: list[str]) -> str:
@@ -61,8 +61,10 @@ def render_notes(notes: list[Note]) -> dict[str, str]:
         else:
             emit(tag, tag_notes)
 
-    main_lines = [GENERATED_HEADER, "# Notes"]
-    for section in main_sections:
+    main_lines = [GENERATED_HEADER, "# Notes", ""]
+    for i, section in enumerate(main_sections):
+        if i:
+            main_lines.append("")
         main_lines += section
     files["notes.md"] = _file_text(main_lines + links)
     return files
