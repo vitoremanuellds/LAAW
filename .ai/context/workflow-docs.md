@@ -19,7 +19,7 @@
 - propagate-context: subtask → tagged notes on the supertask via `laaw task note <supertask-id>` (no staging file); simple task → context files; final propagation reads the supertask's staged `notes.md` and distributes into `.ai/context/`; approval → `laaw task done`.
 - bootstrap-project: skeleton check `.ai/workflow/`, `.ai/tasks/`, `.ai/context/index.md`; if missing → run `laaw sync workflow <project>` from the LAAW checkout; roadmap registered into state via `laaw task register --name [--desc] [--deps]` (→ `not-planned`); never creates plan files or task folders; writes only to `.ai/context/`, state changes via the CLI.
 - gather-context: same skeleton check; tree-only analysis, user Q&A gate, ordered read queue in `.ai/.queue.md`, then writes `.ai/context/`.
-- README bootstrap section: `laaw sync workflow [path]` / `laaw sync skills <path>`; `.ai/tasks/` starts empty — the CLI creates `tasks.json` on first `register`; all other files under `.ai/tasks/` are generated from state.
+- README bootstrap section: `laaw sync workflow [path]` / `laaw sync skills <path>`; `.ai/tasks/` starts empty — the CLI creates `tasks.json` on first `register`; all other files under `.ai/tasks/` are generated from state. The agent hook is automatic: `sync workflow` ensures a `Workflow` section in the project's `AGENTS.md` (created/appended/idempotent); the README still documents adding it by hand for non-default layouts.
 - README "How a task flows": state in `tasks.json` (source of truth, written only by the CLI), tables and notes generated/readonly, model writes only `task.md`, deviations as notes, subtask context staged as tagged notes on the supertask.
 
 ## Decisions and gotchas

@@ -55,6 +55,49 @@ class SyncWorkflowTest(unittest.TestCase):
         content = gitignore.read_text(encoding="utf-8")
         self.assertEqual(content.count(".ai/tasks/"), 1)
 
+    def test_given_no_agents_md_when_sync_workflow_then_created_with_workflow_section(self) -> None:
+        from laaw.core.sync import sync_workflow
+
+        message, code = sync_workflow(self.target)
+        self.assertEqual(code, 0)
+        agents = Path(self.target) / "AGENTS.md"
+        self.assertTrue(agents.is_file())
+        content = agents.read_text(encoding="utf-8")
+        self.assertIn("## Workflow", content)
+        self.assertIn("This project uses LAAW.", content)
+        self.assertIn("AGENTS.md created", message)
+
+    def test_given_agents_md_without_workflow_when_sync_workflow_then_section_appended(self) -> None:
+        from laaw.core.sync import sync_workflow
+
+        agents = Path(self.target) / "AGENTS.md"
+        agents.write_text("# Agents\n\nOther content.\n", encoding="utf-8")
+        message, code = sync_workflow(self.target)
+        self.assertEqual(code, 0)
+        content = agents.read_text(encoding="utf-8")
+        self.assertTrue(content.startswith("# Agents"))
+        self.assertIn("## Workflow", content)
+        self.assertIn("AGENTS.md appended", message)
+
+    def test_given_agents_md_with_workflow_when_sync_workflow_then_untouched(self) -> None:
+        from laaw.core.sync import sync_workflow
+
+        agents = Path(self.target) / "AGENTS.md"
+        original = "# Agents\n\n## Workflow\n\nThis project uses LAAW. Custom extra line.\n"
+        agents.write_text(original, encoding="utf-8")
+        message, code = sync_workflow(self.target)
+        self.assertEqual(code, 0)
+        self.assertEqual(agents.read_text(encoding="utf-8"), original)
+        self.assertNotIn("AGENTS.md", message)
+
+    def test_given_agents_md_when_sync_workflow_twice_then_no_duplicate_section(self) -> None:
+        from laaw.core.sync import sync_workflow
+
+        sync_workflow(self.target)
+        sync_workflow(self.target)
+        content = (Path(self.target) / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertEqual(content.count("## Workflow"), 1)
+
     def test_given_non_directory_when_sync_workflow_then_refused(self) -> None:
         from laaw.core.sync import sync_workflow
 

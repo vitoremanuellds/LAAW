@@ -55,7 +55,7 @@ laaw sync skills ~/.agents/skills
 
 ## Tell the agent about the workflow
 
-For the workflow to actually be used, the agent needs to know to read `workflow.md`. Add a section to the project's `AGENTS.md` (create it if it does not exist):
+For the workflow to actually be used, the agent needs to know to read `workflow.md`. `laaw sync workflow` does this for you: it creates or updates a `Workflow` section in the project's `AGENTS.md` (created if absent, appended if missing, left untouched if already there — re-running never duplicates it):
 
 ```markdown
 ## Workflow
@@ -66,7 +66,7 @@ context propagation, use the `plan-task`, `implement-task`, and
 `propagate-context` skills.
 ```
 
-Installed the workflow or the skills somewhere else? See [Non-default install locations](#non-default-install-locations).
+If you manage `AGENTS.md` by hand (or use a non-default layout), add that section yourself — see [Non-default install locations](#non-default-install-locations).
 
 ## Non-default install locations
 

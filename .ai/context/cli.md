@@ -39,7 +39,7 @@ Core functions take structured params and return `(message, exit_code)`; they ra
   - `task deps <id>` / `task dependents <id>` — task or subtask ID; read-only reports; `--json` for machine output. `deps` exits 1 when the task is blocked.
   - `task check` — drift report: non-terminal planning+ tasks and subtasks have task.md (terminal tasks are skipped — they may never have been planned); top-level and subtask folders ↔ state match (orphan subtask folders flagged); deps reference existing ids; no cycles; scoping respected. Exits 1 on any drift.
 - Bootstrap:
-  - `sync workflow [path]` — copies `workflow.md` from the LAAW checkout into `<target>/.ai/workflow/`; creates `.ai/tasks/index.md` and `.ai/context/index.md` skeletons if absent; appends missing `.gitignore` entries (`.ai/tasks/`, `.ai/workflow/`) without duplicates.
+  - `sync workflow [path]` — copies `workflow.md` from the LAAW checkout into `<target>/.ai/workflow/`; creates `.ai/tasks/index.md` and `.ai/context/index.md` skeletons if absent; ensures a `Workflow` section in `<target>/AGENTS.md` (creates the file if absent, appends the section if missing, leaves it untouched otherwise — idempotent via the `## Workflow` + first-line marker); appends missing `.gitignore` entries (`.ai/tasks/`, `.ai/workflow/`) without duplicates.
   - `sync skills <path>` — copies each skill folder from the LAAW checkout's `skills/` into `<dest>` (re-running overwrites).
   - `task render` — regenerates every generated file (tasks.json, tasks.md, per-supertask subtasks.md, all notes files) from state.
 

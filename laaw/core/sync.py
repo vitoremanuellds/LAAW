@@ -23,6 +23,13 @@ CONTEXT_INDEX_TEMPLATE = """# Context index
 
 GITIGNORE_ENTRIES = (".ai/tasks/", ".ai/workflow/")
 
+AGENTS_WORKFLOW_SECTION = """## Workflow
+
+This project uses LAAW. Before doing any task work, read `.ai/workflow/workflow.md` and follow it. For planning, implementation, and context propagation, use the `plan-task`, `implement-task`, and `propagate-context` skills.
+"""
+
+AGENTS_WORKFLOW_MARKER = "## Workflow\n\nThis project uses LAAW."
+
 
 def sync_workflow(target: str) -> tuple[str, int]:
     target = str(Path(target).expanduser().resolve())
@@ -49,13 +56,30 @@ def sync_workflow(target: str) -> tuple[str, int]:
             persistence.save_text(str(index), template)
             created.append(str(index))
 
+    agents = _ensure_agents_md(target)
     added = _ensure_gitignore_entries(target)
     return (
         f"workflow synced into {target}"
         + (f"; created {', '.join(created)}" if created else "")
+        + (f"; AGENTS.md {agents}" if agents else "")
         + (f"; gitignore + {' '.join(added)}" if added else ""),
         0,
     )
+
+
+def _ensure_agents_md(target: str) -> str:
+    """Ensure <target>/AGENTS.md has the Workflow section. Returns 'created'/'appended'/''."""
+    agents = Path(target) / "AGENTS.md"
+    if not agents.is_file():
+        persistence.save_text(str(agents), AGENTS_WORKFLOW_SECTION)
+        return "created"
+    content = persistence.load_text(str(agents))
+    if AGENTS_WORKFLOW_MARKER in content:
+        return ""
+    if content and not content.endswith("\n"):
+        content += "\n"
+    persistence.save_text(str(agents), content + "\n" + AGENTS_WORKFLOW_SECTION)
+    return "appended"
 
 
 def _ensure_gitignore_entries(target: str) -> list[str]:
