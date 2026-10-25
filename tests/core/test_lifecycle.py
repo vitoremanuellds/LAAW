@@ -40,7 +40,7 @@ class LifecycleTest(unittest.TestCase):
         loaded = read_state(self.dir)
         self.assertEqual(loaded.tasks[0].id, "t01")
         self.assertEqual(loaded.tasks[0].status, Status.NOT_PLANNED)
-        self.assertTrue((Path(self.dir) / "t01_add-login").is_dir())
+        self.assertFalse((Path(self.dir) / "t01_add-login").is_dir())
 
     def test_given_existing_task_when_register_then_next_id_and_distinct_folder(self):
         # arrange
@@ -55,7 +55,7 @@ class LifecycleTest(unittest.TestCase):
         self.assertEqual(code, 0)
         loaded = read_state(self.dir)
         self.assertEqual(loaded.tasks[1].id, "t02")
-        self.assertTrue((Path(self.dir) / "t02_add-auth").is_dir())
+        self.assertFalse((Path(self.dir) / "t02_add-auth").is_dir())
 
     def test_given_unknown_dep_when_register_then_refused_no_write(self):
         # arrange
@@ -95,6 +95,30 @@ class LifecycleTest(unittest.TestCase):
         self.assertEqual(subs[1].id, "t07.2")
         self.assertEqual(subs[1].status, Status.NOT_PLANNED)
         self.assertIn("t07.2", message)
+        self.assertFalse((Path(self.dir) / "t07_auth" / "t07.2_jwt-service").is_dir())
+
+    def test_given_notes_when_save_then_notes_rendered_only_for_non_empty_lists(self):
+        # arrange: top task with notes, subtask without; neither folder exists yet
+        from laaw.model.note import Note
+        from laaw.model.subtask import Subtask
+        from tests.core.helpers import run_in_dir, write_state
+
+        state = ProjectState(tasks=[
+            Task(id="t07", name="Auth", desc="d", type="supertask", status=Status.PLANNING,
+                 subtasks=[Subtask(id="t07.1", name="JWT", desc="d", status=Status.NOT_PLANNED)],
+                 notes=[Note(tag="decision", text="chose X")]),
+        ])
+        write_state(self.dir, state)
+
+        # act
+        run_in_dir(lifecycle.plan, self.dir, "t07.1")  # any save renders notes per rule
+
+        # assert
+        top = Path(self.dir) / "t07_auth"
+        self.assertIn("## decision", (top / "notes.md").read_text())
+        sub = top / "t07.1_jwt"
+        self.assertTrue((sub / "notes.md").is_file())  # plan scaffolded it
+        self.assertNotIn("## decision", (sub / "notes.md").read_text())
 
     def test_given_unknown_parent_when_register_subtask_of_then_refused(self):
         # arrange
@@ -144,7 +168,24 @@ class LifecycleTest(unittest.TestCase):
         folder = Path(self.dir) / "t01_add-login"
         self.assertTrue((folder / "task.md").is_file())
         content = (folder / "task.md").read_text()
-        self.assertIn("## Title", content)
+        self.assertTrue(content.startswith("# "))  # level-1 title
+
+    def test_given_not_planned_when_plan_then_scaffolded_task_md_has_no_notes_section(self):
+        # arrange
+        from tests.core.helpers import run_in_dir, write_state
+
+        write_state(self.dir, ProjectState(tasks=[_task("t01", "Add login")]))
+
+        # act
+        message, code = run_in_dir(lifecycle.plan, self.dir, "t01")
+
+        # assert
+        self.assertEqual(code, 0)
+        content = (Path(self.dir) / "t01_add-login" / "task.md").read_text()
+        self.assertIn("# ", content)  # title is a level-1 heading
+        for section in ("Description", "Context", "In scope / Out of scope", "Steps", "Validations"):
+            self.assertIn(f"## {section}", content)
+        self.assertNotIn("## Notes", content)
 
     def test_given_done_when_plan_then_refused(self):
         # arrange

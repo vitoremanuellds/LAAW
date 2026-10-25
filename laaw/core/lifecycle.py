@@ -45,7 +45,6 @@ def register(
         deps=list(deps),
     )
     state.add_task(task)
-    persistence.ensure_dir(str(Path(tasks_dir) / folder))
     save_and_render(state, tasks_dir)
     return f"registered {task_id} ({folder})", 0
 
@@ -64,9 +63,10 @@ def plan(task_id: str) -> tuple[str, int]:
     _scaffold(folder, resolved.name)
     if resolved.kind == "sub":
         supertask = state.find_task(resolved.parent_id or "")
-        if not can_transition(supertask.status, Action.IMPLEMENT):
-            raise Refuse(f"cannot set supertask {supertask.id} to in-progress from status {supertask.status.value}")
-        supertask.status = resulting_status(supertask.status, Action.IMPLEMENT)
+        if supertask.status is not Status.IN_PROGRESS:
+            if not can_transition(supertask.status, Action.IMPLEMENT):
+                raise Refuse(f"cannot set supertask {supertask.id} to in-progress from status {supertask.status.value}")
+            supertask.status = resulting_status(supertask.status, Action.IMPLEMENT)
     save_and_render(state, tasks_dir)
     return f"{task_id} → planning", 0
 

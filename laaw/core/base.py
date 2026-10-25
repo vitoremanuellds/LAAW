@@ -38,10 +38,13 @@ def save_and_render(state: ProjectState, tasks_dir: str) -> None:
         folder = Path(tasks_dir) / task_folder(task.id, task.name)
         if task.type == "supertask":
             persistence.save_text(str(folder / "subtasks.md"), render_subtasks_md(task))
-        notes_files = render_notes(list(task.notes))
-        for filename, text in notes_files.items():
-            persistence.save_text(str(folder / filename), text)
+        if task.notes:
+            notes_files = render_notes(list(task.notes))
+            for filename, text in notes_files.items():
+                persistence.save_text(str(folder / filename), text)
         for sub in task.subtasks:
+            if not sub.notes:
+                continue
             sub_folder = folder / task_folder(sub.id, sub.name)
             sub_notes = render_notes(list(sub.notes))
             for filename, text in sub_notes.items():

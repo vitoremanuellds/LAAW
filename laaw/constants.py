@@ -19,11 +19,9 @@ TAG_ORDER = (
 )
 
 TASK_MD_SECTIONS = (
-    "Title",
     "Description",
     "Context",
     "In scope / Out of scope",
     "Steps",
     "Validations",
-    "Notes",
 )

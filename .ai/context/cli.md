@@ -22,8 +22,8 @@ Core functions take structured params and return `(message, exit_code)`; they ra
 ## Commands
 
 - Lifecycle:
-  - `task register --name [--desc] [--deps ...] [--subtask-of PARENT_ID]` — without the flag, creates a top-level task in `not-planned`; next id from state; folder created via persistence; unknown dep → refuse. With `--subtask-of`, appends a subtask row (`tNN.n`, status `not-planned`) to the parent's state; refuses unknown or non-supertask parents and out-of-scope deps.
-  - `task plan <id>` — transition check; accepts task or subtask IDs; scaffolds `task.md` (section headings only, from `TASK_MD_SECTIONS`) and empty `notes.md` if absent; legal from not-planned, in-progress, propagating-context (re-plan). For a subtask the folder is `<parent>/<tNN.n>_<slug>/` and the owning supertask's status is set to `in-progress`.
+  - `task register --name [--desc] [--deps ...] [--subtask-of PARENT_ID]` — without the flag, adds a top-level task in `not-planned`; next id from state; unknown dep → refuse. With `--subtask-of`, appends a subtask row (`tNN.n`, status `not-planned`) to the parent's state; refuses unknown or non-supertask parents and out-of-scope deps. Neither kind creates any folder or files.
+  - `task plan <id>` — transition check; accepts task or subtask IDs; creates the folder (top-level `<id>_<slug>/`, subtask `<parent>/<tNN.n>_<slug>/`) and scaffolds `task.md` (section headings only, from `TASK_MD_SECTIONS`) and empty `notes.md`; legal from not-planned, in-progress, propagating-context (re-plan). For a subtask the owning supertask's status is set to `in-progress`.
   - `task implement <id>` — transition check + deps gate (task or subtask ID): refuses listing `unsatisfied_deps`; resume edge from propagating-context.
   - `task propagate <id>`, `task done <id>` — transition check only.
   - `task cancel <id>` — transition check (task or subtask ID); prints dependents as blocked list (sibling subtasks included).
@@ -86,7 +86,8 @@ Dependency graph (`domain/deps.py`, pure):
 ## Subtask handling
 
 - Subtasks live in state under their parent's `subtasks` list; the only CLI path into state is `register --subtask-of`. A subtask row must exist before it can be planned (planning a supertask does not auto-register its listed subtasks).
-- Subtask folders are nested: `<parent_folder>/<tNN.n>_<slug>/`; created by `plan`, never by `register`. `save_and_render` renders each subtask's notes files into its own folder and the parent's `subtasks.md` on every save.
+- Folders are created only by `plan`, for both kinds: top-level `<id>_<slug>/` and nested subtask `<parent_folder>/<tNN.n>_<slug>/`. `register` never creates folders or files.
+- Notes files appear only once notes exist: `save_and_render` renders a task's or subtask's notes files only when its note list is non-empty; `plan`'s scaffold writes the initial empty `notes.md`. The parent's `subtasks.md` is rendered on every save.
 - Planning a subtask sets the owning supertask to `in-progress` (refused if that transition is illegal for the supertask).
 - Deps stay sibling-scoped: a subtask may only depend on siblings in the same supertask; `can_depend` enforces it and `check` flags violations.
 
