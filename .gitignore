@@ -9,3 +9,4 @@ prompt.md
 # LAAW: tasks and workflow copies are per-user; only context is committed
 .ai/tasks/
 .ai/workflow/
+.ai/tasks-legacy/
