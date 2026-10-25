@@ -1,0 +1,30 @@
+# Workflow docs — workflow.md, skills, README
+
+## Modules
+
+- `workflow.md` (repo root) is the source of truth for the LAAW workflow doc; `.ai/workflow/workflow.md` is a synced copy refreshed with `laaw sync workflow <path>`; both are byte-identical after sync.
+- Structure: Principles (5), Invocation, Layout, State (tasks.json + generated tables, IDs/slugs, Statuses), Task files, Context files, Rules, Loops (simple task + supertask), Skills.
+- `skills/` — the five skills; synced into a project with `laaw sync skills <path>`. The three core skills (`plan-task`, `implement-task`, `propagate-context`) drive the CLI-backed workflow; the two optional ones (`bootstrap-project`, `gather-context`) handle bootstrap and never touch task state.
+- `README.md` — project entry point for new users: documents the `laaw/` package, `bin/` wrappers, the Python 3 requirement, and invocation (`laaw` on PATH or `python -m laaw`).
+- `.ai/context/skills.md` — committed context file documenting the five skills.
+
+## Conventions
+
+- The workflow doc describes the CLI-backed workflow: `tasks.json` is the source of truth; `tasks.md`, `subtasks.md`, `notes.md`/`notes_<n>.md` are generated and readonly; `task.md` is model-owned (scaffolded by `laaw task plan`; all task files have identical sections).
+- Invocation: `laaw` may be on PATH (`bin/laaw` / `bin/laaw.ps1`, requires Python 3); otherwise `python -m laaw` with the checkout root on cwd/PYTHONPATH. Commands are non-interactive and fail loud.
+- Notes are CLI-owned state, not part of `task.md`: `laaw task note <id> --tag <tag> --text "..."`, rendered into `notes.md`. Supertask subtask context is staged as tagged notes on the supertask; there is no separate staging file (`new-info.md` is retired from the documented workflow).
+- Loops name the CLI commands at each step: register, plan, implement, propagate, done, cancel, note (progress after each Step, deviation for plan changes), dependents.
+- plan-task: register = `laaw task register`, plan file = `laaw task plan <id>`; IDs are CLI-computed — the agent never derives them (no "compute the ID" step); subtask rows must already exist in the supertask's state; plan content sections per workflow.md (no Notes section in task.md).
+- implement-task: dep check = `laaw task deps`, start = `laaw task implement`; progress note after each Step (`--tag progress`); deviations recorded in task.md Notes + as `--tag deviation` notes; cancellation = `laaw task cancel` (CLI reports dependents); re-pointing deps = `dep-add`/`dep-remove`; approval → `laaw task propagate`.
+- propagate-context: subtask → tagged notes on the supertask via `laaw task note <supertask-id>` (no staging file); simple task → context files; final propagation reads the supertask's staged `notes.md` and distributes into `.ai/context/`; approval → `laaw task done`.
+- bootstrap-project: skeleton check `.ai/workflow/`, `.ai/tasks/`, `.ai/context/index.md`; if missing → run `laaw sync workflow <project>` from the LAAW checkout; roadmap registered into state via `laaw task register --name [--desc] [--deps]` (→ `not-planned`); never creates plan files or task folders; writes only to `.ai/context/`, state changes via the CLI.
+- gather-context: same skeleton check; tree-only analysis, user Q&A gate, ordered read queue in `.ai/.queue.md`, then writes `.ai/context/`.
+- README bootstrap section: `laaw sync workflow [path]` / `laaw sync skills <path>`; `.ai/tasks/` starts empty — the CLI creates `tasks.json` on first `register`; all other files under `.ai/tasks/` are generated from state.
+- README "How a task flows": state in `tasks.json` (source of truth, written only by the CLI), tables and notes generated/readonly, model writes only `task.md`, deviations as notes, subtask context staged as tagged notes on the supertask.
+
+## Decisions and gotchas
+
+- Deduplication per t05: each rule appears verbatim in exactly one place — 100-line threshold in Principle 5 (Splitting and Simple-vs-supertask point to it), att naming only in Splitting, sizing triggers + hard cap only in Sizing. The skills do not restate these rules; they cross-reference workflow.md (sizing text, 100-line threshold, att naming appear zero times verbatim in the three core skills).
+- Task files table dropped the `When` column and the Notes row: all task.md files are identical, and notes live in CLI-rendered `notes.md`, not in task.md.
+- workflow.md is exempt from the 100-line `.ai/` rule (always read in full); the current doc is ~159 lines, at the sanity cap.
+- User-requested deviation: plan-task's "Compute the ID" step was removed because the CLI computes IDs for the agent.
