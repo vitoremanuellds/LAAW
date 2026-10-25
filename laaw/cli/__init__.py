@@ -29,6 +29,10 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--name", required=True)
     p.set_defaults(func=_dispatch("rename"))
 
+    p = cmd.add_parser("promote")
+    p.add_argument("id")
+    p.set_defaults(func=_dispatch("promote"))
+
     p = cmd.add_parser("desc")
     p.add_argument("id")
     p.add_argument("--desc", required=True)

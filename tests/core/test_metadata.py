@@ -1,4 +1,4 @@
-"""Tests for laaw.core.metadata (rename, desc, dep-add, dep-remove)."""
+"""Tests for laaw.core.metadata (rename, desc, dep-add, dep-remove, promote)."""
 
 import tempfile
 import unittest
@@ -11,8 +11,14 @@ from laaw.model.task import Task
 from laaw.domain.status import Status
 
 
-def _task(id: str, name: str, status: Status, deps: list[str] | None = None) -> Task:
-    return Task(id=id, name=name, desc="d", type="simple", status=status, deps=deps or [])
+def _task(
+    id: str,
+    name: str,
+    status: Status,
+    deps: list[str] | None = None,
+    type: str = "simple",
+) -> Task:
+    return Task(id=id, name=name, desc="d", type=type, status=status, deps=deps or [])
 
 
 class MetadataTest(unittest.TestCase):
@@ -192,6 +198,68 @@ class MetadataTest(unittest.TestCase):
         # act
         with self.assertRaises(Refuse):
             run_in_dir(metadata.dep_remove, self.dir, "t01", "t99")
+
+        # assert
+        self.assertEqual(state_json_bytes(self.dir), before)
+
+
+    # --- promote ---------------------------------------------------------------
+
+    def test_given_simple_planning_when_promote_then_supertask(self):
+        # arrange
+        from tests.core.helpers import read_state, run_in_dir, write_state
+
+        write_state(self.dir, ProjectState(tasks=[_task("t01", "A", Status.PLANNING)]))
+
+        # act
+        message, code = run_in_dir(metadata.promote, self.dir, "t01")
+
+        # assert
+        self.assertEqual(code, 0)
+        loaded = read_state(self.dir)
+        self.assertEqual(loaded.tasks[0].type, "supertask")
+
+    def test_given_in_progress_when_promote_then_refused(self):
+        # arrange
+        from tests.core.helpers import run_in_dir, state_json_bytes, write_state
+
+        write_state(self.dir, ProjectState(tasks=[_task("t01", "A", Status.IN_PROGRESS)]))
+        before = state_json_bytes(self.dir)
+
+        # act
+        with self.assertRaises(Refuse):
+            run_in_dir(metadata.promote, self.dir, "t01")
+
+        # assert
+        self.assertEqual(state_json_bytes(self.dir), before)
+
+    def test_given_supertask_when_promote_then_refused(self):
+        # arrange
+        from tests.core.helpers import run_in_dir, state_json_bytes, write_state
+
+        write_state(
+            self.dir,
+            ProjectState(tasks=[_task("t01", "A", Status.PLANNING, type="supertask")]),
+        )
+        before = state_json_bytes(self.dir)
+
+        # act
+        with self.assertRaises(Refuse):
+            run_in_dir(metadata.promote, self.dir, "t01")
+
+        # assert
+        self.assertEqual(state_json_bytes(self.dir), before)
+
+    def test_given_unknown_id_when_promote_then_refused(self):
+        # arrange
+        from tests.core.helpers import run_in_dir, state_json_bytes, write_state
+
+        write_state(self.dir, ProjectState(tasks=[_task("t01", "A", Status.PLANNING)]))
+        before = state_json_bytes(self.dir)
+
+        # act
+        with self.assertRaises(Refuse):
+            run_in_dir(metadata.promote, self.dir, "t99")
 
         # assert
         self.assertEqual(state_json_bytes(self.dir), before)

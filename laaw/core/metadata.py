@@ -1,4 +1,4 @@
-"""Core metadata orchestrators: rename, desc, dep-add, dep-remove."""
+"""Core metadata orchestrators: rename, desc, dep-add, dep-remove, promote."""
 
 from pathlib import Path
 
@@ -75,6 +75,21 @@ def dep_remove(task_id: str, dep_id: str) -> tuple[str, int]:
     deps.remove(dep_id)
     save_and_render(state, tasks_dir)
     return f"{task_id} no longer depends on {dep_id}", 0
+
+
+def promote(task_id: str) -> tuple[str, int]:
+    tasks_dir = _dir()
+    state = load_or_empty(tasks_dir)
+    task = _find(state, task_id)
+
+    if task.status not in (Status.NOT_PLANNED, Status.PLANNING):
+        raise Refuse(f"cannot promote from status {task.status.value} (pre-implementation only)")
+    if task.type == "supertask":
+        raise Refuse(f"{task_id} is already a supertask")
+
+    task.type = "supertask"
+    save_and_render(state, tasks_dir)
+    return f"{task_id} promoted to supertask", 0
 
 
 def _find(state, task_id: str):
