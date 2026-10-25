@@ -23,20 +23,21 @@ Core functions take structured params and return `(message, exit_code)`; they ra
 
 - Lifecycle:
   - `task register --name [--desc] [--deps ...] [--subtask-of PARENT_ID]` — without the flag, adds a top-level task in `not-planned`; next id from state; unknown dep → refuse. With `--subtask-of`, appends a subtask row (`tNN.n`, status `not-planned`) to the parent's state; refuses unknown or non-supertask parents and out-of-scope deps. Neither kind creates any folder or files.
-  - `task plan <id>` — transition check; accepts task or subtask IDs; creates the folder (top-level `<id>_<slug>/`, subtask `<parent>/<tNN.n>_<slug>/`) and scaffolds `task.md` (section headings only, from `TASK_MD_SECTIONS`) and empty `notes.md`; legal from not-planned, in-progress, propagating-context (re-plan). For a subtask the owning supertask's status is set to `in-progress` only if it is not already there (refused from terminal statuses).
+  - `task plan <id>` — transition check; accepts task or subtask IDs; creates the folder (top-level `<id>_<slug>/`, subtask `<parent>/<tNN.n>_<slug>/`) and scaffolds `task.md` (level-1 `# <name>` title from the task name, then level-2 sections from `TASK_MD_SECTIONS`: Description, Context, In scope / Out of scope, Steps, Validations — no Title or Notes section) and empty `notes.md`; legal from not-planned, in-progress, propagating-context (re-plan). For a subtask the owning supertask's status is set to `in-progress` only if it is not already there (refused from terminal statuses).
   - `task implement <id>` — transition check + deps gate (task or subtask ID): refuses listing `unsatisfied_deps`; resume edge from propagating-context.
   - `task propagate <id>`, `task done <id>` — transition check only.
   - `task cancel <id>` — transition check (task or subtask ID); prints dependents as blocked list (sibling subtasks included).
+  - `task remove <id>` — deletes a cancelled task or subtask from state and recursively deletes its folder; refuses non-cancelled status, tasks with dependents (listed), supertasks that still have subtasks, unknown ids.
 - Edit:
   - `task rename <id> --name` — task or subtask ID; only from `not-planned`/`planning`; moves the folder (subtask folders stay inside the parent folder), updates name; refuse if `in-progress`+.
   - `task desc <id> --desc` — any non-terminal; clamped to 180 chars.
   - `task dep-add <id> tXX` — task or subtask ID, any non-terminal; refuses on unknown/out-of-scope dep or cycle; warns when the new dep is not `done`.
   - `task dep-remove <id> tXX` — any non-terminal; refuses if the dep is not present.
   - `task promote <id>` — flips a top-level task from `simple` to `supertask`; pre-implementation only, like rename; refuses subtask IDs and tasks that are already supertasks. There is no demote: cancel and re-create instead.
-  - `task note <id> --tag --text` — task or subtask ID; appends a tagged note (150-word cap enforced) to the task/subtask's state, re-renders notes files into its folder.
+  - `task note <id> --tag --text` — task or subtask ID; status-gated: refused on not-planned and terminal (done/cancelled), legal only from planning, in-progress, propagating-context. Appends a tagged note (150-word cap enforced) to the task/subtask's state, re-renders notes files into its folder.
 - Query:
   - `task deps <id>` / `task dependents <id>` — task or subtask ID; read-only reports; `--json` for machine output. `deps` exits 1 when the task is blocked.
-  - `task check` — drift report: planning+ tasks and subtasks have task.md; top-level and subtask folders ↔ state match (orphan subtask folders flagged); deps reference existing ids; no cycles; scoping respected. Exits 1 on any drift.
+  - `task check` — drift report: non-terminal planning+ tasks and subtasks have task.md (terminal tasks are skipped — they may never have been planned); top-level and subtask folders ↔ state match (orphan subtask folders flagged); deps reference existing ids; no cycles; scoping respected. Exits 1 on any drift.
 - Bootstrap:
   - `sync workflow [path]` — copies `workflow.md` from the LAAW checkout into `<target>/.ai/workflow/`; creates `.ai/tasks/index.md` and `.ai/context/index.md` skeletons if absent; appends missing `.gitignore` entries (`.ai/tasks/`, `.ai/workflow/`) without duplicates.
   - `sync skills <path>` — copies each skill folder from the LAAW checkout's `skills/` into `<dest>` (re-running overwrites).
@@ -64,7 +65,7 @@ Rendering (`domain/render.py`, pure):
 Notes rendering (`domain/notes.py`, pure):
 
 - `validate_note(note)` raises `ValueError` if a note exceeds 150 words; `core/notes.add_note` converts it to `Refuse` so the single refusal path covers cap violations and unknown tasks uniformly.
-- `render_notes(notes)` groups notes by tag in `TAG_ORDER` (unknown tags fold into `other`), packs under the 600-word file cap, and auto-splits overflow into `notes_1.md`, `notes_2.md`, … in emission order. A tag whose content alone exceeds the cap gets its own numbered file(s); smaller tags share files. Every file starts with `GENERATED_HEADER`; `notes.md` links each overflow as `- notes_N.md (tags: <tag>)`.
+- `render_notes(notes)` groups notes by tag in `TAG_ORDER` (unknown tags fold into `other`), packs under the 600-word file cap, and auto-splits overflow into `notes_1.md`, `notes_2.md`, … in emission order. A tag whose content alone exceeds the cap gets its own numbered file(s); smaller tags share files. Every file starts with `GENERATED_HEADER`; `notes.md` links each overflow as `- notes_N.md (tags: <tag>)`. Layout: blank line after `# Notes`, after every `## tag` header, and between sections; overflow files are `## tag` + blank + bullets (`_section_lines` emits the per-section block, `render_notes` joins with blank lines).
 - The 600-word file cap counts **note content only** — section headers (`## tag`) and markdown structure are excluded.
 
 Status machine (`domain/status.py`, pure):

@@ -7,7 +7,7 @@ Core (part of the task loop):
 | Skill | When | What it does |
 |---|---|---|
 | `plan-task` | User asks to plan | Registers the task in state (`laaw task register`) and creates its plan file via the CLI (`laaw task plan`); decides simple vs supertask; planning a subtask sets the supertask `in-progress`; context before codebase |
-| `implement-task` | User asks to implement an approved task | Checks dependencies (`laaw task deps`), implements, records progress and deviations as notes (`laaw task note`), handles cancellation (`laaw task cancel`), runs validations |
+| `implement-task` | User asks to implement an approved task | Checks dependencies (`laaw task deps`), implements, records exactly one progress note per completed Step plus deviation notes (`laaw task note`), handles cancellation (`laaw task cancel`), runs validations; `laaw task propagate <id>` only after explicit user approval (validations are not approval) |
 | `propagate-context` | After implementation is approved | Writes the task's information back into `.ai/context/`, or as tagged notes on the supertask for subtasks; final propagation moves staged notes into the context files |
 
 Optional (standalone, not part of the task loop):
