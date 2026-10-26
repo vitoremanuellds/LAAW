@@ -24,7 +24,7 @@
 
 ## Decisions and gotchas
 
-- Deduplication per t05: each rule appears verbatim in exactly one place — 100-line threshold in Principle 5 (Splitting and Simple-vs-supertask point to it), att naming only in Splitting, sizing triggers + hard cap only in Sizing. The skills do not restate these rules; they cross-reference workflow.md (sizing text, 100-line threshold, att naming appear zero times verbatim in the three core skills).
+- Deduplication: each rule appears verbatim in exactly one place — the file-size threshold in Principle 5 (Splitting and Simple-vs-supertask point to it), sizing triggers + hard cap only in Sizing. The skills do not restate these rules; they cross-reference workflow.md (threshold number, sizing text appear zero times verbatim in the five skills).
 - Task files table dropped the `When` column and the Notes row: all task.md files are identical, and notes live in CLI-rendered `notes.md`, not in task.md.
-- workflow.md is exempt from the 100-line `.ai/` rule (always read in full); the current doc is ~159 lines, at the sanity cap.
+- Principle 5: any `.ai/` file larger than ~1500 words (≈2k tokens ≈ one read at the session's context budget) is split; a file between the threshold and its next natural break is fine as long as it still reads in one pass. Split pieces keep a descriptive name chosen by the agent, live in the same folder, and the entry point links to them one-way — there is no base/att naming grammar. Exceptions: `workflow/workflow.md` itself (session entry point, always read in full; currently ~1770 words, above the threshold but exempt) and project code outside `.ai/`. Note: `.ai/context/cli.md` is ~1890 words, slightly over the threshold — a candidate for a future split.
 - User-requested deviation: plan-task's "Compute the ID" step was removed because the CLI computes IDs for the agent.

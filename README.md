@@ -6,7 +6,7 @@ LAAW is a workflow for local AI agents running on limited hardware. It targets m
 - **Human gates.** You approve the plan, the implementation, and the propagated context. The agent never skips a gate.
 - **Deviations are recorded.** Anything that deviates from the approved plan is noted in the task's notes.
 - **Context propagates.** What a task creates or changes is written back into the project's context files (a small wiki the agent reads before working).
-- **Files stay small.** Files over 100 lines are split, so the agent only ever loads what it needs.
+- **Files stay small.** `.ai/` files over ~1500 words (≈ one read at the session's context budget) are split, so the agent only ever loads what it needs.
 
 LAAW is not a project management solution — it is a workflow for the user to work with the agent. Tasks are done sequentially, not in parallel, by a single agent. The tasks folder is git-ignored for that reason, so tasks and IDs are unique per user. If you want parallel agents, give each agent its own git worktree and bootstrap the project in each one.
 

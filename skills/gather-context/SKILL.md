@@ -18,7 +18,7 @@ Read `.ai/workflow/workflow.md` first if you have not read it this session.
    3. Core modules, dependency order.
    4. Utility files last.
    Skip files the existing `.ai/context/` already covers well.
-5. Read the files in queue order. For each, decide which context file it belongs to (existing or new) and update `.ai/context/index.md`. Follow the context rules: descriptive names, no IDs, task-agnostic, current state only; split any context file that would pass 100 lines.
+5. Read the files in queue order. For each, decide which context file it belongs to (existing or new) and update `.ai/context/index.md`. Follow the context rules: descriptive names, no IDs, task-agnostic, current state only; split any context file that would pass Principle 5's threshold.
 6. When the queue is exhausted, delete `.ai/.queue.md` and present the resulting context to the user for approval.
 
 ## Rules

@@ -24,7 +24,7 @@ Read `.ai/workflow/workflow.md` first if you have not read it this session.
      - If the task made a context file obsolete → mark its Status as not valid (or rewrite it to reflect the new reality).
    - **Supertask final propagation** (when all subtasks are done): read the supertask's staged notes (`notes.md`) and distribute them into the context files as above.
 
-4. Respect the 100-line limit and att naming per workflow.md: if a context file grows past the limit, split it into smaller files and keep the entry point linking one-way to the children.
+4. Respect Principle 5's threshold per workflow.md: if a context file grows past it, split it into smaller files with descriptive names and keep the entry point linking one-way to the children.
 5. Keep context agnostic to tasks: never mention task IDs, task names, or task files inside `.ai/context/` files (including the index). If a context file already contains such references, drop them while you are there.
 
 6. Present the changes to the user. The user approves the context; only after approval is the propagation done.
