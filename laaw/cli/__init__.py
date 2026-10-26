@@ -68,6 +68,13 @@ def main(argv: list[str] | None = None) -> int:
     p = cmd.add_parser("render")
     p.set_defaults(func=_dispatch("render"))
 
+    file_parser = sub.add_parser("file")
+    file_cmd = file_parser.add_subparsers(dest="command", required=True)
+
+    p = file_cmd.add_parser("check")
+    p.add_argument("path")
+    p.set_defaults(func=_dispatch("file_check"))
+
     sync_parser = sub.add_parser("sync")
     sync_cmd = sync_parser.add_subparsers(dest="command", required=True)
 
