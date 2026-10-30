@@ -5,8 +5,9 @@ Subcommands:
   sync workflow [path]  Copy the workflow files into .ai/workflow/ of the
                         target project. `path` defaults to the current
                         directory. Also creates the .ai/tasks/ and
-                        .ai/context/ skeleton with their indexes, and makes
-                        sure .ai/tasks/ and .ai/workflow/ are git-ignored.
+                        .ai/context/ skeleton with their tables (_tasks.md,
+                        _index.md), and makes sure .ai/tasks/ and
+                        .ai/workflow/ are git-ignored.
   sync skills <path>    Copy the skills from the LAAW skills/ folder into the
                         given path.
 """
@@ -20,7 +21,7 @@ LAAW_ROOT = Path(__file__).resolve().parent
 
 WORKFLOW_FILES = ("workflow.md",)
 
-TASKS_INDEX_TEMPLATE = """# Task index
+TASKS_INDEX_TEMPLATE = """# Task table
 
 | ID | Status | Name | Description | Type | Dependencies |
 |---|---|---|---|---|---|
@@ -53,7 +54,7 @@ def sync_workflow(target: Path) -> None:
     ):
         folder = target / ".ai" / rel
         folder.mkdir(parents=True, exist_ok=True)
-        index = folder / "index.md"
+        index = folder / ("_tasks.md" if rel == "tasks" else "_index.md")
         if index.exists():
             print(f"kept    {index}")
         else:

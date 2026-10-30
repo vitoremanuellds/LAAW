@@ -6,7 +6,7 @@ LAAW is a workflow for local AI agents running on limited hardware. It targets m
 - **Human gates.** You approve the plan, the implementation, and the propagated context. The agent never skips a gate.
 - **Deviations are recorded.** Anything that deviates from the approved plan is noted in the task file.
 - **Context propagates.** What a task creates or changes is written back into the project's context files (a small wiki the agent reads before working).
-- **Files stay small.** Files over 100 lines are split, so the agent only ever loads what it needs.
+- **Files stay small.** Files over 1000 words (≈1250 tokens) are split, so the agent only ever loads what it needs.
 
 LAAW is not a project management solution — it is a workflow for the user to work with the agent. Tasks are done sequentially, not in parallel, by a single agent. The tasks folder is git-ignored for that reason, so tasks and IDs are unique per user. If you want parallel agents, give each agent its own git worktree and bootstrap the project in each one.
 
@@ -35,8 +35,8 @@ This creates:
 project/
 └── .ai/
     ├── workflow/workflow.md   # the agent's workflow reference
-    ├── tasks/index.md         # empty task index (git-ignored)
-    └── context/index.md       # empty context index
+    ├── tasks/_tasks.md        # empty task table (git-ignored)
+    └── context/_index.md      # empty context index
 ```
 
 ### Install the skills
@@ -81,13 +81,13 @@ Note: `laaw.py sync workflow` only creates the default `.ai/` layout; any other 
 
 ## How a task flows
 
-1. **Plan** — you ask to plan a task. The agent registers it in `.ai/tasks/index.md` and writes the plan file. You iterate until the plan is good.
+1. **Plan** — you ask to plan a task. The agent registers it in `.ai/tasks/_tasks.md` and creates its task folder (`task.md`, `notes.md`). You iterate until the plan is good.
 2. **Implement** — you ask to implement it. The agent checks dependencies, implements, and you iterate until the implementation is good. Deviations from the plan are recorded. You can abandon the task at any point; it is then marked `cancelled`, and the agent reports the tasks that depended on it, so you can decide what to do with them (cancel them too, re-plan, or replace the dependency).
-3. **Propagate context** — the agent writes what the task created back into `.ai/context/` (or into the supertask's `new-info.md`, for subtasks). You approve it.
+3. **Propagate context** — the agent writes what the task created back into `.ai/context/` (or into the supertask's `staged.md`, for subtasks). You approve it.
 
-Once a plan is approved it is frozen: only the Notes section (and the subtask table, for supertasks) can change. If a plan turns out to be unimplementable, you re-plan the whole task with the agent.
+Once a plan is approved it is frozen: only `notes.md` (and `subtasks.md`, for supertasks) can change. If a plan turns out to be unimplementable, you re-plan the whole task with the agent.
 
-Big tasks become **supertasks**: one folder with a `task.md` and separate subtask files, each planned and implemented one at a time (you can ask to plan several in advance). Subtask context lands in the supertask's `new-info.md` staging file and is moved into the context files when all subtasks are done.
+Big tasks become **supertasks**: one folder with a `task.md`, a `subtasks.md` table, and separate subtask folders, each planned and implemented one at a time (you can ask to plan several in advance). Subtask context lands in the supertask's `staged.md` staging file and is moved into the context files when all subtasks are done.
 
 ### Task statuses
 
